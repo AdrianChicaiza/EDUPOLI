@@ -1,36 +1,38 @@
 import { useNavigate } from "react-router-dom";
-import { useContext,useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
 import { AuthContext } from "../../contexts";
 import { Link } from "react-router-dom";
 
 export const Login = () => {
-   const { login } = useContext(AuthContext);
-   const navigate = useNavigate();
-   const [email, setEmail] = useState("");
-   const [password, setPassword] = useState("");
-  
-   const onLogin = async (e) => {
-     e.preventDefault();
-     try {
-       const response = await axios.post(
-         "http://localhost:8000/api/v1/login",
-         { email, password },
-         { headers: { accept: "application/json" } }
-       );
-       const { access_token, token_type, user } = response.data.data;
-       login(user, `${token_type} ${access_token}`);
-       navigate("/");
-       console.log(token_type);
-       console.log(access_token);
-       console.log(user);
-       console.log(response);
-     } catch (error) {
-       console.log(error.response.data.message, "error");
-       setEmail("");
-       setPassword("");
-     }
-   };
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [activo, setActivo] = useState(false);
+
+  const onLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/login",
+        { email, password },
+        { headers: { accept: "application/json" } }
+      );
+      const { access_token, token_type, user } = response.data.data;
+      login(user, `${token_type} ${access_token}`);
+      navigate("/");
+      console.log(token_type);
+      console.log(access_token);
+      console.log(user);
+      console.log(response);
+    } catch (error) {
+      console.log(error.response.data.message, "error");
+      setEmail("");
+      setPassword("");
+      setActivo(true);
+    }
+  };
 
   return (
     <>
@@ -58,14 +60,11 @@ export const Login = () => {
                     </a>
                   </p>
                 </div>
-                <form
-                  className="mt-8 space-y-6"                  
-                  onSubmit={onLogin}
-                >
+                <form className="mt-8 space-y-6" onSubmit={onLogin}>
                   <input type="hidden" name="remember" defaultValue="true" />
                   <div className="-space-y-px rounded-md shadow-sm">
                     <div>
-                      <label htmlFor="email" className="sr-only" >
+                      <label htmlFor="email" className="sr-only">
                         Correo
                       </label>
                       <input
@@ -75,12 +74,12 @@ export const Login = () => {
                         value={email}
                         required
                         className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
-                        placeholder="Correo"                        
-                        onChange={e => setEmail(e.target.value)}
+                        placeholder="Correo"
+                        onChange={(e) => setEmail(e.target.value)}
                       />
                     </div>
                     <div>
-                      <label htmlFor="password" className="sr-only" >
+                      <label htmlFor="password" className="sr-only">
                         Contraseña
                       </label>
                       <input
@@ -91,11 +90,13 @@ export const Login = () => {
                         required
                         className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
                         placeholder="Contraseña"
-                        onChange={e => setPassword(e.target.value)}
+                        onChange={(e) => setPassword(e.target.value)}
                       />
                     </div>
                   </div>
-
+                  <b className="block text-sm text-center text-cyan-700 tracking-wide">
+                    {activo ? "Las credenciales son incorrectas" : ""}
+                  </b>
                   <div className="flex items-center justify-center">
                     <div className="text-sm  ">
                       <Link
@@ -104,7 +105,6 @@ export const Login = () => {
                       >
                         ¿Olvidaste tu contraseña?
                       </Link>
-                      
                     </div>
                   </div>
 
@@ -113,7 +113,6 @@ export const Login = () => {
                       type="submit"
                       className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
                     >
-                      
                       Ingresar
                     </button>
                   </div>
@@ -121,7 +120,7 @@ export const Login = () => {
               </div>
             </div>
           </div>
-        </div>        
+        </div>
       </div>
     </>
   );

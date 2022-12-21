@@ -1,6 +1,8 @@
 import axios from "axios";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import InputCyan from "../../components/variants/InputCyan";
 import { AuthContext } from "../../contexts/auth/AuthContext";
+import Avatar from 'react-avatar';
 
 export const PerfilUsuario = () => {
   const [first_name, setFirst_name] = useState("");
@@ -11,13 +13,14 @@ export const PerfilUsuario = () => {
   const [full_name, setFull_name] = useState("");
   const { user, logout } = useContext(AuthContext);
   const tokenUser = localStorage.getItem("token");
-
+  const [image, setImage] = useState("");
+  const [editar, setEditar] = useState(false);
   //   const config = {
   //     headers: { Authorization: `${tokenUser}` },
   //   };
 
-  const traerDatos = async (e) => {
-    e.preventDefault();
+  const traerDatos = async () => {
+    // e.preventDefault();
     try {
       const response = await axios.get(
         "http://localhost:8000/api/v1/profile/",
@@ -26,7 +29,9 @@ export const PerfilUsuario = () => {
         // config
       );
       console.log("Trae datos de: ", tokenUser);
-
+      console.log("Respuesta: ", response.data.data);
+      console.log("Imagen del ususario es: ", response.data.data.avatar);
+      setImage(response.data.data.avatar);
       console.log("Respuesta: ", response.data.data.user);
       console.log("Email del usuario: ", response.data.data.user.email);
       setEmail(response.data.data.user.email);
@@ -35,99 +40,183 @@ export const PerfilUsuario = () => {
       setLast_name(response.data.data.user.last_name);
       // setactivo(true)
       // navigate('/');
-
       // navigate("login");
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
   };
 
+  const vistaPreliminarFoto = (event) => {
+    const leer_img = new FileReader();
+    const id_img = document.getElementById("imgFoto");
+    leer_img.onload = () => {
+      if (leer_img.readyState == 2) {
+        id_img.src = leer_img.result;
+      }
+    };
+    leer_img.readAsDataURL(event.target.files[0]);
+  };
+
+  const subirFoto = async () => {
+    const f = new FormData();
+    f.append("image", image);
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/profile/avatar",
+        f,
+        { headers: { Authorization: `Bearer: ${tokenUser}` } }
+      );
+      console.log("Se subio la imagen");
+    } catch (error) {
+      console.log(error.response.data.message, "error");
+    }
+  };
+
+  const limpiar = () => {
+    setEmail("");
+    setFirst_name("");
+    setLast_name("");
+  };
+
+  const actualizarUsusario = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/profile/",
+        { first_name, last_name, email },
+        { headers: { Authorization: `Bearer: ${tokenUser}` } },
+        { headers: { accept: "application/json" } }
+      );
+      subirFoto();
+      // navigate("/");
+      //  setActivo(true);
+      //  setActivo2(false);
+      console.log("Se actualizaron los cambios :D");
+    } catch (error) {
+      console.log(error.response.data.message, "error no se guardo D:");
+      // setMensajeactivo("No se pudo actualizar los cambios")
+      // setEmail('');
+      // setActivo2(true);
+      // setActivo(false);
+    }
+  };
+
+  const divStyle = {
+    "background-size": "contain",
+   "background-repeat": "no-repeat"
+  };
+
+  useEffect(() => {
+    // traerDatos();
+  });
+
   return (
     <>
       <div className="flex flex-row justify-center ">
-        <div className="flex justify-center bg-white ">
-          <div className="flex items-center justify-center bg-white  max-w-sm w-96 rounded-l-lg shadow-xl shadow-cyan-500/50">
-            <div class="flex items-center justify-center w-full">
-              <label
-                for="dropzone-file"
-                class="flex flex-col items-center justify-center w-4/5 h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-              >
-                <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                  <svg
-                    aria-hidden="true"
-                    class="w-10 h-10 mb-3 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    ></path>
-                  </svg>
-                  <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                    <span class="font-semibold">Click to upload</span> or drag
-                    and drop
-                  </p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    SVG, PNG, JPG or GIF (MAX. 800x400px)
-                  </p>
-                </div>
-                <input id="dropzone-file" type="file" class="hidden" />
-              </label>
+        <div className="flex justify-center bg-white rounded-lg shadow-xl shadow-cyan-500/50">
+          <div className="flex flex-col items-center justify-center bg-white  max-w-sm w-96 ">
+            {/* __________________________________________________________________________________________________________________ */}
+
+            <div className="flex flex-row justify-center ">
+              {/* <input type="file"/> */}
+              <img
+                src={image}
+                id="imgFoto"
+                className="rounded-lg w-11/12 max-w-screen-lg h-auto"
+              />
             </div>
+            <div className="flex flex-col justify-center items-center mt-2">
+              {/* <form method="post" enctype="multipart/form-data"> */}
+
+              <input
+                className="text-sm text-grey-500
+                 file:mr-1 file:py-3 file:px-2
+                 file:rounded-lg file:border-0
+                 file:text-md file:font-semibold  file:text-white
+                 file:bg-sky-500  
+                 hover:file:cursor-pointer hover:file:opacity-80
+               "
+                id="image"
+                type="file"
+                onChange={(e) => {
+                  vistaPreliminarFoto(e);
+                  //console.log("e: ",e);
+                  setImage(e.target.files[0]);
+                }}
+              />
+              <p
+                className="mt-1 text-sm text-gray-500 dark:text-gray-300"
+                id="file_input_help"
+              >
+                SVG, PNG, JPG or GIF (MAX. 800x400px).
+              </p>
+              {/* </form> */}
+              
+            </div>
+            {/* //__________________________________________________________________ */}
           </div>
-          <div className="block p-3 rounded-r-lg shadow-xl shadow-cyan-500/50  bg-white">
+          <div className="block p-3  bg-white w-2/3">
             <div className="flex min-h-full items-center justify-center pt-5 pb-5 px-4 sm:px-6 lg:px-8">
               <div className="w-full max-w-md space-y-2">
                 <div className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
                   PerfilUsuario
                 </div>
-                {/* <h3>{email}</h3>
-                <h3>{full_name}</h3>
-                <h3>{first_name}</h3> */}
-                <label className="font-medium">Correo</label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={email}
-                  required
-                  className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
-                  // placeholder="Correo"
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <label className="font-medium">Nombre</label>
-                <input
-                  id="first_name"
-                  name="first_name"
-                  type="string"
-                  value={first_name}
-                  required
-                  className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
-                  // placeholder="Correo"
-                  onChange={(e) => setFirst_name(e.target.value)}
-                />
-                <label className="font-medium">Apellido</label>
-                <input
-                  id="last_name"
-                  name="last_name"
-                  type="string"
-                  value={last_name}
-                  required
-                  className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
-                  // placeholder="Correo"
-                  onChange={(e) => setLast_name(e.target.value)}
-                />
+                <form className="mt-0 space-y-1" onSubmit={actualizarUsusario}>
+                  <label className="font-medium">Correo</label>
+                  <InputCyan
+                    id="email"
+                    value={email}
+                    setvalue={setEmail}
+                    type="email"
+                    name="email"
+                    lectura={editar ? false : true}
+                  />
+                  <label className="font-medium">Nombre</label>
+                  <InputCyan
+                    id="first_name"
+                    value={first_name}
+                    setvalue={setFirst_name}
+                    type="text"
+                    name="first_name"
+                    lectura={editar ? false : true}
+                  />
+                  <label className="font-medium">Apellido</label>
+                  <InputCyan
+                    id="last_name"
+                    value={last_name}
+                    setvalue={setLast_name}
+                    type="text"
+                    lectura={editar ? false : true}
+                  />
+                  <button
+                    type="submit"
+                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
+                  >
+                    Actualizar
+                  </button>
+                </form>
                 <button
                   type="submit"
                   onClick={traerDatos}
                   className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
                 >
-                  Ingresar
+                  Traer Datos
+                </button>
+                <button
+                  type="submit"
+                  onClick={() => {
+                    setEditar(true);
+                  }}
+                  className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
+                >
+                  Editar
+                </button>
+                <button
+                  type="submit"
+                  onClick={subirFoto}
+                  className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
+                >
+                  Subirfoto
                 </button>
                 {/* <button onClick={traerDatos}>VerPerfil</button> */}
               </div>

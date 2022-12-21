@@ -69,7 +69,7 @@ const LogoutStyle = {
     </div>
     
     <div className="App-header2">   
-    <div class="flex flex-row hover:flex-wrap-reverse" >
+    <div className="flex flex-row hover:flex-wrap-reverse" >
    
       </div>
        

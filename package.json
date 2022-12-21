@@ -11,6 +11,7 @@
     "bootstrap": "^5.2.2",
     "faker": "^6.6.6",
     "react": "^18.2.0",
+    "react-avatar": "^5.0.3",
     "react-bootstrap": "^2.6.0",
     "react-dom": "^18.2.0",
     "react-multi-carousel": "^2.8.2",

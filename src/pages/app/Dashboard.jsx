@@ -107,7 +107,7 @@ export const Dashboard = () => {
     <>
       
       {/* ___________________________________________________________________________________ */}
-      {/* <div class="flex flex-row">
+      {/* <div className="flex flex-row">
         <CardCarrera carrera={carrera} />
         <CardCarrera carrera={carrera2} />
       </div> */}

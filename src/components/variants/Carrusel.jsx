@@ -13,7 +13,7 @@ export const Carrusel = ({ carrera }) => {
           onClick={() => (slider.current.scrollLeft -= 200)}
         >
           <svg
-            class="w-5 h-5 text-white sm:w-6 sm:h-6 dark:text-gray-800"
+            className="w-5 h-5 text-white sm:w-6 sm:h-6 dark:text-gray-800"
             fillRule="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -29,10 +29,10 @@ export const Carrusel = ({ carrera }) => {
         </button>
         <div
           ref={slider}
-          class="snap-x overflow-scroll scroll-smooth h-full flex items-center justify-start"
+          className="snap-x overflow-scroll scroll-smooth h-full flex items-center justify-start"
         >
           {images.map((e, i) => (
-            <div key={i} class="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs">
+            <div key={i} className="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs">
               {/* <img
                 src={`https://picsum.photos/id/${i}/300/300`}
                 alt={`images${i}`}
@@ -40,19 +40,19 @@ export const Carrusel = ({ carrera }) => {
               /> */}
               <a href="#!">
                 <img
-                  class="rounded-t-lg"
+                  className="rounded-t-lg"
                   src={`https://picsum.photos/id/${i}/300/300`}
                   alt={`images${i}`}
                 />
               </a>
-              <div class="p-6">
-                <h5 class="text-gray-900 text-xl font-medium mb-1">
+              <div className="p-6">
+                <h5 className="text-gray-900 text-xl font-medium mb-1">
                   {carrera.titulo}
                 </h5>
-                <p class="text-gray-700 text-base mb-1">{carrera.texto}</p>
+                <p className="text-gray-700 text-base mb-1">{carrera.texto}</p>
                 <button
                   type="button"
-                  class=" inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+                  className=" inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
                 >
                   Ingresar
                 </button>
@@ -64,19 +64,19 @@ export const Carrusel = ({ carrera }) => {
         {/* ______________________________________________________________ */}
         {/* <div
           ref={slider}
-          class="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs"
+          className="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs"
         >
           <a href="#!">
-            <img class="rounded-t-lg" src={carrera.url} alt="" />
+            <img className="rounded-t-lg" src={carrera.url} alt="" />
           </a>
-          <div class="p-6">
-            <h5 class="text-gray-900 text-xl font-medium mb-1">
+          <div className="p-6">
+            <h5 className="text-gray-900 text-xl font-medium mb-1">
               {carrera.titulo}
             </h5>
-            <p class="text-gray-700 text-base mb-1">{carrera.texto}</p>
+            <p className="text-gray-700 text-base mb-1">{carrera.texto}</p>
             <button
               type="button"
-              class=" inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+              className=" inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
             >
               Ingresar
             </button>
@@ -88,7 +88,7 @@ export const Carrusel = ({ carrera }) => {
           onClick={() => (slider.current.scrollLeft += 200)}
         >
           <svg
-            class="w-5 h-5 text-white sm:w-6 sm:h-6 dark:text-gray-800"
+            className="w-5 h-5 text-white sm:w-6 sm:h-6 dark:text-gray-800"
             fillRule="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

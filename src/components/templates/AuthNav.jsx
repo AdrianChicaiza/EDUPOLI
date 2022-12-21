@@ -12,6 +12,8 @@ import { CardCarrera } from "../../components/variants/CardCarrera";
 import { Carrusel } from "../../components/variants/Carrusel";
 import { Carrusel2 } from "../../components/variants/Carrusel2";
 import { ComentarioCard } from "../../components/variants/ComentarioCard";
+import Avatar from "react-avatar";
+import { useEffect } from "react";
 // https://tailwind-elements.com/docs/standard/components/video-carousel/
 export const AuthNav = () => {
   //-------------------------------------------------------------------------------
@@ -48,61 +50,80 @@ export const AuthNav = () => {
   const handleMouseLeave = () => {
     setIsHover(false);
   };
+  const [image, setImage] = useState("");
+  const traerDatos = async () => {
+    // e.preventDefault();
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/v1/profile/",
+        // {config},
+        { headers: { Authorization: `Bearer: ${tokenUser}` } }
+        // config
+      );
+
+      setImage(response.data.data.avatar);
+    } catch (error) {
+      console.log(error.response.data.message, "error");
+    }
+  };
+  useEffect(() => {
+    traerDatos();
+  }, []);
 
   // __________________________________________FUNCIONES De OBJETOS____________________
-//   const [carreras, setCarreras] = useState([]);
+  //   const [carreras, setCarreras] = useState([]);
 
-//   const handleAddCarrera = () => {
-//     const newCarrera = {
-//       id:"1",
-//       url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-//       titulo: "Primer Semestre",
-//       texto: "Primer semestre de la carrera de desarrollo de Software",
-//     };
-//     setCarreras([...carreras,newCarrera])
-//   };
+  //   const handleAddCarrera = () => {
+  //     const newCarrera = {
+  //       id:"1",
+  //       url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
+  //       titulo: "Primer Semestre",
+  //       texto: "Primer semestre de la carrera de desarrollo de Software",
+  //     };
+  //     setCarreras([...carreras,newCarrera])
+  //   };
 
-//   const handleRemoveCarrera = (id) => {
-//     const newCarrera = carreras.filter((carrera)=>carrera.id!==id);
-//     setCarreras(newCarrera);
-//   };
+  //   const handleRemoveCarrera = (id) => {
+  //     const newCarrera = carreras.filter((carrera)=>carrera.id!==id);
+  //     setCarreras(newCarrera);
+  //   };
 
-//   const handleUpdateCarrera = () => {};
+  //   const handleUpdateCarrera = () => {};
 
   // ____________________________________________________________________________________
 
-//   const LogoutStyle = {
-//     color: isHover ? "rgba(0,217,255,1)" : "rgba(113,44,205,1",
-//     textDecorationLine: isHover ? "underline" : "none",
-//   };
-//   //-----------------------------------------------------------------------------------
-//   const carrera = {
-//     url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-//     titulo: "Primer Semestre",
-//     texto: "Primer semestre de la carrera de desarrollo de Software",
-//   };
-//   const carrera2 = {
-//     url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-//     titulo: "Segundo Semestre",
-//     texto: "Segundo semestre de la carrera de desarrollo de Software",
-//   };
+  //   const LogoutStyle = {
+  //     color: isHover ? "rgba(0,217,255,1)" : "rgba(113,44,205,1",
+  //     textDecorationLine: isHover ? "underline" : "none",
+  //   };
+  //   //-----------------------------------------------------------------------------------
+  //   const carrera = {
+  //     url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
+  //     titulo: "Primer Semestre",
+  //     texto: "Primer semestre de la carrera de desarrollo de Software",
+  //   };
+  //   const carrera2 = {
+  //     url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
+  //     titulo: "Segundo Semestre",
+  //     texto: "Segundo semestre de la carrera de desarrollo de Software",
+  //   };
 
-//   const palabras = [
-//     { id: "1", bn: "si" },
-//     { id: "2", bn: "no" },
-//     { id: "3", bn: "a" },
-//     { id: "4", bn: "nbo" },
-//     { id: "5", bn: "noc" },
-//     { id: "6", bn: "nos" },
-//     { id: "7", bn: "nod" },
-//   ];
+  //   const palabras = [
+  //     { id: "1", bn: "si" },
+  //     { id: "2", bn: "no" },
+  //     { id: "3", bn: "a" },
+  //     { id: "4", bn: "nbo" },
+  //     { id: "5", bn: "noc" },
+  //     { id: "6", bn: "nos" },
+  //     { id: "7", bn: "nod" },
+  //   ];
 
-//   const personas = {
-//     urlImagen:
-//       "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-//     nombre: "Adrian Chicaiza",
-//     texto: "Buena aplicacion :D",
-//   };
+  //   const personas = {
+  //     urlImagen:
+  //       "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
+  //     nombre: "Adrian Chicaiza",
+  //     texto: "Buena aplicacion :D",
+  //   };
   return (
     <>
       <Navbar
@@ -129,6 +150,7 @@ export const AuthNav = () => {
 
           <Navbar.Collapse className="justify-content-end">
             <Nav>
+              <Avatar size="40" round={true} src={image} />
               <NavDropdown title={user.full_name} id="collasible-nav-dropdown">
                 <NavDropdown.Item href="/perfil">
                   Editar Perfil
@@ -141,25 +163,24 @@ export const AuthNav = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <div >
-      {/* className='absolute flex w-full md:w-3/5  h-screen items-center justify-center py-16 left-0' */}
-            <div className='w-full   h-screen items-center justify-center '>
-            {/* className='max-w-md w-full h-auto ' */}
-                <main >
-                {/* text-center quitado del siguiente div -> */}
-                    <div className=''>
-
-                        {/* icono que aparece con la pantalla a la mitad */}
-                        {/* <Link to="/" className='inline-flex md:hidden'>
+      <div>
+        {/* className='absolute flex w-full md:w-3/5  h-screen items-center justify-center py-16 left-0' */}
+        <div className="w-full  h-full items-center justify-center px-5">
+          {/* className='max-w-md w-full h-auto ' */}
+          <main>
+            {/* text-center quitado del siguiente div -> */}
+            <div className="">
+              {/* icono que aparece con la pantalla a la mitad */}
+              {/* <Link to="/" className='inline-flex md:hidden'>
                             <ShieldIcon styles='w-14 h-14 mx-auto text-cyan-500' />
                         </Link> */}
-                        <Outlet />
-                    </div>
-                </main>
+              <Outlet />
             </div>
-            </div>
+          </main>
+        </div>
+      </div>
       {/* ___________________________________________________________________________________ */}
-      {/* <div class="flex flex-row">
+      {/* <div className="flex flex-row">
         <CardCarrera carrera={carrera} />
         <CardCarrera carrera={carrera2} />
       </div> */}
@@ -169,13 +190,13 @@ export const AuthNav = () => {
         <p className="pl-20 text-lg font-bold">Desarrollo de Software</p>
         <Carrusel2 carrera={carrera} />
         <hr/> */}
-        {/* <ComentarioCard persona={personas} className="p-25" /> */}
-        {/* <p className="pl-20 mt-4 text-lg font-bold">
+      {/* <ComentarioCard persona={personas} className="p-25" /> */}
+      {/* <p className="pl-20 mt-4 text-lg font-bold">
           Redes y Telecomunicaciones
         </p>
         <Carrusel2 carrera={carrera2} /> */}
 
-        {/* <ul>
+      {/* <ul>
           {carreras.map((carrera) => (
             <li onClick={()=>handleRemoveCarrera(carrera.id)} key={carrera.id}>{carrera.titulo}</li>
           ))}

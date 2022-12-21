@@ -64,7 +64,7 @@ export const Carrusel2 = ({ carrera }) => {
       {images.map((e, i) => (
         <div
           key={i}
-          //class="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs"
+          //className="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs"
         >
           <CardCarrera carrera={carrera} />
         </div>
