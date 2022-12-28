@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import InputCyan from "../../components/variants/InputCyan";
 import { AuthContext } from "../../contexts/auth/AuthContext";
-import Avatar from 'react-avatar';
+import Avatar from "react-avatar";
 
 export const PerfilUsuario = () => {
   const [first_name, setFirst_name] = useState("");
@@ -15,6 +15,7 @@ export const PerfilUsuario = () => {
   const tokenUser = localStorage.getItem("token");
   const [image, setImage] = useState("");
   const [editar, setEditar] = useState(false);
+  const [active, setActive] = useState(false);
   //   const config = {
   //     headers: { Authorization: `${tokenUser}` },
   //   };
@@ -28,12 +29,12 @@ export const PerfilUsuario = () => {
         { headers: { Authorization: `Bearer: ${tokenUser}` } }
         // config
       );
-      console.log("Trae datos de: ", tokenUser);
-      console.log("Respuesta: ", response.data.data);
-      console.log("Imagen del ususario es: ", response.data.data.avatar);
+      // console.log("Trae datos de: ", tokenUser);
+      // console.log("Respuesta: ", response.data.data);
+      // console.log("Imagen del ususario es: ", response.data.data.avatar);
       setImage(response.data.data.avatar);
-      console.log("Respuesta: ", response.data.data.user);
-      console.log("Email del usuario: ", response.data.data.user.email);
+      // console.log("Respuesta: ", response.data.data.user);
+      // console.log("Email del usuario: ", response.data.data.user.email);
       setEmail(response.data.data.user.email);
       setFull_name(user.full_name);
       setFirst_name(response.data.data.user.first_name);
@@ -103,12 +104,13 @@ export const PerfilUsuario = () => {
 
   const divStyle = {
     "background-size": "contain",
-   "background-repeat": "no-repeat"
+    "background-repeat": "no-repeat",
   };
 
   useEffect(() => {
-    // traerDatos();
-  });
+    traerDatos();
+    console.log("Traje datos------active cambio :o");
+  }, [active]);
 
   return (
     <>
@@ -127,31 +129,34 @@ export const PerfilUsuario = () => {
             </div>
             <div className="flex flex-col justify-center items-center mt-2">
               {/* <form method="post" enctype="multipart/form-data"> */}
-
-              <input
-                className="text-sm text-grey-500
+              {editar ? (
+                <input
+                  className="text-sm text-grey-500
                  file:mr-1 file:py-3 file:px-2
                  file:rounded-lg file:border-0
                  file:text-md file:font-semibold  file:text-white
                  file:bg-sky-500  
                  hover:file:cursor-pointer hover:file:opacity-80
                "
-                id="image"
-                type="file"
-                onChange={(e) => {
-                  vistaPreliminarFoto(e);
-                  //console.log("e: ",e);
-                  setImage(e.target.files[0]);
-                }}
-              />
-              <p
+                  id="image"
+                  type="file"
+                  onChange={(e) => {
+                    vistaPreliminarFoto(e);
+                    //console.log("e: ",e);
+                    setImage(e.target.files[0]);
+                  }}
+                />
+              ) : (
+                <></>
+              )}
+
+              {/* <p
                 className="mt-1 text-sm text-gray-500 dark:text-gray-300"
                 id="file_input_help"
               >
                 SVG, PNG, JPG or GIF (MAX. 800x400px).
-              </p>
+              </p> */}
               {/* </form> */}
-              
             </div>
             {/* //__________________________________________________________________ */}
           </div>
@@ -188,36 +193,78 @@ export const PerfilUsuario = () => {
                     type="text"
                     lectura={editar ? false : true}
                   />
-                  <button
-                    type="submit"
-                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
-                  >
-                    Actualizar
-                  </button>
+
+                  {editar ? (
+                    <button
+                      type="submit"
+                      // onClick={() => {
+                        
+                      //   traerDatos();
+                      // }}
+                      className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
+                    >
+                      Actualizar
+                    </button>
+                  ) : (
+                    <></>
+                  )}
                 </form>
-                <button
+                {/* <button
                   type="submit"
                   onClick={traerDatos}
                   className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
                 >
                   Traer Datos
-                </button>
-                <button
-                  type="submit"
-                  onClick={() => {
-                    setEditar(true);
-                  }}
-                  className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
-                >
-                  Editar
-                </button>
-                <button
+                </button> */}
+                <div className="flex flex-row">
+                  <button
+                    type="submit"
+                    onClick={() => {
+                      setEditar(true);
+                    }}
+                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
+                  >
+                    Editar
+                  </button>
+                  <div className="flex justify-center">
+                    <a
+                      href="/"
+                      className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className="w-5 h-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M11.25 9l-3 3m0 0l3 3m-3-3h7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+
+                {/* <button
                   type="submit"
                   onClick={subirFoto}
                   className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
                 >
                   Subirfoto
-                </button>
+                </button> */}
+                {/* <button
+                  type="submit"
+                  onClick={() => {
+                    setActive(true);
+                  }}
+                  className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
+                >
+                  activar useEffect
+                </button> */}
                 {/* <button onClick={traerDatos}>VerPerfil</button> */}
               </div>
             </div>

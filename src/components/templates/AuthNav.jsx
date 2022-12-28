@@ -22,6 +22,7 @@ export const AuthNav = () => {
 
   const { user, logout } = useContext(AuthContext);
   const tokenUser = localStorage.getItem("token");
+  const [activeImage, setActiveImage] = useState(false)
 
   const config = {
     headers: { Authorization: `${tokenUser}` },
@@ -68,7 +69,7 @@ export const AuthNav = () => {
   };
   useEffect(() => {
     traerDatos();
-  }, []);
+  }, [activeImage]);
 
   // __________________________________________FUNCIONES De OBJETOS____________________
   //   const [carreras, setCarreras] = useState([]);
