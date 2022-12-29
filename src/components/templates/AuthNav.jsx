@@ -42,15 +42,15 @@ export const AuthNav = () => {
     }
   };
 
-  const [isHover, setIsHover] = useState(false);
+  // const [isHover, setIsHover] = useState(false);
 
-  const handleMouseEnter = () => {
-    setIsHover(true);
-  };
+  // const handleMouseEnter = () => {
+  //   setIsHover(true);
+  // };
 
-  const handleMouseLeave = () => {
-    setIsHover(false);
-  };
+  // const handleMouseLeave = () => {
+  //   setIsHover(false);
+  // };
   const [image, setImage] = useState("");
   const traerDatos = async () => {
     // e.preventDefault();
@@ -58,11 +58,14 @@ export const AuthNav = () => {
       const response = await axios.get(
         "http://localhost:8000/api/v1/profile/",
         // {config},
-        { headers: { Authorization: `Bearer: ${tokenUser}` } }
-        // config
+       // { headers: { Authorization: `Bearer: ${tokenUser}` } }
+       ///{ headers: { accept: "application/json" } },
+         config
       );
-
+      console.log("Respuesta: ", response.data.data.user);
       setImage(response.data.data.avatar);
+      //console.log("traje datos :D")
+      //console.log("traje datos :D",response.data.data)
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
@@ -151,13 +154,14 @@ export const AuthNav = () => {
 
           <Navbar.Collapse className="justify-content-end">
             <Nav>
+            {/* <img className="h-10 w-10 rounded-full" src={image} alt="img" /> */}
               <Avatar size="40" round={true} src={image} />
               <NavDropdown title={user.full_name} id="collasible-nav-dropdown">
                 <NavDropdown.Item href="/perfil">
                   Editar Perfil
                 </NavDropdown.Item>
-                <NavDropdown.Item>
-                  <a onClick={onLogout}>Salir</a>
+                <NavDropdown.Item onClick={onLogout}>
+                  Salir
                 </NavDropdown.Item>
               </NavDropdown>
             </Nav>

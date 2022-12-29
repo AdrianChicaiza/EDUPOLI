@@ -5,11 +5,13 @@ import { useNavigate } from "react-router-dom";
 
 export const Registro = () => {
 
-  const [password,setpassword]=useState();
-  const [password_confirmation,setpassword_confirmation]=useState();
+  const [password,setpassword]=useState("");
+  const [password_confirmation,setpassword_confirmation]=useState("");
   const [Mensajeactivo, setMensajeactivo] = useState("");
-  const [email,setemail]=useState();
-  const [first_name,setfirst_name]=useState();
+  const [email,setemail]=useState("");
+  const [first_name,setfirst_name]=useState("");
+  const [last_name, setlast_name] = useState("");
+  const [role_id, setRole_id] = useState()
 
 
 
@@ -18,13 +20,14 @@ export const Registro = () => {
     try {
         const response = await axios.post(                
             'http://127.0.0.1:8000/api/v1/register',
-            { first_name,password,password_confirmation,email},
+            {role_id,first_name,last_name,password,password_confirmation,email},
             { headers: { 'accept': 'application/json' } }
         )              
-        
+        setRole_id(2);
         if(password==password_confirmation){
           console.log("Se ha registrado con exito :D");  
           setMensajeactivo("Se registro con exito ");
+          console.log("Respuesta: ",response.data.data)
         }else{
           setMensajeactivo("No coinciden la contraseña");
         }
@@ -55,7 +58,7 @@ export const Registro = () => {
               {/* --------------------------------------------------------FORM-------------------------------------------------------------- */}
               <form className="mt-8 space-y-6" onSubmit={registroF}>
                 <input type="hidden" name="remember" defaultValue="true" />
-                <div className="space-y-1 rounded-md shadow-sm ">
+                <div className="space-y-0 rounded-md shadow-sm ">
                   <div>
                     <label htmlFor="first_name" className="font-medium  ">
                       Nombre
@@ -77,10 +80,13 @@ export const Registro = () => {
                     </label>
                     <input
                       id="last_name"
-                      name="last_name"
+                      name="last_name"                      
                       type="text"
+                      value={last_name}
+                      required
                       className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
                       placeholder="Apellido"
+                      onChange={e => setlast_name(e.target.value)}
                     />
                   </div>
                   {/* <div>
@@ -136,24 +142,11 @@ export const Registro = () => {
                       type="password" 
                       value={password_confirmation}                     
                       required
-                      className="relative block w-full appearance-none rounded-none rounded-b-lg border border-gray-300 px-3  text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+                      className="relative block w-full appearance-none rounded-b-lg border border-gray-300 px-3  text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
                       placeholder="Confirma tu nueva Contraseña"   
                       onChange={e => setpassword_confirmation(e.target.value)}                   
                     />
                   </div>
-                 
-                  {/* <div>
-                    <label htmlFor="username" className="font-medium">
-                      Username
-                    </label>
-                    <input
-                      id="username"
-                      name="username"
-                      type="text"
-                      className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                      placeholder="Contraseña"
-                    />
-                  </div> */}
                  
                 </div>
 
@@ -161,7 +154,7 @@ export const Registro = () => {
                   <div>
                     <button
                       type="submit"
-                      className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+                      className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 "
                     >
                       Registrarse
                     </button>
@@ -170,19 +163,19 @@ export const Registro = () => {
                   <div>
                     <a
                       href="/"
-                      className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+                      className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 "
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
-                        stroke-width="1.5"
+                        strokeWidth="1.5"
                         stroke="currentColor"
                         className="w-5 h-5"
                       >
                         <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                           d="M11.25 9l-3 3m0 0l3 3m-3-3h7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                       </svg>

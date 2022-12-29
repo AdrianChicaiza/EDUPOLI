@@ -1,5 +1,5 @@
 // import './App.css';
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../contexts/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -14,48 +14,60 @@ import { Carrusel2 } from "../../components/variants/Carrusel2";
 import { ComentarioCard } from "../../components/variants/ComentarioCard";
 // https://tailwind-elements.com/docs/standard/components/video-carousel/
 export const Dashboard = () => {
-  //-------------------------------------------------------------------------------
-
+  //const tokenUser1 = localStorage.getItem("token");
   const navigate = useNavigate();
 
   const { user, logout } = useContext(AuthContext);
   const tokenUser = localStorage.getItem("token");
+  const [active, setActive] = useState(true);
+  const [nombre, setNombre] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  // iterar objetos:
+  // https://mauriciogc.medium.com/react-map-filter-y-reduce-54777359d94
 
   const config = {
     headers: { Authorization: `${tokenUser}` },
   };
-
-  // const onLogout = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     const response = await axios.post(
-  //       "http://localhost:8000/api/v1/logout",
-  //       { headers: { accept: "application/json" } },
-  //       config
-  //     );
-  //     logout();
-  //     navigate("/login");
-  //   } catch (error) {
-  //     console.log(error.response.data.message, "error");
-  //   }
-  // };
-
-  // const [isHover, setIsHover] = useState(false);
-
-  // const handleMouseEnter = () => {
-  //   setIsHover(true);
-  // };
-
-  // const handleMouseLeave = () => {
-  //   setIsHover(false);
-  // };
-
-  // const LogoutStyle = {
-  //   color: isHover ? "rgba(0,217,255,1)" : "rgba(113,44,205,1",
-  //   textDecorationLine: isHover ? "underline" : "none",
-  // };
-
+  //-------------------------------------------------------------------------------
+  const traerCarreras = async () => {
+    // e.preventDefault();
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/carreras",
+        // {config},
+        //{ headers: { Authorization: `Bearer: ${tokenUser1}` } }
+        config
+      );
+      // console.log("Trae datos de: ", tokenUser);
+      console.log("___________________________////////CARRERAS////////_____________________________________");
+       console.log("Respuesta: ", response.data.data);
+       console.log("Respuesta: ", response.data.data[0].id);
+       console.log("Respuesta: ", response.data.data[0].nombre);
+       setNombre(response.data.data[0].nombre);
+       setDescripcion(response.data.data[0].descripcion);
+      // console.log("Imagen del ususario es: ", response.data.data.avatar);
+      //setImage(response.data.data.avatar);
+      // console.log("Respuesta: ", response.data.data.user);
+      // console.log("Email del usuario: ", response.data.data.user.email);
+      // setEmail(response.data.data.user.email);
+      // setFull_name(user.full_name);
+      // setFirst_name(response.data.data.user.first_name);
+      // setLast_name(response.data.data.user.last_name);
+      // setactivo(true)
+      // navigate('/');
+      // navigate("login");
+    } catch (error) {
+      console.log(error.response.data.message, "error");
+    }
+  };
   
+  useEffect(() => {
+    traerCarreras();
+    console.log("Traje datos de carreras");
+  }, [active]);
+
+  //___________________________________________________________________________________
+
   // __________________________________________FUNCIONES De OBJETOS____________________
   const [carreras, setCarreras] = useState([]);
 
@@ -117,8 +129,31 @@ export const Dashboard = () => {
       <div className="p-1">
         <h1 className="pl-10">ESFOT</h1>
         <p className="pl-20 text-lg font-bold">Desarrollo de Software</p>
-        <Carrusel2 carrera={carrera} />
+        {/* <Carrusel2 carrera={carrera} /> */}
+        {/* ________________________________________________________________________________________ */}
         <hr />
+        <div className="flex justify-center p-1">
+      <div className="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs">
+        <a href="#!">
+          <img
+            className="rounded-t-lg"
+            src={carrera.url}
+            alt=""
+          />
+        </a>
+        <div className="p-6">
+          <h5 className="text-gray-900 text-xl font-medium mb-1">{nombre}</h5>
+          <p className="text-gray-700 text-base mb-1">{descripcion}</p>
+          <button
+            type="button"
+            className=" inline-block px-6 py-2.5 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+          >
+            Ingresar
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr/>
         {/* <ComentarioCard persona={personas} className="p-25" /> */}
         {/* <p className="pl-20 mt-4 text-lg font-bold">
           Redes y Telecomunicaciones
