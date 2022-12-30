@@ -19,7 +19,7 @@ export const Registro = () => {
     e.preventDefault();
     try {
         const response = await axios.post(                
-            'http://127.0.0.1:8000/api/v1/register',
+            'http://localhost:8000/api/v1/register',
             {role_id,first_name,last_name,password,password_confirmation,email},
             { headers: { 'accept': 'application/json' } }
         )              

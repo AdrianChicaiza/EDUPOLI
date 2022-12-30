@@ -22,6 +22,8 @@ export const Dashboard = () => {
   const [active, setActive] = useState(true);
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
+  const [sem, setSem] = useState([]);
+  let semes=[];
   // iterar objetos:
   // https://mauriciogc.medium.com/react-map-filter-y-reduce-54777359d94
 
@@ -60,9 +62,51 @@ export const Dashboard = () => {
       console.log(error.response.data.message, "error");
     }
   };
+
+  const traerSemestres = async () => {
+    // e.preventDefault();
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/semestres",
+        { headers: { 'accept': 'application/json' } },
+        config
+      );
+      // console.log("Trae datos de: ", tokenUser);
+      console.log("___________________________////////CARRERAS////////_____________________________________");
+        console.log("Respuesta de data.data.data: ", response.data.data);
+       //console.log("Respuesta: ", response.data.data[0].id);
+       //console.log("Respuesta: ", response.data.data[0].nombre);
+       setNombre(response.data.data[0].nombre);
+       setDescripcion(response.data.data[0].descripcion);
+       semes=[response.data.data];
+       setSem(response.data.data);
+       
+       console.log("Semestres en arreglo es: ",sem);
+       
+       console.log("Semestres en arreglo 2 es: ",semes);
+
+      //  semes.map(elemento=>(
+      //   console.log(elemento.nombre)
+      // ))
+      // console.log("Imagen del ususario es: ", response.data.data.avatar);
+      //setImage(response.data.data.avatar);
+      // console.log("Respuesta: ", response.data.data.user);
+      // console.log("Email del usuario: ", response.data.data.user.email);
+      // setEmail(response.data.data.user.email);
+      // setFull_name(user.full_name);
+      // setFirst_name(response.data.data.user.first_name);
+      // setLast_name(response.data.data.user.last_name);
+      // setactivo(true)
+      // navigate('/');
+      // navigate("login");
+    } catch (error) {
+      console.log(error.response.data.message, "error");
+    }
+  };
   
   useEffect(() => {
-    traerCarreras();
+    //traerCarreras();
+    traerSemestres();
     console.log("Traje datos de carreras");
   }, [active]);
 
@@ -154,13 +198,14 @@ export const Dashboard = () => {
       </div>
     </div>
     <hr/>
+    {/* _____________________________________________________________________________________________________________ */}
         {/* <ComentarioCard persona={personas} className="p-25" /> */}
         {/* <p className="pl-20 mt-4 text-lg font-bold">
           Redes y Telecomunicaciones
         </p>
         <Carrusel2 carrera={carrera2} /> */}
 
-        <ul>
+        {/* <ul>
           {carreras.map((carrera) => (
             <li
               onClick={() => handleRemoveCarrera(carrera.id)}
@@ -169,8 +214,15 @@ export const Dashboard = () => {
               {carrera.titulo}
             </li>
           ))}
-        </ul>
-        <button onClick={handleAddCarrera}>Agregar Carrera</button>
+        </ul> */}
+        
+      {
+        semes.map(elemento=>(
+          <h3>{elemento[0].nombre}</h3>
+        ))
+      }
+
+        {/* <button onClick={handleAddCarrera}>Agregar Carrera</button> */}
       </div>
       {/* _______________________________________________________________________________ */}
     </>
