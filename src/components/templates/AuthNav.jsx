@@ -14,6 +14,7 @@ import { Carrusel2 } from "../../components/variants/Carrusel2";
 import { ComentarioCard } from "../../components/variants/ComentarioCard";
 import Avatar from "react-avatar";
 import { useEffect } from "react";
+import "../templates/imageAvatar.css"
 // https://tailwind-elements.com/docs/standard/components/video-carousel/
 export const AuthNav = () => {
   //-------------------------------------------------------------------------------
@@ -52,6 +53,7 @@ export const AuthNav = () => {
   //   setIsHover(false);
   // };
   const [image, setImage] = useState("");
+
   const traerDatos = async () => {
     // e.preventDefault();
     try {
@@ -72,7 +74,7 @@ export const AuthNav = () => {
   };
   useEffect(() => {
     traerDatos();
-  }, [activeImage]);
+  }, []);
 
   // __________________________________________FUNCIONES De OBJETOS____________________
   //   const [carreras, setCarreras] = useState([]);
@@ -154,8 +156,8 @@ export const AuthNav = () => {
 
           <Navbar.Collapse className="justify-content-end">
             <Nav>
-            {/* <img className="h-10 w-10 rounded-full" src={image} alt="img" /> */}
-              <Avatar size="40" round={true} src={image} />
+            <img className="avatarImg" src={image?image:"https://t4.ftcdn.net/jpg/02/29/75/83/360_F_229758328_7x8jwCwjtBMmC6rgFzLFhZoEpLobB6L8.jpg"} alt="img" />
+              {/* <Avatar size="40" round={true} src={image} className="avatarImg"/> */}
               <NavDropdown title={user.full_name} id="collasible-nav-dropdown">
                 <NavDropdown.Item href="/perfil">
                   Editar Perfil

@@ -10,7 +10,8 @@ export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [activo, setActivo] = useState(false);
-
+ // https://www.youtube.com/watch?v=I0yFDDeQG7I
+ //crear spinner
   const onLogin = async (e) => {
     e.preventDefault();
     try {

@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) =>
     // https://tutorial.tips/double-exclamation-mark-not-not-operator-in-javascript/
     const initialization = () => {
         const user = JSON.parse(localStorage.getItem('user'))
+        console.log("variable user del context: ",user);
         return {
             logged: !!user,
             user: user,

@@ -6,7 +6,8 @@ import { CardCarrera } from "./CardCarrera";
 
 // https://react-multi-carousel.surge.sh/?selectedKind=Carousel&selectedStory=Without%20infinite%20mode&full=0&addons=1&stories=1&panelRight=0&addonPanel=kadira%2Fjsx%2Fpanel
 export const Carrusel2 = ({ carrera }) => {
-  const images = [...Array(6).keys()];
+  const images = [...Array(carrera.length).keys()];
+  
   return (
     <Carousel
       additionalTransfrom={0}
@@ -61,12 +62,12 @@ export const Carrusel2 = ({ carrera }) => {
       slidesToSlide={1}
       swipeable
     >
-      {images.map((e, i) => (
+      {carrera.map((e, i) => (
         <div
           key={i}
           //className="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs"
         >
-          <CardCarrera carrera={carrera} />
+          <CardCarrera carrera={e} />
         </div>
       ))}
       {/* <CardCarrera carrera={carrera} /> */}

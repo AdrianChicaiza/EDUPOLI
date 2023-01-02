@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import InputCyan from "../../components/variants/InputCyan";
 import { AuthContext } from "../../contexts/auth/AuthContext";
 import Avatar from "react-avatar";
+import Loading from "../app/loading";
 
 export const PerfilUsuario = () => {
   const [first_name, setFirst_name] = useState("");
@@ -16,11 +17,13 @@ export const PerfilUsuario = () => {
   const [image, setImage] = useState("");
   const [editar, setEditar] = useState(false);
   const [active, setActive] = useState(false);
+  const [recargar, setRecargar] = useState(true);
   //   const config = {
   //     headers: { Authorization: `${tokenUser}` },
   //   };
 
   const traerDatos = async () => {
+    setRecargar(true);
     // e.preventDefault();
     try {
       const response = await axios.get(
@@ -45,6 +48,7 @@ export const PerfilUsuario = () => {
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
+    setRecargar(false);
   };
 
   const vistaPreliminarFoto = (event) => {
@@ -109,9 +113,11 @@ export const PerfilUsuario = () => {
 
   useEffect(() => {
     traerDatos();
-    console.log("Traje datos------active cambio :o");
-  }, [active]);
-
+    //console.log("Traje datos------active cambio :o");
+  }, []);
+  if (recargar) {
+    return <Loading/>
+  }
   return (
     <>
       <div className="flex flex-row justify-center ">

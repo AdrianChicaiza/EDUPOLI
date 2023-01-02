@@ -9,7 +9,9 @@ import { CarrerasScreen } from "../pages/app/CarrerasScreen";
 import { ConfirmarContra } from "../pages/app/ConfirmarContra";
 import { ConfirmarCorreo } from "../pages/app/ConfirmarCorreo";
 import { Dashboard } from "../pages/app/Dashboard";
+import { Ejemplos } from "../pages/app/Ejemplos";
 import { Registro } from "../pages/app/Registro";
+import { SemestrePage } from "../pages/app/SemestrePage";
 import { Login } from "../pages/auth/Login";
 import { PerfilUsuario } from "../pages/auth/PerfilUsuario";
 
@@ -49,7 +51,11 @@ export const AppRouter = () => {
               <Routes>
                 {/* <Route index path='/' element={<App />} />  */}
                 <Route element={<AuthNav/>}>
+                  
+                {/* <Route index path="/" element={<Ejemplos />} /> */}
                 <Route index path="/" element={<Dashboard />} />
+                <Route index path="/:semestreid" element={<SemestrePage />} />
+
                 </Route>
                
                 <Route index path="/carreras" element={<CarrerasScreen />} />
