@@ -9,15 +9,14 @@ export const PerfilUsuario = () => {
   const [first_name, setFirst_name] = useState("");
   const [last_name, setLast_name] = useState("");
   const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
-  const [avatar, setAvatar] = useState(null);
   const [full_name, setFull_name] = useState("");
   const { user, logout } = useContext(AuthContext);
   const tokenUser = localStorage.getItem("token");
   const [image, setImage] = useState("");
   const [editar, setEditar] = useState(false);
-  const [active, setActive] = useState(false);
   const [recargar, setRecargar] = useState(true);
+  const [activo, setActivo] = useState(false);
+  const [activo2, setActivo2] = useState(false);
   //   const config = {
   //     headers: { Authorization: `${tokenUser}` },
   //   };
@@ -93,12 +92,15 @@ export const PerfilUsuario = () => {
         { headers: { accept: "application/json" } }
       );
       subirFoto();
+      setEditar(false);
       // navigate("/");
       //  setActivo(true);
       //  setActivo2(false);
       console.log("Se actualizaron los cambios :D");
+      setActivo(true);
     } catch (error) {
       console.log(error.response.data.message, "error no se guardo D:");
+      setActivo2(true);
       // setMensajeactivo("No se pudo actualizar los cambios")
       // setEmail('');
       // setActivo2(true);
@@ -121,16 +123,22 @@ export const PerfilUsuario = () => {
   return (
     <>
       <div className="flex flex-row justify-center ">
-        <div className="flex justify-center bg-white rounded-lg shadow-xl shadow-cyan-500/50">
-          <div className="flex flex-col items-center justify-center bg-white  max-w-sm w-96 ">
+        <div className="flex justify-center bg-white rounded-md shadow-xl shadow-cyan-500/50">
+          <div className="flex flex-col items-center justify-center bg-white  max-w-sm w-96">
             {/* __________________________________________________________________________________________________________________ */}
 
-            <div className="flex flex-row justify-center ">
+            <div className="flex flex-col justify-center items-center">
               {/* <input type="file"/> */}
+              <b className="block text-sm text-center text-cyan-700 tracking-wide">
+                    {activo ? "Se actualizaron los cambios" : ""}
+                  </b>
+                  <b className="block text-sm text-center text-cyan-700 tracking-wide">
+                    {activo2 ? "Algo salio mal" : ""}
+                  </b>   
               <img
                 src={image}
                 id="imgFoto"
-                className="rounded-lg w-11/12 max-w-screen-lg h-auto"
+                className="flex items-center justify-center rounded-lg w-11/12 max-w-screen-lg h-auto"
               />
             </div>
             <div className="flex flex-col justify-center items-center mt-2">
@@ -176,6 +184,7 @@ export const PerfilUsuario = () => {
                   <label className="font-medium">Correo</label>
                   <InputCyan
                     id="email"
+                    required
                     value={email}
                     setvalue={setEmail}
                     type="email"
@@ -185,6 +194,7 @@ export const PerfilUsuario = () => {
                   <label className="font-medium">Nombre</label>
                   <InputCyan
                     id="first_name"
+                    required
                     value={first_name}
                     setvalue={setFirst_name}
                     type="text"
@@ -194,6 +204,7 @@ export const PerfilUsuario = () => {
                   <label className="font-medium">Apellido</label>
                   <InputCyan
                     id="last_name"
+                    required
                     value={last_name}
                     setvalue={setLast_name}
                     type="text"
@@ -204,8 +215,7 @@ export const PerfilUsuario = () => {
                     <button
                       type="submit"
                       // onClick={() => {
-                        
-                      //   traerDatos();
+                      //   setEditar(false);
                       // }}
                       className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-600"
                     >
