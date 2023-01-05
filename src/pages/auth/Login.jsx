@@ -23,10 +23,10 @@ export const Login = () => {
       const { access_token, token_type, user } = response.data.data;
       login(user, `${token_type} ${access_token}`);
       navigate("/");
-      console.log(token_type);
-      console.log(access_token);
-      console.log(user);
-      console.log(response);
+      // console.log(token_type);
+      // console.log(access_token);
+       console.log(user);
+      // console.log("el response es : ",response);
     } catch (error) {
       console.log(error.response.data.message, "error");
       setEmail("");

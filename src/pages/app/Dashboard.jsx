@@ -1,5 +1,5 @@
 // import './App.css';
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 //import { AuthContext } from "../../contexts/auth/AuthContext";
 // import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -13,6 +13,7 @@ import axios from "axios";
 import { Carrusel2 } from "../../components/variants/Carrusel2";
 import { Link } from "react-router-dom";
 import Loading from "./loading";
+import { AuthContext } from "../../contexts";
 // import { ComentarioCard } from "../../components/variants/ComentarioCard";
 // https://tailwind-elements.com/docs/standard/components/video-carousel/
 export const Dashboard = () => {
@@ -23,7 +24,7 @@ export const Dashboard = () => {
   const [descripcion, setDescripcion] = useState("");
   const [sem, setSem] = useState([]);
   const [recargar, setRecargar] = useState(true);
-
+  const {user} = useContext(AuthContext);
   let semes = [];
   let nuevo = [];
   // iterar objetos:
@@ -93,6 +94,11 @@ export const Dashboard = () => {
       // console.log("Semestres en arreglo es: ",sem);
 
       //console.log("Semestres en arreglo 2 es: ",semes);
+      if(user.role_id==1){
+        console.log("El usuario es admin");
+      }else{
+        console.log("El usuario es estudiante");
+      }
     } catch (error) {
       console.log(error.response.data.message, "error");
     }

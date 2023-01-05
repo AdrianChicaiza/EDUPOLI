@@ -3,7 +3,8 @@ import Carousel from "react-multi-carousel";
 
 import "react-multi-carousel/lib/styles.css";
 import { CardCarrera } from "./CardCarrera";
-
+// https://www.youtube.com/watch?v=bSX3_oGrZSs
+// actualizar datos modal
 // https://react-multi-carousel.surge.sh/?selectedKind=Carousel&selectedStory=Without%20infinite%20mode&full=0&addons=1&stories=1&panelRight=0&addonPanel=kadira%2Fjsx%2Fpanel
 export const Carrusel2 = ({ carrera }) => {
   const images = [...Array(carrera.length).keys()];
@@ -14,7 +15,7 @@ export const Carrusel2 = ({ carrera }) => {
       arrows
       autoPlaySpeed={3000}
       centerMode={false}
-      className=""
+      className="px-0 rounded"
       containerClass="container"
       dotListClass=""
       draggable
