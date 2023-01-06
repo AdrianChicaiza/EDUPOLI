@@ -6,8 +6,8 @@ import { CardCarrera } from "./CardCarrera";
 // https://www.youtube.com/watch?v=bSX3_oGrZSs
 // actualizar datos modal
 // https://react-multi-carousel.surge.sh/?selectedKind=Carousel&selectedStory=Without%20infinite%20mode&full=0&addons=1&stories=1&panelRight=0&addonPanel=kadira%2Fjsx%2Fpanel
-export const Carrusel2 = ({ carrera }) => {
-  const images = [...Array(carrera.length).keys()];
+export const Carrusel2 = ({ semestre }) => {
+  const images = [...Array(semestre.length).keys()];
   
   return (
     <Carousel
@@ -63,12 +63,12 @@ export const Carrusel2 = ({ carrera }) => {
       slidesToSlide={1}
       swipeable
     >
-      {carrera.map((e, i) => (
+      {semestre.map((e, i) => (
         <div
           key={i}
           //className="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs"
         >
-          <CardCarrera carrera={e} />
+          <CardCarrera semestre={e} />
         </div>
       ))}
       {/* <CardCarrera carrera={carrera} /> */}

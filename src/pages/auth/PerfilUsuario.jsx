@@ -86,7 +86,7 @@ export const PerfilUsuario = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/v1/profile/",
+        "http://localhost:8000/api/v1/profile/1",
         { first_name, last_name, email },
         { headers: { Authorization: `Bearer: ${tokenUser}` } },
         { headers: { accept: "application/json" } }

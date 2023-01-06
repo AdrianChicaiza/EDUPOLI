@@ -14,19 +14,32 @@ import { Carrusel2 } from "../../components/variants/Carrusel2";
 import { Link } from "react-router-dom";
 import Loading from "./loading";
 import { AuthContext } from "../../contexts";
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  FormGroup,
+  Input,
+  Label,
+} from "reactstrap";
 // import { ComentarioCard } from "../../components/variants/ComentarioCard";
 // https://tailwind-elements.com/docs/standard/components/video-carousel/
+// crud apirest
+//https://www.youtube.com/watch?v=tk61nYJzCA8s
+
 export const Dashboard = () => {
   // const navigate = useNavigate();
   const tokenUser = localStorage.getItem("token");
   const [active, setActive] = useState(true);
-  const [nombre, setNombre] = useState("");
-  const [descripcion, setDescripcion] = useState("");
   const [sem, setSem] = useState([]);
   const [recargar, setRecargar] = useState(true);
-  const {user} = useContext(AuthContext);
-  let semes = [];
-  let nuevo = [];
+  const { user } = useContext(AuthContext);
+  const [estadoModal, setEstadoModal] = useState(false);
+  //variables para las nuevas carreras:
+  const [nombre, setNombre] = useState("");
+  const [descripcion, setDescripcion] = useState("");
   // iterar objetos:
   // https://mauriciogc.medium.com/react-map-filter-y-reduce-54777359d94
 
@@ -68,6 +81,35 @@ export const Dashboard = () => {
   //     console.log(error.response.data.message, "error");
   //   }
   // };
+  const traerSemestreRol=async()=>{
+    if (user.role_id == 1) {
+      console.log("El usuario es admin");
+      traerSemestresAdmin();
+    } else {
+      console.log("El usuario es estudiante");
+      traerSemestres();
+    }
+  }
+
+  const traerSemestresAdmin = async () => {
+    setRecargar(true);
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/semestres/admin",
+        config
+      );
+      console.log("Respuesta de data.data.data: ", response.data.data);
+      setSem(response.data.data);
+      // if (user.role_id == 1) {
+      //   console.log("El usuario es admin");
+      // } else {
+      //   console.log("El usuario es estudiante");
+      // }
+    } catch (error) {
+      console.log(error.response.data.message, "error");
+    }
+    setRecargar(false);
+  }
 
   const traerSemestres = async () => {
     setRecargar(true);
@@ -76,43 +118,53 @@ export const Dashboard = () => {
         "http://localhost:8000/api/semestres",
         config
       );
-      // console.log("Trae datos de: ", tokenUser);
-      // console.log("_____________________________");
       console.log("Respuesta de data.data.data: ", response.data.data);
-      //console.log("Respuesta: ", response.data.data[0].id);
-      //console.log("Respuesta: ", response.data.data[0].nombre);
-      //   setNombre(response.data.data[0].nombre);
-      //   setDescripcion(response.data.data[0].descripcion);
-      //   semes = [response.data.data];
       setSem(response.data.data);
-      //  // nuevo=[response.data.data];
-      //    console.log("sem es:", sem);
-
-      //   console.log("semes descripcion es:", semes.descripcion);
-      // /console.log("traje datos");
-      //console.log("__________________________________________________________________");
-      // console.log("Semestres en arreglo es: ",sem);
-
-      //console.log("Semestres en arreglo 2 es: ",semes);
-      if(user.role_id==1){
-        console.log("El usuario es admin");
-      }else{
-        console.log("El usuario es estudiante");
-      }
+      // if (user.role_id == 1) {
+      //   console.log("El usuario es admin");
+      // } else {
+      //   console.log("El usuario es estudiante");
+      // }
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
     setRecargar(false);
   };
-  //   traerSemestres();
+
+  const crearSemestre = async () => {
+   
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/semestres",
+        { nombre, descripcion },
+        { headers: { accept: "application/json" } },
+        config
+      );
+
+      console.log("Se creo el nuevo semestre");
+      setNombre("");
+      setDescripcion("");
+      traerSemestreRol();
+      setEstadoModal(false);
+    } catch (error) {
+      console.log(error.response.data.message, "error");
+    }
+  };
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%,-50%)",
+    width: 1000
+    //background:"black",
+    //padding:10
+  };
+ 
 
   useEffect(() => {
     //traerCarreras();
-    traerSemestres();
-    // console.log("Traje datos de carreras");
+    traerSemestreRol();
   }, []);
-
-  //___________________________________________________________________________________
 
   // __________________________________________FUNCIONES De OBJETOS____________________
   const [carreras, setCarreras] = useState([]);
@@ -180,10 +232,62 @@ export const Dashboard = () => {
   //   texto: "Buena aplicacion :D",
   // };
   if (recargar) {
-    return <Loading/>
+    return <Loading />;
   }
   return (
     <>
+    <Modal isOpen={estadoModal} style={modalStyle}>
+        <ModalHeader>Vista Semestre</ModalHeader>
+        <ModalBody>
+          {/* <form className="mt-8 space-y-6" onSubmit={actualizarSemestre(semestre.id)}> */}
+          <div className="form-group">
+            <label htmlFor="nombre" className="font-medium">Nombre</label>
+            <input
+              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+              type="text"
+              name="nombre"
+              id="nombre"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+            />
+            <br />
+            <label htmlFor="descripcion" className="font-medium mt-2">Descripcion</label>
+            <input
+              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+              type="text"
+              name="descripcion"
+              id="descripcion"
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+            />
+            <br />
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          {/* <Button>a</Button> */}
+          <button
+            // type="submit"
+            onClick={() => {
+              // verSemestre(semestre.id);
+              //setEstadoModal(false);
+              crearSemestre();
+            }}
+            className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+          >
+            Crear
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              // verSemestre(semestre.id);
+              setEstadoModal(false);
+            }}
+            className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+          >
+            Cerrar
+          </button>
+        </ModalFooter>
+      </Modal>
       {/* ___________________________________________________________________________________ */}
       {/* <div className="flex flex-row">
         <CardCarrera carrera={carrera} />
@@ -192,12 +296,21 @@ export const Dashboard = () => {
       {/* <Carrusel carrera={carrera}/> */}
       <div className="p-1">
         <h1 className="pl-10">ESFOT</h1>
-        <p className="pl-20 text-lg font-bold">Desarrollo de Software</p>
-       
+        <p className="pl-10 text-lg font-bold">Desarrollo de Software</p>
+        <button
+            // type="submit"
+            onClick={() => {
+              // verSemestre(semestre.id);
+              setEstadoModal(true);
+              //actualizarSemestre(semestre.id);
+            }}
+            className=" inline-block px-3 ml-10 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+          >
+            Crear Semestre
+          </button>
         <hr />
-        <Carrusel2 carrera={sem} />
-       
-       
+        <Carrusel2 semestre={sem} />
+
         {/* ________________________________________________________________________________________ */}
         <hr />
         {/* <div className="flex justify-center p-1">
@@ -221,7 +334,7 @@ export const Dashboard = () => {
         </div>
       </div>
     </div> */}
-       
+
         {/* _____________________________________________________________________________________________________________ */}
         {/* <ComentarioCard persona={personas} className="p-25" /> */}
         {/* <p className="pl-20 mt-4 text-lg font-bold">
@@ -246,15 +359,38 @@ export const Dashboard = () => {
           </div>
         ))} */}
 
-        {/* <button
-          onClick={() => {
-            traerSemestres();
-          }}
-          className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-600"
-        >
-          accion
-        </button> */}
         {/* <button onClick={handleAddCarrera}>Agregar Carrera</button> */}
+
+        {/* <form className="mt-8 space-y-6" onSubmit={crearSemestre}>
+          <input
+            id="nombre"
+            name="nombre"
+            type="text"
+            value={nombre}
+            required
+            className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+            placeholder="Nombre"
+            onChange={(e) => setNombre(e.target.value)}
+          />
+          <input
+            id="descripcion"
+            name="descripcion"
+            type="text"
+            value={descripcion}
+            required
+            className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+            placeholder="descripcion"
+            onChange={(e) => setDescripcion(e.target.value)}
+          />
+          <button
+            type="submit"
+            className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 "
+          >
+            Crear Semestre
+          </button>
+        </form> */}
+
+        
       </div>
       {/* _______________________________________________________________________________ */}
     </>
