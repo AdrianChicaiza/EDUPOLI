@@ -49,38 +49,7 @@ export const Dashboard = () => {
   const config = {
     headers: { Authorization: `${tokenUser}` },
   };
-  //-------------------------------------------------------------------------------
-  // const traerCarreras = async () => {
-  //   // e.preventDefault();
-  //   try {
-  //     const response = await axios.get(
-  //       "http://localhost:8000/api/carreras",
-  //       // {config},
-  //       //{ headers: { Authorization: `Bearer: ${tokenUser1}` } }
-  //       config
-  //     );
-  //     // console.log("Trae datos de: ", tokenUser);
-  //     console.log("___________________________////////CARRERAS////////_____________________________________");
-  //      console.log("Respuesta: ", response.data.data);
-  //      console.log("Respuesta: ", response.data.data[0].id);
-  //      console.log("Respuesta: ", response.data.data[0].nombre);
-  //      setNombre(response.data.data[0].nombre);
-  //      setDescripcion(response.data.data[0].descripcion);
-  //     // console.log("Imagen del ususario es: ", response.data.data.avatar);
-  //     //setImage(response.data.data.avatar);
-  //     // console.log("Respuesta: ", response.data.data.user);
-  //     // console.log("Email del usuario: ", response.data.data.user.email);
-  //     // setEmail(response.data.data.user.email);
-  //     // setFull_name(user.full_name);
-  //     // setFirst_name(response.data.data.user.first_name);
-  //     // setLast_name(response.data.data.user.last_name);
-  //     // setactivo(true)
-  //     // navigate('/');
-  //     // navigate("login");
-  //   } catch (error) {
-  //     console.log(error.response.data.message, "error");
-  //   }
-  // };
+  
   const traerSemestreRol=async()=>{
     if (user.role_id == 1) {
       console.log("El usuario es admin");
@@ -95,7 +64,7 @@ export const Dashboard = () => {
     setRecargar(true);
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/semestres/admin",
+        "http://localhost:8000/api/v1/semestres/adminE",
         config
       );
       console.log("Respuesta de data.data.data: ", response.data.data);
@@ -131,13 +100,13 @@ export const Dashboard = () => {
     setRecargar(false);
   };
 
-  const crearSemestre = async () => {
+  const crearSemestre = async (a) => {
    
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/semestres",
+        "http://localhost:8000/api/v1/semestres/admin/"+a,
         { nombre, descripcion },
-        { headers: { accept: "application/json" } },
+        //{ headers: { accept: "application/json" } },
         config
       );
 
@@ -165,55 +134,6 @@ export const Dashboard = () => {
     //traerCarreras();
     traerSemestreRol();
   }, []);
-
-  // __________________________________________FUNCIONES De OBJETOS____________________
-  const [carreras, setCarreras] = useState([]);
-
-  // const handleAddCarrera = () => {
-  //   const newCarrera = {
-  //     id: "1",
-  //     url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-  //     titulo: "Primer Semestre",
-  //     texto: "Primer semestre de la carrera de desarrollo de Software",
-  //   };
-  //   setCarreras([...carreras, newCarrera]);
-  // };
-
-  // const handleRemoveCarrera = (id) => {
-  //   const newCarrera = carreras.filter((carrera) => carrera.id !== id);
-  //   setCarreras(newCarrera);
-  // };
-
-  // const handleUpdateCarrera = () => {};
-
-  // ____________________________________________________________________________________
-
-  //-----------------------------------------------------------------------------------
-  const carrera = {
-    url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-    titulo: "Primer Semestre",
-    texto: "Primer semestre de la carrera de desarrollo de Software",
-  };
-  const ejemploA = [
-    {
-      //url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-      id: 1,
-      titulo: "1111",
-      texto: "Segundo semestre de la carrera de desarrollo de Software",
-    },
-    {
-      id: 2,
-      //url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-      titulo: "22222",
-      texto: "Segundo semestre de la carrera de desarrollo de Software",
-    },
-    {
-      id: 3,
-      //url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-      titulo: "33333",
-      texto: "Segundo semestre de la carrera de desarrollo de Software",
-    },
-  ];
 
   // const palabras = [
   //   { id: "1", bn: "si" },
@@ -270,7 +190,7 @@ export const Dashboard = () => {
             onClick={() => {
               // verSemestre(semestre.id);
               //setEstadoModal(false);
-              crearSemestre();
+              crearSemestre(1);
             }}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
           >
@@ -313,27 +233,7 @@ export const Dashboard = () => {
 
         {/* ________________________________________________________________________________________ */}
         <hr />
-        {/* <div className="flex justify-center p-1">
-      <div className="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs">
-        <a href="#!">
-          <img
-            className="rounded-t-lg"
-            src={carrera.url}
-            alt=""
-          />
-        </a>
-        <div className="p-6">
-          <h5 className="text-gray-900 text-xl font-medium mb-1">{nombre}</h5>
-          <p className="text-gray-700 text-base mb-1">{descripcion}</p>
-          <button
-            type="button"
-            className=" inline-block px-6 py-2.5 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
-          >
-            Ingresar
-          </button>
-        </div>
-      </div>
-    </div> */}
+      
 
         {/* _____________________________________________________________________________________________________________ */}
         {/* <ComentarioCard persona={personas} className="p-25" /> */}

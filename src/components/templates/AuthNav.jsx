@@ -20,7 +20,7 @@ export const AuthNav = () => {
   //-------------------------------------------------------------------------------
 
   const navigate = useNavigate();
-
+  const [image, setImage] = useState("");
   const { user, logout } = useContext(AuthContext);
   const tokenUser = localStorage.getItem("token");
   const [activeImage, setActiveImage] = useState(false)
@@ -43,16 +43,7 @@ export const AuthNav = () => {
     }
   };
 
-  // const [isHover, setIsHover] = useState(false);
 
-  // const handleMouseEnter = () => {
-  //   setIsHover(true);
-  // };
-
-  // const handleMouseLeave = () => {
-  //   setIsHover(false);
-  // };
-  const [image, setImage] = useState("");
 
   const traerDatos = async () => {
     // e.preventDefault();
@@ -76,60 +67,6 @@ export const AuthNav = () => {
     traerDatos();
   }, []);
 
-  // __________________________________________FUNCIONES De OBJETOS____________________
-  //   const [carreras, setCarreras] = useState([]);
-
-  //   const handleAddCarrera = () => {
-  //     const newCarrera = {
-  //       id:"1",
-  //       url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-  //       titulo: "Primer Semestre",
-  //       texto: "Primer semestre de la carrera de desarrollo de Software",
-  //     };
-  //     setCarreras([...carreras,newCarrera])
-  //   };
-
-  //   const handleRemoveCarrera = (id) => {
-  //     const newCarrera = carreras.filter((carrera)=>carrera.id!==id);
-  //     setCarreras(newCarrera);
-  //   };
-
-  //   const handleUpdateCarrera = () => {};
-
-  // ____________________________________________________________________________________
-
-  //   const LogoutStyle = {
-  //     color: isHover ? "rgba(0,217,255,1)" : "rgba(113,44,205,1",
-  //     textDecorationLine: isHover ? "underline" : "none",
-  //   };
-  //   //-----------------------------------------------------------------------------------
-  //   const carrera = {
-  //     url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-  //     titulo: "Primer Semestre",
-  //     texto: "Primer semestre de la carrera de desarrollo de Software",
-  //   };
-  //   const carrera2 = {
-  //     url: "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-  //     titulo: "Segundo Semestre",
-  //     texto: "Segundo semestre de la carrera de desarrollo de Software",
-  //   };
-
-  //   const palabras = [
-  //     { id: "1", bn: "si" },
-  //     { id: "2", bn: "no" },
-  //     { id: "3", bn: "a" },
-  //     { id: "4", bn: "nbo" },
-  //     { id: "5", bn: "noc" },
-  //     { id: "6", bn: "nos" },
-  //     { id: "7", bn: "nod" },
-  //   ];
-
-  //   const personas = {
-  //     urlImagen:
-  //       "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-  //     nombre: "Adrian Chicaiza",
-  //     texto: "Buena aplicacion :D",
-  //   };
   return (
     <>
       <Navbar
@@ -172,7 +109,7 @@ export const AuthNav = () => {
       </Navbar>
       <div>
         {/* className='absolute flex w-full md:w-3/5  h-screen items-center justify-center py-16 left-0' */}
-        <div className="w-full  h-full items-center justify-center px-5">
+        <div className="w-full  h-full items-center justify-center px-20">
           {/* className='max-w-md w-full h-auto ' */}
           <main>
             {/* text-center quitado del siguiente div -> */}

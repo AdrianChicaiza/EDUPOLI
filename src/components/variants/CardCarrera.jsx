@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useContext, useState } from "react";
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts";
 import {
   Button,
@@ -22,7 +22,7 @@ export const CardCarrera = ({ semestre }) => {
   const tokenUser = localStorage.getItem("token");
   const [estadoModal, setEstadoModal] = useState(false);
   const [recargar, setRecargar] = useState(false);
-
+  const navigate = useNavigate();
   //variables para las nuevas carreras:
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
@@ -46,7 +46,8 @@ export const CardCarrera = ({ semestre }) => {
     // setRecargar(true);
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/semestres/" + a,
+        "http://localhost:8000/api/v1/semestres/admin/" + a,
+        //{ headers: { accept: "application/json" } },
         config
       );
       console.log("Semestre : ", response.data.data);
@@ -62,9 +63,8 @@ export const CardCarrera = ({ semestre }) => {
     //e.preventDefault();
     try {
       const response = await axios.put(
-        "http://localhost:8000/api/semestres/" + a,
+        "http://localhost:8000/api/v1/semestres/admin/" + a,
         { nombre, descripcion },
-        { headers: { accept: "application/json" } },
         config
       );
 
@@ -75,17 +75,17 @@ export const CardCarrera = ({ semestre }) => {
     }
   };
 
-  const desactivarSemestre=async(a)=>{
+  const desactivarSemestre = async (a) => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/semestres/desactiva/" + a,
+        "http://localhost:8000/api/v1/semestres/desactiva/admin/" + a,
         config
       );
       console.log("Se cambio el estado del semestre");
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
-  }
+  };
 
   useEffect(() => {
     comprobarRole();
@@ -96,7 +96,7 @@ export const CardCarrera = ({ semestre }) => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%,-50%)",
-    width: 1000
+    width: 1000,
     //background:"black",
     //padding:10
   };
@@ -111,7 +111,9 @@ export const CardCarrera = ({ semestre }) => {
         <ModalBody>
           {/* <form className="mt-8 space-y-6" onSubmit={actualizarSemestre(semestre.id)}> */}
           <div className="form-group">
-            <label htmlFor="nombre" className="font-medium">Nombre</label>
+            <label htmlFor="nombre" className="font-medium">
+              Nombre
+            </label>
             <input
               className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
               type="text"
@@ -121,7 +123,9 @@ export const CardCarrera = ({ semestre }) => {
               onChange={(e) => setNombre(e.target.value)}
             />
             <br />
-            <label htmlFor="descripcion" className="font-medium mt-2">Descripcion</label>
+            <label htmlFor="descripcion" className="font-medium mt-2">
+              Descripcion
+            </label>
             <input
               className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
               type="text"
@@ -161,7 +165,7 @@ export const CardCarrera = ({ semestre }) => {
 
       <div className="flex justify-center p-1 ">
         <div className="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs ">
-          <Link to={"/semestre_" + semestre.id}>
+          {/* <Link to={"/semestre_" + semestre.id}> */}
             <img
               className="rounded-t-lg"
               src={
@@ -171,7 +175,7 @@ export const CardCarrera = ({ semestre }) => {
               }
               alt=""
             />
-          </Link>
+          {/* </Link> */}
           {/* p-6 por default */}
           <div className="px-6 py-3">
             <h5 className="text-gray-900 text-xl font-medium mb-1">
@@ -182,13 +186,16 @@ export const CardCarrera = ({ semestre }) => {
               {semestre.descripcion}
             </p>
             <p className="text-gray-700 text-xs mb-2">
-               {semestre.estado?"Semestre activo":"Semestre desactivo"}
+              {semestre.estado ? "Semestre activo" : "Semestre desactivo"}
             </p>
 
             {/* __________________________BOTONES______________________________________________________________________ */}
             <div className="flex flex-row">
               <button
                 type="button"
+                onClick={()=>{
+                  navigate("/semestre_" + semestre.id);
+                }}
                 className=" inline-block px-3 py-1 h-9 mr-2 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
               >
                 Ingresar
@@ -223,7 +230,7 @@ export const CardCarrera = ({ semestre }) => {
                   </button>
                   <button
                     type="button"
-                    onClick={()=>{
+                    onClick={() => {
                       desactivarSemestre(semestre.id);
                     }}
                     className=" inline-block px-3 py-1 h-9  bg-sky-900 text-white font-medium text-xs leading-tight uppercase rounded-r-lg shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
