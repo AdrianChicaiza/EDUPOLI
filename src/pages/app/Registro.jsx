@@ -27,7 +27,7 @@ export const Registro = () => {
         if(password==password_confirmation){
           console.log("Se ha registrado con exito :D");  
           setMensajeactivo("Se registro con exito ");
-          console.log("Respuesta: ",response.data.data)
+         // console.log("Respuesta: ",response.data.data)
         }else{
           setMensajeactivo("No coinciden la contraseña");
         }

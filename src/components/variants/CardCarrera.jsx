@@ -50,7 +50,7 @@ export const CardCarrera = ({ semestre }) => {
         //{ headers: { accept: "application/json" } },
         config
       );
-      console.log("Semestre : ", response.data.data);
+      console.log("Traje datos del semestre en card");
       setNombre(response.data.data.nombre);
       setDescripcion(response.data.data.descripcion);
     } catch (error) {
@@ -68,7 +68,7 @@ export const CardCarrera = ({ semestre }) => {
         config
       );
 
-      console.log("Se actualizo el semetres");
+      console.log("Se actualizo el semestre");
       // traerSemestres();
     } catch (error) {
       console.log(error.response.data.message, "error");
@@ -194,7 +194,7 @@ export const CardCarrera = ({ semestre }) => {
               <button
                 type="button"
                 onClick={()=>{
-                  navigate("/semestre_" + semestre.id);
+                  navigate("/" + semestre.id);
                 }}
                 className=" inline-block px-3 py-1 h-9 mr-2 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
               >

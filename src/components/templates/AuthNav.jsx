@@ -55,7 +55,7 @@ export const AuthNav = () => {
        ///{ headers: { accept: "application/json" } },
          config
       );
-      console.log("Respuesta: ", response.data.data.user);
+      //console.log("Respuesta: ", response.data.data.user);
       setImage(response.data.data.avatar);
       //console.log("traje datos :D")
       //console.log("traje datos :D",response.data.data)
@@ -74,7 +74,7 @@ export const AuthNav = () => {
         variant="dark"
       >
         <Container>
-          <Navbar.Brand href="#home" className="">
+          <Navbar.Brand className="">
             <img
               alt=""
               src="https://cdn-icons-png.flaticon.com/512/4945/4945861.png"
@@ -85,7 +85,7 @@ export const AuthNav = () => {
             EduPoli
           </Navbar.Brand>
           <Nav className="me-auto">
-            <Nav.Link href="#home">Inicio</Nav.Link>
+            <Nav.Link href="/">Inicio</Nav.Link>
             <Nav.Link href="#pricing">Sobre Nosotros</Nav.Link>
           </Nav>
 
@@ -109,7 +109,7 @@ export const AuthNav = () => {
       </Navbar>
       <div>
         {/* className='absolute flex w-full md:w-3/5  h-screen items-center justify-center py-16 left-0' */}
-        <div className="w-full  h-full items-center justify-center px-20">
+        <div className="w-full  h-full items-center justify-center px-20 py-2">
           {/* className='max-w-md w-full h-auto ' */}
           <main>
             {/* text-center quitado del siguiente div -> */}

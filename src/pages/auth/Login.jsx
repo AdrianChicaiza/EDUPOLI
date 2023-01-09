@@ -25,7 +25,7 @@ export const Login = () => {
       navigate("/");
       // console.log(token_type);
       // console.log(access_token);
-       console.log(user);
+      // console.log(user);
       // console.log("el response es : ",response);
     } catch (error) {
       console.log(error.response.data.message, "error");

@@ -18,6 +18,8 @@ export const SemestrePage = () => {
   const tokenUser = localStorage.getItem("token");
   const [estadoModal, setEstadoModal] = useState(false);
   const [estadoModal2, setEstadoModal2] = useState(false);
+  const [active, setActive] = useState(false);
+  const [comentario, setComentario] = useState([]);
   //variables del APIREST para carrera
   const [nombreCarrera, setNombreCarrera] = useState("")
   const [descripcionCarrera, setDescripcionCarrera] = useState("");
@@ -41,9 +43,11 @@ export const SemestrePage = () => {
 const traerMateriasRol=async()=>{
   if (user.role_id == 1) {
     console.log("El usuario es admin");
+    setActive(true);
     traerMateriasAdmin();
   } else {
     console.log("El usuario es estudiante");
+    setActive(false);
     traerMaterias();
   }
 }
@@ -51,10 +55,23 @@ const traerMateriasRol=async()=>{
 const traerMateriasAdmin=async()=>{
   try {
     const response = await axios.get(
-      "http://localhost:8000/api/semestres/admin",
+      "http://localhost:8000/api/v1/materias/admin",
       config
     );
-   // console.log("Respuesta de data.data.data: ", response.data.data);
+    console.log("Traje las materias en modo admin");
+   // console.log("Info de materia: ",response.data.data);
+    //setNombreMateria(response.data.nombre);
+    //let semestreId=response.data.data.semestres_id;
+    // console.log("Id de semestre es: ",response.data.data.semestres_id);
+    //console.log("nombre materia",response.data.data[0].semestres_id);
+    // if(semestreId==1){
+    //   setMaterias(response.data.data);
+      
+    // }
+     setMaterias(response.data.data);
+    //  let a=materias.filter(response.data.data.semestres_id);  
+    // console.log("Materias por semestre 1 es: ",a);
+    
   } catch (error) {
     console.log(error.response.data.message, "error");
   }
@@ -63,10 +80,12 @@ const traerMateriasAdmin=async()=>{
 const traerMaterias=async()=>{
   try {
     const response = await axios.get(
-      "http://localhost:8000/api/semestres/adminE",
+      "http://localhost:8000/api/v1/materias/adminE",
       config
     );
-   // console.log("Respuesta de data.data.data: ", response.data.data);
+    console.log("Traje las meterias en modo estudiante");
+    //setNombreMateria(response.data.nombre);
+    setMaterias(response.data.data);
   } catch (error) {
     console.log(error.response.data.message, "error");
   }
@@ -102,7 +121,7 @@ const verMateria=async()=>{
 }
 
 const actualizarMateria=async()=>{
-
+  // pendiente de hacer hay fallos en el backend xd
 }
 
 const verMateriaEspecifica=async(a)=>{
@@ -111,7 +130,7 @@ const verMateriaEspecifica=async(a)=>{
       "http://localhost:8000/api/v1/materias/admin/"+a,
       config
     );
-    //console.log("Materia especifica: ", response.data.data);
+    console.log("Estas viendo la materia", response.data.id);
     setNombre(response.data.data.nombre);
   } catch (error) {
     console.log(error.response.data.message, "error");
@@ -130,6 +149,18 @@ const desactivarMateria=async(a)=>{
   }
 }
 
+const verComentarios=async()=>{
+  try {
+    const response = await axios.get(
+      "http://localhost:8000/api/v1/comentarios/admin/",
+      config
+    );
+    console.log("Traje estos comentarios: ",response.data.data);
+    setComentario(response.data.data);
+  } catch (error) {
+    console.log(error.response.data.message, "error");
+  }
+}
 
 
 const infoCarrera=async()=>{
@@ -138,7 +169,7 @@ const infoCarrera=async()=>{
       "http://localhost:8000/api/v1/carreras/admin/1",
       config
     );
-    console.log("Respuesta de data.data.data: ", response.data.data);
+    console.log("Traje info de la carrera");
     setNombreCarrera(response.data.data.nombre);
     setDescripcionCarrera(response.data.data.descripcion);
     setEncargadoCarrera(response.data.data.encargado);
@@ -161,7 +192,8 @@ const modalStyle = {
 useEffect(() => {
   //traerCarreras();
   infoCarrera();
-  verMateria();
+  traerMateriasRol();
+  verComentarios();
 }, []);
 
 // _____________________________________________________________________________________________________________
@@ -246,12 +278,24 @@ useEffect(() => {
       </Modal>
 
 
-      <div>
+      {/* <div>
         <h2>{nombreCarrera}</h2>
-        <p>{descripcionCarrera}</p>
+        <p className="text-justify">{descripcionCarrera}</p>
         <h6>{encargadoCarrera}</h6>
+      </div> */}
+      <div className="w-full p-6 my-2 bg-white border border-gray-200 rounded-lg shadow-md  ">
+        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ">{nombreCarrera}</h5>
+         <p className="mb-3 font-normal text-gray-700 ">{descripcionCarrera}</p>
       </div>
-      <div className="flex flex-row">
+      <div className="flex flex-row items-center justify-between">
+      <div className="font-semibold text-base">
+          Materias del Semestre {semestreid}
+      </div>
+      {active?
+      (<div className="flex flex-row items-center">
+        <div className="font-semibold  pl-3 mr-2">
+          Crear Materia
+        </div>
       <button
                     type="button"
                     onClick={() => {
@@ -264,12 +308,25 @@ useEffect(() => {
                   </svg>
                     
                   </button>
+      </div>):(<></>)
+      }
       </div>
+      
       <div>
          {materias?.map((elemento) => (
-          <div key={elemento.id} className="flex flex-row rounded bg-sky-900 mt-1 ">
-            <p>{elemento.nombre} {elemento.estado?"Activo":"Inactivo"}</p>
-            <div className="flex flex-row">
+          <div key={elemento.id} >
+          <div className="flex flex-row justify-between items-center rounded bg-sky-900 mt-1">
+            <div className="flex flex-row justify-between p-1 w-full">
+            <div className=" text-stone-50 pl-3 mr-3 ">
+            {elemento.nombre} 
+            </div>
+            <div className=" text-stone-50">
+            {elemento.estado?"Activo":"Inactivo"}
+            </div>
+            </div>
+
+            {active? 
+            (<div className="flex flex-row">
                   <button
                     type="button"
                     onClick={() => {
@@ -315,13 +372,29 @@ useEffect(() => {
                       />
                     </svg>
                   </button>
+             </div>)
+            :(<></>)}
+                
+          </div>
+          <div className="flex flex-row justify-between items-center rounded bg-sky-600 mt-1 ml-5 h-10 px-2">
+                <div>
+                aqui van los docs :v  
                 </div>
-                {/* <div className="flex flex-col bg-cyan-500">
-                  <p>aqui van los links de las materias crack</p>
-                  </div> */}
+          </div>
+
           </div>
         ))}            
 
+      </div>
+
+      <div className="flex flex-col justify-center items-center rounded bg-sky-300 mt-3">
+        <div>COMENTARIOS: </div>
+        {comentario?.map((elemento) =>(
+          <div key={elemento.id} >
+          <div>{elemento.comentario}</div>
+          </div>
+        
+        ))}
       </div>
 
     </>

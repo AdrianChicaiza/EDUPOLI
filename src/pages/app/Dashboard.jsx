@@ -52,10 +52,10 @@ export const Dashboard = () => {
   
   const traerSemestreRol=async()=>{
     if (user.role_id == 1) {
-      console.log("El usuario es admin");
+      console.log("El usuario es admin semestre");
       traerSemestresAdmin();
     } else {
-      console.log("El usuario es estudiante");
+      console.log("El usuario es estudiante semestre");
       traerSemestres();
     }
   }
@@ -67,13 +67,8 @@ export const Dashboard = () => {
         "http://localhost:8000/api/v1/semestres/adminE",
         config
       );
-      console.log("Respuesta de data.data.data: ", response.data.data);
+      console.log("Traje semestres modo admin");
       setSem(response.data.data);
-      // if (user.role_id == 1) {
-      //   console.log("El usuario es admin");
-      // } else {
-      //   console.log("El usuario es estudiante");
-      // }
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
@@ -87,13 +82,8 @@ export const Dashboard = () => {
         "http://localhost:8000/api/semestres",
         config
       );
-      console.log("Respuesta de data.data.data: ", response.data.data);
+      console.log("Traje semestres modo estudiante");
       setSem(response.data.data);
-      // if (user.role_id == 1) {
-      //   console.log("El usuario es admin");
-      // } else {
-      //   console.log("El usuario es estudiante");
-      // }
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
@@ -101,7 +91,6 @@ export const Dashboard = () => {
   };
 
   const crearSemestre = async (a) => {
-   
     try {
       const response = await axios.post(
         "http://localhost:8000/api/v1/semestres/admin/"+a,
@@ -109,7 +98,6 @@ export const Dashboard = () => {
         //{ headers: { accept: "application/json" } },
         config
       );
-
       console.log("Se creo el nuevo semestre");
       setNombre("");
       setDescripcion("");
@@ -119,6 +107,7 @@ export const Dashboard = () => {
       console.log(error.response.data.message, "error");
     }
   };
+
   const modalStyle = {
     position: "absolute",
     top: "50%",
@@ -129,28 +118,10 @@ export const Dashboard = () => {
     //padding:10
   };
  
-
   useEffect(() => {
-    //traerCarreras();
     traerSemestreRol();
   }, []);
 
-  // const palabras = [
-  //   { id: "1", bn: "si" },
-  //   { id: "2", bn: "no" },
-  //   { id: "3", bn: "a" },
-  //   { id: "4", bn: "nbo" },
-  //   { id: "5", bn: "noc" },
-  //   { id: "6", bn: "nos" },
-  //   { id: "7", bn: "nod" },
-  // ];
-
-  // const personas = {
-  //   urlImagen:
-  //     "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg",
-  //   nombre: "Adrian Chicaiza",
-  //   texto: "Buena aplicacion :D",
-  // };
   if (recargar) {
     return <Loading />;
   }
@@ -218,11 +189,9 @@ export const Dashboard = () => {
         <h1 className="pl-10">ESFOT</h1>
         <p className="pl-10 text-lg font-bold">Desarrollo de Software</p>
         <button
-            // type="submit"
+          
             onClick={() => {
-              // verSemestre(semestre.id);
               setEstadoModal(true);
-              //actualizarSemestre(semestre.id);
             }}
             className=" inline-block px-3 ml-10 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
           >
@@ -261,35 +230,7 @@ export const Dashboard = () => {
 
         {/* <button onClick={handleAddCarrera}>Agregar Carrera</button> */}
 
-        {/* <form className="mt-8 space-y-6" onSubmit={crearSemestre}>
-          <input
-            id="nombre"
-            name="nombre"
-            type="text"
-            value={nombre}
-            required
-            className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
-            placeholder="Nombre"
-            onChange={(e) => setNombre(e.target.value)}
-          />
-          <input
-            id="descripcion"
-            name="descripcion"
-            type="text"
-            value={descripcion}
-            required
-            className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
-            placeholder="descripcion"
-            onChange={(e) => setDescripcion(e.target.value)}
-          />
-          <button
-            type="submit"
-            className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 "
-          >
-            Crear Semestre
-          </button>
-        </form> */}
-
+        
         
       </div>
       {/* _______________________________________________________________________________ */}
