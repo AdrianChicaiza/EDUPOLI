@@ -378,7 +378,7 @@ useEffect(() => {
           </div>
           <div className="flex flex-row justify-between items-center rounded bg-sky-600 mt-1 ml-5 h-10 px-2">
                 <div>
-                aqui van los docs :v  
+                Seccion de los documentos
                 </div>
           </div>
 
@@ -388,7 +388,7 @@ useEffect(() => {
       </div>
 
       <div className="flex flex-col justify-center items-center rounded bg-sky-300 mt-3">
-        <div>COMENTARIOS: </div>
+        <div>Seccion de comentarios: </div>
         {comentario?.map((elemento) =>(
           <div key={elemento.id} >
           <div>{elemento.comentario}</div>

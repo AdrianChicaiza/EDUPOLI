@@ -24,8 +24,8 @@ export const CardCarrera = ({ semestre }) => {
   const [recargar, setRecargar] = useState(false);
   const navigate = useNavigate();
   //variables para las nuevas carreras:
-  const [nombre, setNombre] = useState("");
-  const [descripcion, setDescripcion] = useState("");
+  const [nombre, setNombre] = useState(semestre.nombre);
+  const [descripcion, setDescripcion] = useState(semestre.descripcion);
 
   // https://heroicons.com
   const config = {
@@ -169,7 +169,7 @@ export const CardCarrera = ({ semestre }) => {
             <img
               className="rounded-t-lg"
               src={
-                semestre.url
+                semestre?.url
                   ? semestre.url
                   : "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg"
               }
@@ -179,14 +179,14 @@ export const CardCarrera = ({ semestre }) => {
           {/* p-6 por default */}
           <div className="px-6 py-3">
             <h5 className="text-gray-900 text-xl font-medium mb-1">
-              {semestre.nombre}
+              {semestre?.nombre}
               {/* {semestre.estado} */}
             </h5>
             <p className="text-gray-700 text-base mb-2">
-              {semestre.descripcion}
+              {semestre?.descripcion}
             </p>
             <p className="text-gray-700 text-xs mb-2">
-              {semestre.estado ? "Semestre activo" : "Semestre desactivo"}
+              {semestre?.estado ? "Semestre activo" : "Semestre desactivo"}
             </p>
 
             {/* __________________________BOTONES______________________________________________________________________ */}
@@ -208,7 +208,7 @@ export const CardCarrera = ({ semestre }) => {
                   <button
                     type="button"
                     onClick={() => {
-                      verSemestre(semestre.id);
+                      // verSemestre(semestre.id);
                       setEstadoModal(true);
                     }}
                     className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded-l-lg shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"

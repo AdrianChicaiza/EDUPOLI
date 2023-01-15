@@ -24,6 +24,7 @@ import {
   Input,
   Label,
 } from "reactstrap";
+import { useRef } from "react";
 // import { ComentarioCard } from "../../components/variants/ComentarioCard";
 // https://tailwind-elements.com/docs/standard/components/video-carousel/
 // crud apirest
@@ -33,13 +34,16 @@ export const Dashboard = () => {
   // const navigate = useNavigate();
   const tokenUser = localStorage.getItem("token");
   const [active, setActive] = useState(true);
-  const [sem, setSem] = useState([]);
+  const [sem, setSem] = useState(null);
   const [recargar, setRecargar] = useState(true);
+  const [carrerasA, setCarrerasA] = useState(null);
   const { user } = useContext(AuthContext);
   const [estadoModal, setEstadoModal] = useState(false);
   //variables para las nuevas carreras:
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
+  let semestreSeleccionado=-1;
+  const carreraSelect=useRef(-1);
   // iterar objetos:
   // https://mauriciogc.medium.com/react-map-filter-y-reduce-54777359d94
 
@@ -49,16 +53,31 @@ export const Dashboard = () => {
   const config = {
     headers: { Authorization: `${tokenUser}` },
   };
-  
-  const traerSemestreRol=async()=>{
+
+  const traerSemestreRol = async () => {
     if (user.role_id == 1) {
       console.log("El usuario es admin semestre");
       traerSemestresAdmin();
+      setActive(true);
     } else {
       console.log("El usuario es estudiante semestre");
       traerSemestres();
+      setActive(false);
     }
-  }
+  };
+
+  const traerCarrerasAdmin = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/v1/carreras/admin",
+        config
+      );
+      console.log("Carreras: ", response.data.data);
+      setCarrerasA(response.data.data);
+    } catch (error) {
+      console.log(error.response.data.message, "error");
+    }
+  };
 
   const traerSemestresAdmin = async () => {
     setRecargar(true);
@@ -67,19 +86,24 @@ export const Dashboard = () => {
         "http://localhost:8000/api/v1/semestres/adminE",
         config
       );
-      console.log("Traje semestres modo admin");
+      console.log(
+        "Traje semestres modo admin los semestres son: ",
+        response.data.data
+      );
+      //console.log("Id Semetres: ",response.data.data.carreras_id);
+
       setSem(response.data.data);
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
     setRecargar(false);
-  }
+  };
 
   const traerSemestres = async () => {
     setRecargar(true);
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/semestres",
+        "http://localhost:8000/api/v1/semestres/admin",
         config
       );
       console.log("Traje semestres modo estudiante");
@@ -90,10 +114,10 @@ export const Dashboard = () => {
     setRecargar(false);
   };
 
-  const crearSemestre = async (a) => {
+  const crearSemestre = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/v1/semestres/admin/"+a,
+        "http://localhost:8000/api/v1/semestres/admin/" + carreraSelect.current,
         { nombre, descripcion },
         //{ headers: { accept: "application/json" } },
         config
@@ -113,26 +137,30 @@ export const Dashboard = () => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%,-50%)",
-    width: 1000
+    width: 1000,
     //background:"black",
     //padding:10
   };
- 
+
   useEffect(() => {
+    traerCarrerasAdmin();
     traerSemestreRol();
   }, []);
 
-  if (recargar) {
+  if (recargar || !carrerasA || !sem) {
     return <Loading />;
+
   }
   return (
     <>
-    <Modal isOpen={estadoModal} style={modalStyle}>
+      <Modal isOpen={estadoModal} style={modalStyle}>
         <ModalHeader>Vista Semestre</ModalHeader>
         <ModalBody>
           {/* <form className="mt-8 space-y-6" onSubmit={actualizarSemestre(semestre.id)}> */}
           <div className="form-group">
-            <label htmlFor="nombre" className="font-medium">Nombre</label>
+            <label htmlFor="nombre" className="font-medium">
+              Nombre
+            </label>
             <input
               className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
               type="text"
@@ -142,7 +170,9 @@ export const Dashboard = () => {
               onChange={(e) => setNombre(e.target.value)}
             />
             <br />
-            <label htmlFor="descripcion" className="font-medium mt-2">Descripcion</label>
+            <label htmlFor="descripcion" className="font-medium mt-2">
+              Descripcion
+            </label>
             <input
               className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
               type="text"
@@ -161,7 +191,7 @@ export const Dashboard = () => {
             onClick={() => {
               // verSemestre(semestre.id);
               //setEstadoModal(false);
-              crearSemestre(1);
+              crearSemestre(carreraSelect.current);
             }}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
           >
@@ -187,22 +217,35 @@ export const Dashboard = () => {
       {/* <Carrusel carrera={carrera}/> */}
       <div className="p-1">
         <h1 className="pl-10">ESFOT</h1>
-        <p className="pl-10 text-lg font-bold">Desarrollo de Software</p>
-        <button
-          
-            onClick={() => {
-              setEstadoModal(true);
-            }}
-            className=" inline-block px-3 ml-10 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
-          >
-            Crear Semestre
-          </button>
-        <hr />
-        <Carrusel2 semestre={sem} />
 
+        {carrerasA?.map((carrera) => {
+          const semestress =[]; 
+            sem.map((semestrefilter) => {
+            if (semestrefilter.carreras_id === carrera.id) {
+              semestress.push(semestrefilter);
+            }
+          });
+          return (
+            <div key={carrera.id}>
+              <p className="pl-10 text-lg font-bold">{carrera.nombre}</p>
+              <button
+                onClick={() => {
+                  carreraSelect.current=carrera.id;
+                  setEstadoModal(true);
+                }}
+                className=" inline-block px-3 ml-10 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+              >
+                Crear Semestre
+              </button>
+              <hr />
+              {/* {const semestress=[]} */}
+
+              <Carrusel2 semestre={semestress} />
+            </div>
+          );
+        })}
         {/* ________________________________________________________________________________________ */}
         <hr />
-      
 
         {/* _____________________________________________________________________________________________________________ */}
         {/* <ComentarioCard persona={personas} className="p-25" /> */}
@@ -229,9 +272,6 @@ export const Dashboard = () => {
         ))} */}
 
         {/* <button onClick={handleAddCarrera}>Agregar Carrera</button> */}
-
-        
-        
       </div>
       {/* _______________________________________________________________________________ */}
     </>
