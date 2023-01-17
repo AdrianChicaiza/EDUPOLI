@@ -42,8 +42,7 @@ export const Dashboard = () => {
   //variables para las nuevas carreras:
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  let semestreSeleccionado=-1;
-  const carreraSelect=useRef(-1);
+  const carreraSelect = useRef(-1);
   // iterar objetos:
   // https://mauriciogc.medium.com/react-map-filter-y-reduce-54777359d94
 
@@ -149,7 +148,6 @@ export const Dashboard = () => {
 
   if (recargar || !carrerasA || !sem) {
     return <Loading />;
-
   }
   return (
     <>
@@ -215,32 +213,36 @@ export const Dashboard = () => {
         <CardCarrera carrera={carrera2} />
       </div> */}
       {/* <Carrusel carrera={carrera}/> */}
-      <div className="p-1">
-        <h1 className="pl-10">ESFOT</h1>
+      <div>
+        <h1 className="pl-2">ESFOT</h1>
 
         {carrerasA?.map((carrera) => {
-          const semestress =[]; 
-            sem.map((semestrefilter) => {
+          const semestress = [];
+          sem.map((semestrefilter) => {
             if (semestrefilter.carreras_id === carrera.id) {
               semestress.push(semestrefilter);
             }
           });
           return (
             <div key={carrera.id}>
-              <p className="pl-10 text-lg font-bold">{carrera.nombre}</p>
-              <button
-                onClick={() => {
-                  carreraSelect.current=carrera.id;
-                  setEstadoModal(true);
-                }}
-                className=" inline-block px-3 ml-10 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
-              >
-                Crear Semestre
-              </button>
-              <hr />
-              {/* {const semestress=[]} */}
+              <p className="pl-2 text-lg font-bold">{carrera.nombre}</p>
+              {active ? (
+                <button
+                  onClick={() => {
+                    carreraSelect.current = carrera.id;
+                    setEstadoModal(true);
+                  }}
+                  className=" inline-block px-3 ml-2 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+                >
+                  Crear Semestre
+                </button>
+              ) : (
+                <></>
+              )}
+              
 
               <Carrusel2 semestre={semestress} />
+              <hr />
             </div>
           );
         })}
