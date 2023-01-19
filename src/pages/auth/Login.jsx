@@ -3,6 +3,7 @@ import { useContext, useState } from "react";
 import axios from "axios";
 import { AuthContext } from "../../contexts";
 import { Link } from "react-router-dom";
+import swal from 'sweetalert';
 
 export const Login = () => {
   const { login } = useContext(AuthContext);
@@ -12,6 +13,17 @@ export const Login = () => {
   const [activo, setActivo] = useState(false);
  // https://www.youtube.com/watch?v=I0yFDDeQG7I
  //crear spinner
+  const alerta=()=>{
+    // https://sweetalert.js.org/guides/
+    swal({
+      title: "Error",
+      text: "Las credenciales son incorrectas",
+      icon: "warning",
+      button: "ok",
+      timer:"2000"
+    });
+  }
+
   const onLogin = async (e) => {
     e.preventDefault();
     try {
@@ -28,10 +40,11 @@ export const Login = () => {
       // console.log(user);
       // console.log("el response es : ",response);
     } catch (error) {
+      alerta();
       console.log(error.response.data.message, "error");
       setEmail("");
       setPassword("");
-      setActivo(true);
+      // setActivo(true);
     }
   };
 
@@ -95,9 +108,9 @@ export const Login = () => {
                       />
                     </div>
                   </div>
-                  <b className="block text-sm text-center text-cyan-700 tracking-wide">
+                  {/* <b className="block text-sm text-center text-cyan-700 tracking-wide">
                     {activo ? "Las credenciales son incorrectas" : ""}
-                  </b>
+                  </b> */}
                   <div className="flex items-center justify-center">
                     <div className="text-sm  ">
                       <Link

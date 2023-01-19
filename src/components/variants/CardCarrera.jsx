@@ -15,6 +15,7 @@ import {
 } from "reactstrap";
 import InputCyan from "./InputCyan";
 import Loading from "../../pages/app/loading";
+import swal from 'sweetalert';
 
 export const CardCarrera = ({ semestre }) => {
   const { user } = useContext(AuthContext);
@@ -26,7 +27,26 @@ export const CardCarrera = ({ semestre }) => {
   //variables para las nuevas carreras:
   const [nombre, setNombre] = useState(semestre.nombre);
   const [descripcion, setDescripcion] = useState(semestre.descripcion);
-
+  const alerta=()=>{
+    // https://sweetalert.js.org/guides/
+    swal({
+      //title: "Error",
+      text: "Se actualizo el semestre",
+      icon: "success",
+      button: "ok",
+      timer:"2000"
+    });
+  }
+  const desactivarAlert=()=>{
+    // https://sweetalert.js.org/guides/
+    swal({
+      //title: "Error",
+      text: "Se cambio el estado de la materia",
+      icon: "success",
+      button: "ok",
+      timer:"3000"
+    });
+  }
   // https://heroicons.com
   const config = {
     headers: { Authorization: `${tokenUser}` },
@@ -42,22 +62,22 @@ export const CardCarrera = ({ semestre }) => {
     }
   };
 
-  const verSemestre = async (a) => {
-    // setRecargar(true);
-    try {
-      const response = await axios.get(
-        "http://localhost:8000/api/v1/semestres/admin/" + a,
-        //{ headers: { accept: "application/json" } },
-        config
-      );
-      console.log("Traje datos del semestre en card");
-      setNombre(response.data.data.nombre);
-      setDescripcion(response.data.data.descripcion);
-    } catch (error) {
-      console.log(error.response.data.message, "error");
-    }
-    // setRecargar(false);
-  };
+  // const verSemestre = async (a) => {
+  //   // setRecargar(true);
+  //   try {
+  //     const response = await axios.get(
+  //       "http://localhost:8000/api/v1/semestres/admin/" + a,
+  //       //{ headers: { accept: "application/json" } },
+  //       config
+  //     );
+  //     console.log("Traje datos del semestre en card");
+  //     setNombre(response.data.data.nombre);
+  //     setDescripcion(response.data.data.descripcion);
+  //   } catch (error) {
+  //     console.log(error.response.data.message, "error");
+  //   }
+  //   // setRecargar(false);
+  // };
 
   const actualizarSemestre = async (a) => {
     //e.preventDefault();
@@ -69,6 +89,10 @@ export const CardCarrera = ({ semestre }) => {
       );
 
       console.log("Se actualizo el semestre");
+      // comprobarRole();
+      setEstadoModal(false);
+      alerta();
+      window.location.href = window.location.href;
       // traerSemestres();
     } catch (error) {
       console.log(error.response.data.message, "error");
@@ -81,7 +105,9 @@ export const CardCarrera = ({ semestre }) => {
         "http://localhost:8000/api/v1/semestres/desactiva/admin/" + a,
         config
       );
+      desactivarAlert();
       console.log("Se cambio el estado del semestre");
+      window.location.href = window.location.href;
     } catch (error) {
       console.log(error.response.data.message, "error");
     }

@@ -153,6 +153,7 @@ export const PerfilUsuario = () => {
                  hover:file:cursor-pointer hover:file:opacity-80
                "
                   id="image"
+                  accept="image/*"
                   type="file"
                   onChange={(e) => {
                     vistaPreliminarFoto(e);
