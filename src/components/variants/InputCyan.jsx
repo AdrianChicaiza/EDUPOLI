@@ -9,6 +9,7 @@ export default function InputCyan({
   required,
   tamaño,
   lectura,
+  ref
 }) {
   return (
     <div>
@@ -19,8 +20,9 @@ export default function InputCyan({
         value={value}
         required={required}
         maxLength={tamaño}
-        className="relative w-full rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+        className="relative w-full rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 sm:text-sm"
         // placeholder="Correo"
+        ref={ref}
         onChange={(e) => setvalue(e.target.value)}
         readOnly={lectura}
       />

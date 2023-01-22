@@ -13,16 +13,14 @@ export const Login = () => {
   const [activo, setActivo] = useState(false);
  // https://www.youtube.com/watch?v=I0yFDDeQG7I
  //crear spinner
-  const alerta=()=>{
-    // https://sweetalert.js.org/guides/
-    swal({
-      title: "Error",
-      text: "Las credenciales son incorrectas",
-      icon: "warning",
-      button: "ok",
-      timer:"2000"
-    });
-  }
+ const Swal = require("sweetalert2");
+ const errorAlert = () => {
+   Swal.fire({
+     icon: "error",
+     title: "Oops...",
+     text: "Algo salio mal",
+   });
+ };
 
   const onLogin = async (e) => {
     e.preventDefault();
@@ -40,7 +38,7 @@ export const Login = () => {
       // console.log(user);
       // console.log("el response es : ",response);
     } catch (error) {
-      alerta();
+      errorAlert();
       console.log(error.response.data.message, "error");
       setEmail("");
       setPassword("");

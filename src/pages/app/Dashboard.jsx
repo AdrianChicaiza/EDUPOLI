@@ -48,13 +48,29 @@ export const Dashboard = () => {
   const carreraSelect = useRef(-1);
   const carreraSlectEdit = useRef(-1);
   const [consultando, setConsultando] = useState(false);
-
+  const Swal = require("sweetalert2");
   // iterar objetos:
   // https://mauriciogc.medium.com/react-map-filter-y-reduce-54777359d94
 
   // https://www.youtube.com/watch?v=eBKcGAhkZUI
   // carrusel v2
+  const errorAlert = () => {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Algo salio mal",
+    });
+  };
 
+  const bienAlert = () => {
+    Swal.fire({
+      icon: "success",
+      title: "Bien!!",
+      text: "Todo salio bien",
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  };
   const config = {
     headers: { Authorization: `${tokenUser}` },
   };
@@ -120,6 +136,7 @@ export const Dashboard = () => {
   };
 
   const crearSemestre = async () => {
+    setConsultando(true);
     try {
       const response = await axios.post(
         "http://localhost:8000/api/v1/semestres/admin/" + carreraSelect.current,
@@ -132,16 +149,21 @@ export const Dashboard = () => {
       setDescripcion("");
       traerSemestreRol();
       setEstadoModal(false);
+      bienAlert();
+      window.location.href = window.location.href;
     } catch (error) {
+      errorAlert();
       console.log(error.response.data.message, "error");
     }
+    setConsultando(false);
   };
 
   const crearCarrera = async () => {
+    setConsultando(true);
     try {
       const response = await axios.post(
         "http://localhost:8000/api/v1/carreras/admin",
-        { nombre, descripcion,encargado },
+        { nombre, descripcion, encargado },
         //{ headers: { accept: "application/json" } },
         config
       );
@@ -149,30 +171,51 @@ export const Dashboard = () => {
       setNombre("");
       setDescripcion("");
       setEncargado("");
-      traerSemestreRol();
+      // traerSemestreRol();
       setEstadoModal(false);
+      bienAlert();
       window.location.href = window.location.href;
     } catch (error) {
+      errorAlert();
       console.log(error.response.data.message, "error");
     }
+    setConsultando(true);
   };
 
-  const editarCarrera=async()=>{
+  const editarCarrera = async () => {
     setConsultando(true);
-    try {      
+    try {
       const response = await axios.put(
-        "http://localhost:8000/api/v1/carreras/admin/" +carreraSelect.current,
-        { nombre, descripcion,encargado },
+        "http://localhost:8000/api/v1/carreras/admin/" + carreraSelect.current,
+        { nombre, descripcion, encargado },
         config
       );
       console.log("Se actualizo la carrera");
-      window.location.href = window.location.href;
       setEstadoModal3(false);
+      bienAlert();
+      window.location.href = window.location.href;
     } catch (error) {
+      errorAlert();
       console.log(error.response.data.message, "error");
     }
     setConsultando(false);
+  };
 
+  const desactivarCarrera=async()=>{
+    setRecargar(true);
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/v1/carreras/desactiva/admin/"+carreraSelect.current,
+        config
+      );
+      console.log("Traje semestres modo estudiante");
+      bienAlert()
+      window.location.href = window.location.href;
+    } catch (error) {
+      errorAlert();
+      console.log(error.response.data.message, "error");
+    }
+    setRecargar(false);
   }
 
   const modalStyle = {
@@ -196,7 +239,7 @@ export const Dashboard = () => {
   return (
     <>
       <Modal isOpen={estadoModal} style={modalStyle}>
-        <ModalHeader>Vista Semestre</ModalHeader>
+        <ModalHeader>Crear Semestre</ModalHeader>
         <ModalBody>
           {/* <form className="mt-8 space-y-6" onSubmit={actualizarSemestre(semestre.id)}> */}
           <div className="form-group">
@@ -227,27 +270,24 @@ export const Dashboard = () => {
           </div>
         </ModalBody>
         <ModalFooter>
-          {/* <Button>a</Button> */}
           <button
-            // type="submit"
             onClick={() => {
-              // verSemestre(semestre.id);
-              //setEstadoModal(false);
               crearSemestre(carreraSelect.current);
             }}
+            disabled={consultando}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
           >
-            Crear
+            {consultando ? "Cargando..." : "Crear"}
           </button>
           <button
             type="button"
             onClick={() => {
-              // verSemestre(semestre.id);
               setEstadoModal(false);
             }}
+            disabled={consultando}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
           >
-            Cerrar
+            {consultando ? "..." : "Cerrar"}
           </button>
         </ModalFooter>
       </Modal>
@@ -294,18 +334,14 @@ export const Dashboard = () => {
           </div>
         </ModalBody>
         <ModalFooter>
-          {/* <Button>a</Button> */}
           <button
-            // type="submit"
             onClick={() => {
-              // verSemestre(semestre.id);
-              //setEstadoModal(false);
-              // crearSemestre(carreraSelect.current);
               crearCarrera();
             }}
+            disabled={consultando}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
           >
-            Crear
+            {consultando ? "Cargando..." : "Crear"}
           </button>
           <button
             type="button"
@@ -313,9 +349,10 @@ export const Dashboard = () => {
               // verSemestre(semestre.id);
               setEstadoModal2(false);
             }}
+            disabled={consultando}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
           >
-            Cerrar
+            {consultando ? "..." : "Cerrar"}
           </button>
         </ModalFooter>
       </Modal>
@@ -362,56 +399,45 @@ export const Dashboard = () => {
           </div>
         </ModalBody>
         <ModalFooter>
-          {/* <Button>a</Button> */}
           <button
-            // type="submit"
             onClick={() => {
-               console.log("Edite la Carrera escogida: ",carreraSelect.current);
+              console.log("Edite la Carrera escogida: ", carreraSelect.current);
               editarCarrera();
             }}
-            disabled={consultando}
             className="inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+            disabled={consultando}
           >
-            {consultando?"Cargando...":"Editar"}
+            {consultando ? "Cargando..." : "Editar"}
           </button>
           <button
             type="button"
             onClick={() => {
-              // verSemestre(semestre.id);
               setEstadoModal3(false);
             }}
+            disabled={consultando}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
           >
-            Cerrar
+            {consultando ? "..." : "Cerrar"}
           </button>
         </ModalFooter>
       </Modal>
       {/* ___________________________________________________________________________________ */}
-      {/* <div className="flex flex-row">
-        <CardCarrera carrera={carrera} />
-        <CardCarrera carrera={carrera2} />
-      </div> */}
-      {/* <Carrusel carrera={carrera}/> */}
       <div>
         <div className="flex flex-row justify-between items-center">
-        <div className="pl-2 text-lg font-bold text-2xl">ESFOT</div>
-        {active ? (
-                <button
-                  onClick={() => {
-                    // carreraSelect.current = carrera.id;
-                    // setEstadoModal(true);
-                    setEstadoModal2(true);
-                  }}
-                  className=" inline-block px-3 ml-2 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
-                >
-                  Crear Carrera
-                </button>
-              ) : (
-                <></>
-              )}
-
+          <div className="pl-2 text-lg font-bold text-2xl">ESFOT</div>
+          {active ? (
+            <button
+              onClick={() => {
+                setEstadoModal2(true);
+              }}
+              className=" inline-block px-3 ml-2 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+            >
+              Crear Carrera
+            </button>
+          ) : (
+            <></>
+          )}
         </div>
-        
 
         {carrerasA?.map((carrera) => {
           const semestress = [];
@@ -421,33 +447,43 @@ export const Dashboard = () => {
             }
           });
           return (
-            <div key={carrera.id}>
+            <div key={carrera.id} className=" rounded">
               <p className="pl-2 text-lg font-bold">{carrera.nombre}</p>
-              
+              <p>{carrera?.estado ? "Carrera activo" : "Carrera desactivo"}</p>
+
               {active ? (
                 <div>
                   <button
-                  onClick={() => {
-                    carreraSelect.current = carrera.id;
-                    setNombre(carrera.nombre);
-                    setDescripcion(carrera.descripcion);
-                    setEncargado(carrera.encargado);
-                    setEstadoModal3(true);
-                  }}
-                  
-                  className=" inline-block px-3 ml-2 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-900 active:shadow-lg transition duration-150 ease-in-out"
-                >
-                  Editar Carrera
-                </button>
-                <button
-                  onClick={() => {
-                    carreraSelect.current = carrera.id;
-                    setEstadoModal(true);
-                  }}
-                  className=" inline-block px-3 ml-2 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
-                >
-                  Crear Semestre
-                </button>
+                    onClick={() => {
+                      carreraSelect.current = carrera.id;
+                      setNombre(carrera.nombre);
+                      setDescripcion(carrera.descripcion);
+                      setEncargado(carrera.encargado);
+                      setEstadoModal3(true);
+                    }}
+                    className=" inline-block px-3 ml-2 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-900 active:shadow-lg transition duration-150 ease-in-out"
+                  >
+                    Editar Carrera
+                  </button>
+                  <button
+                    onClick={() => {
+                      carreraSelect.current = carrera.id;
+                      //console.log("carrera seleccionada",carreraSelect.current)
+                      desactivarCarrera();
+                    }}
+                    className=" inline-block px-3 ml-2 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+                  >
+                    Desactivar Carrera
+                  </button>
+                  <button
+                    onClick={() => {
+                      carreraSelect.current = carrera.id;
+                      setEstadoModal(true);
+                    }}
+                    className=" inline-block px-3 ml-2 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+                  >
+                    Crear Semestre
+                  </button>
                 </div>
               ) : (
                 <></>

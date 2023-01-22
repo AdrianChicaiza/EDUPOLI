@@ -15,7 +15,6 @@ import {
 } from "reactstrap";
 import InputCyan from "./InputCyan";
 import Loading from "../../pages/app/loading";
-import swal from 'sweetalert';
 
 export const CardCarrera = ({ semestre }) => {
   const { user } = useContext(AuthContext);
@@ -24,30 +23,38 @@ export const CardCarrera = ({ semestre }) => {
   const [estadoModal, setEstadoModal] = useState(false);
   const [recargar, setRecargar] = useState(false);
   const navigate = useNavigate();
+  const [consultando, setConsultando] = useState(false);
   //variables para las nuevas carreras:
   const [nombre, setNombre] = useState(semestre.nombre);
   const [descripcion, setDescripcion] = useState(semestre.descripcion);
-  const alerta=()=>{
-    // https://sweetalert.js.org/guides/
-    swal({
-      //title: "Error",
-      text: "Se actualizo el semestre",
-      icon: "success",
-      button: "ok",
-      timer:"2000"
-    });
-  }
-  const desactivarAlert=()=>{
-    // https://sweetalert.js.org/guides/
-    swal({
-      //title: "Error",
-      text: "Se cambio el estado de la materia",
-      icon: "success",
-      button: "ok",
-      timer:"3000"
-    });
-  }
+  const Swal = require("sweetalert2");
   // https://heroicons.com
+
+  const errorAlert = () => {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Algo salio mal",
+    });
+  };
+
+  const actualizarSemestreAlert = () => {
+    Swal.fire({
+      icon: "success",
+      title: "Se actualizo el Semestre",
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  };
+  const estadoMateriaAlert = () => {
+    Swal.fire({
+      icon: "success",
+      title: "Se cambio el estado de la materia",
+      showConfirmButton: false,
+      timer: 2000
+    });
+  };
+
   const config = {
     headers: { Authorization: `${tokenUser}` },
   };
@@ -63,6 +70,7 @@ export const CardCarrera = ({ semestre }) => {
   };
 
   const actualizarSemestre = async (a) => {
+    setConsultando(true);
     //e.preventDefault();
     try {
       const response = await axios.put(
@@ -74,26 +82,31 @@ export const CardCarrera = ({ semestre }) => {
       console.log("Se actualizo el semestre");
       // comprobarRole();
       setEstadoModal(false);
-      alerta();
+      actualizarSemestreAlert();
       window.location.href = window.location.href;
       // traerSemestres();
     } catch (error) {
+      errorAlert();
       console.log(error.response.data.message, "error");
     }
+    setConsultando(false);
   };
 
   const desactivarSemestre = async (a) => {
+    setConsultando(true);
     try {
       const response = await axios.get(
         "http://localhost:8000/api/v1/semestres/desactiva/admin/" + a,
         config
       );
-      desactivarAlert();
+      estadoMateriaAlert();
       console.log("Se cambio el estado del semestre");
       window.location.href = window.location.href;
     } catch (error) {
+      errorAlert();
       console.log(error.response.data.message, "error");
     }
+    setConsultando(false);
   };
 
   useEffect(() => {
@@ -147,49 +160,42 @@ export const CardCarrera = ({ semestre }) => {
           </div>
         </ModalBody>
         <ModalFooter>
-          {/* <Button>a</Button> */}
           <button
-            // type="submit"
             onClick={() => {
-              // verSemestre(semestre.id);
-              //setEstadoModal(false);
+              console.log("Aplaste el actualizar");
               actualizarSemestre(semestre.id);
             }}
+            disabled={consultando}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
           >
-            Actualizar
+            {consultando ? "Cargando..." : "Actualizar"}
           </button>
           <button
             type="button"
             onClick={() => {
-              // verSemestre(semestre.id);
               setEstadoModal(false);
             }}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
           >
-            Cerrar
+            {consultando ? "..." : "Cerrar"}
           </button>
         </ModalFooter>
       </Modal>
 
-      <div className="flex justify-center p-1 ">
-        <div className="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs ">
-          {/* <Link to={"/semestre_" + semestre.id}> */}
-            <img
-              className="rounded-t-lg"
-              src={
-                semestre?.url
-                  ? semestre.url
-                  : "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg"
-              }
-              alt=""
-            />
-          {/* </Link> */}
-          {/* p-6 por default */}
+      <div className="flex justify-center p-1 rounded">
+        <div className="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs">
+          {/* <img
+            className="rounded-t-lg"
+            src={
+              semestre?.url
+                ? semestre.url
+                : "https://monkeyplusbc.com/assets/imags/blogs/cinco-razones-para-estudiar-desarrollo-de-software-pricipal.jpg"
+            }
+            alt=""
+          /> */}
           <div className="px-6 py-3">
             <h5 className="text-gray-900 text-xl font-medium mb-1">
               {semestre?.nombre}
-              {/* {semestre.estado} */}
             </h5>
             <p className="text-gray-700 text-base mb-2">
               {semestre?.descripcion}
@@ -197,30 +203,27 @@ export const CardCarrera = ({ semestre }) => {
             <p className="text-gray-700 text-xs mb-2">
               {semestre?.estado ? "Semestre activo" : "Semestre desactivo"}
             </p>
-
             {/* __________________________BOTONES______________________________________________________________________ */}
-            <div className="flex flex-row">
+            <div className="flex flex-row justify-between items-center max-w-200">
               <button
                 type="button"
-                onClick={()=>{
+                onClick={() => {
                   navigate("/" + semestre.id);
                 }}
-                className=" inline-block px-3 py-1 h-9 mr-2 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+                className="bg-sky-700 hover:bg-sky-900 text-white font-bold py-1 px-3 rounded"
               >
                 Ingresar
               </button>
 
               {/* ______________________botones admin___________________ */}
-
               {active ? (
-                <div className="flex flex-row">
+                <div className="flex flex-row  ">
                   <button
                     type="button"
                     onClick={() => {
-                      // verSemestre(semestre.id);
                       setEstadoModal(true);
                     }}
-                    className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded-l-lg shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+                    className="bg-sky-600 hover:bg-sky-900 text-white font-bold py-1 px-3 rounded-l-lg"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -242,22 +245,27 @@ export const CardCarrera = ({ semestre }) => {
                     onClick={() => {
                       desactivarSemestre(semestre.id);
                     }}
-                    className=" inline-block px-3 py-1 h-9  bg-sky-900 text-white font-medium text-xs leading-tight uppercase rounded-r-lg shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+                    disabled={consultando}
+                    className="bg-sky-900 hover:bg-sky-600 text-white font-bold py-1 px-3 rounded-r-lg"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                    {consultando ? (
+                      "..."
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    )}
                   </button>
                 </div>
               ) : (

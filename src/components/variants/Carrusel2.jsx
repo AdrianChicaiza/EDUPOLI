@@ -15,7 +15,7 @@ export const Carrusel2 = ({ semestre }) => {
       arrows
       autoPlaySpeed={3000}
       centerMode={false}
-      className="px-0 rounded"
+      className="rounded"
       containerClass="container"
       dotListClass=""
       draggable

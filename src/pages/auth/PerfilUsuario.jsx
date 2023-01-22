@@ -1,9 +1,10 @@
 import axios from "axios";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import InputCyan from "../../components/variants/InputCyan";
 import { AuthContext } from "../../contexts/auth/AuthContext";
 import Avatar from "react-avatar";
 import Loading from "../app/loading";
+import { useNavigate } from "react-router-dom";
 
 export const PerfilUsuario = () => {
   const [first_name, setFirst_name] = useState("");
@@ -17,9 +18,35 @@ export const PerfilUsuario = () => {
   const [recargar, setRecargar] = useState(true);
   const [activo, setActivo] = useState(false);
   const [activo2, setActivo2] = useState(false);
-  //   const config = {
-  //     headers: { Authorization: `${tokenUser}` },
-  //   };
+  const [consultando, setConsultando] = useState(false);
+  const navigate = useNavigate();
+  const ref = useRef(null);
+
+  const handleClick = () => {
+    ref.current.focus();
+  };
+
+  const Swal = require("sweetalert2");
+  const errorAlert = () => {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Algo salio mal",
+    });
+  };
+
+  const bienAlert = () => {
+    Swal.fire({
+      icon: "success",
+      title: "Bien!!",
+      text: "Todo salio bien",
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  };
+  const config = {
+    headers: { Authorization: `${tokenUser}` },
+  };
 
   const traerDatos = async () => {
     setRecargar(true);
@@ -27,23 +54,13 @@ export const PerfilUsuario = () => {
     try {
       const response = await axios.get(
         "http://localhost:8000/api/v1/profile/",
-        // {config},
-        { headers: { Authorization: `Bearer: ${tokenUser}` } }
-        // config
+        config
       );
-      // console.log("Trae datos de: ", tokenUser);
-      // console.log("Respuesta: ", response.data.data);
-      // console.log("Imagen del ususario es: ", response.data.data.avatar);
       setImage(response.data.data.avatar);
-      // console.log("Respuesta: ", response.data.data.user);
-      // console.log("Email del usuario: ", response.data.data.user.email);
       setEmail(response.data.data.user.email);
       setFull_name(user.full_name);
       setFirst_name(response.data.data.user.first_name);
       setLast_name(response.data.data.user.last_name);
-      // setactivo(true)
-      // navigate('/');
-      // navigate("login");
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
@@ -83,29 +100,24 @@ export const PerfilUsuario = () => {
   };
 
   const actualizarUsusario = async (e) => {
+    setConsultando(true);
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/v1/profile/1",
+        "http://localhost:8000/api/v1/profile/",
         { first_name, last_name, email },
         { headers: { Authorization: `Bearer: ${tokenUser}` } },
         { headers: { accept: "application/json" } }
       );
       subirFoto();
       setEditar(false);
-      // navigate("/");
-      //  setActivo(true);
-      //  setActivo2(false);
+      bienAlert();
       console.log("Se actualizaron los cambios :D");
-      setActivo(true);
     } catch (error) {
       console.log(error.response.data.message, "error no se guardo D:");
-      setActivo2(true);
-      // setMensajeactivo("No se pudo actualizar los cambios")
-      // setEmail('');
-      // setActivo2(true);
-      // setActivo(false);
+      errorAlert();
     }
+    setConsultando(false);
   };
 
   const divStyle = {
@@ -118,7 +130,7 @@ export const PerfilUsuario = () => {
     //console.log("Traje datos------active cambio :o");
   }, []);
   if (recargar) {
-    return <Loading/>
+    return <Loading />;
   }
   return (
     <>
@@ -129,12 +141,12 @@ export const PerfilUsuario = () => {
 
             <div className="flex flex-col justify-center items-center">
               {/* <input type="file"/> */}
+              {/* <b className="block text-sm text-center text-cyan-700 tracking-wide">
+                {activo ? "Se actualizaron los cambios" : ""}
+              </b>
               <b className="block text-sm text-center text-cyan-700 tracking-wide">
-                    {activo ? "Se actualizaron los cambios" : ""}
-                  </b>
-                  <b className="block text-sm text-center text-cyan-700 tracking-wide">
-                    {activo2 ? "Algo salio mal" : ""}
-                  </b>   
+                {activo2 ? "Algo salio mal" : ""}
+              </b> */}
               <img
                 src={image}
                 id="imgFoto"
@@ -153,7 +165,7 @@ export const PerfilUsuario = () => {
                  hover:file:cursor-pointer hover:file:opacity-80
                "
                   id="image"
-                  accept="image/*"
+                  accept=".jpg"
                   type="file"
                   onChange={(e) => {
                     vistaPreliminarFoto(e);
@@ -200,6 +212,7 @@ export const PerfilUsuario = () => {
                     setvalue={setFirst_name}
                     type="text"
                     name="first_name"
+                    ref={ref}
                     lectura={editar ? false : true}
                   />
                   <label className="font-medium">Apellido</label>
@@ -215,38 +228,32 @@ export const PerfilUsuario = () => {
                   {editar ? (
                     <button
                       type="submit"
-                      // onClick={() => {
-                      //   setEditar(false);
-                      // }}
                       className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-600"
+                      disabled={consultando}
                     >
-                      Actualizar
+                      {consultando ? "Cargando..." : "Actualizar"}
                     </button>
                   ) : (
                     <></>
                   )}
                 </form>
-                {/* <button
-                  type="submit"
-                  onClick={traerDatos}
-                  className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
-                >
-                  Traer Datos
-                </button> */}
                 <div className="flex flex-row">
                   <button
                     type="submit"
                     onClick={() => {
                       setEditar(true);
+                      handleClick();
                     }}
                     className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-600 "
                   >
                     Editar
                   </button>
                   <div className="flex justify-center">
-                    
-                    <a
-                      href="/"
+                    <button
+                      onClick={() => {
+                        navigate("/");
+                      }}
+                      disabled={consultando}
                       className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-600 "
                     >
                       <svg
@@ -263,27 +270,9 @@ export const PerfilUsuario = () => {
                           d="M11.25 9l-3 3m0 0l3 3m-3-3h7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                       </svg>
-                    </a>
+                    </button>
                   </div>
                 </div>
-
-                {/* <button
-                  type="submit"
-                  onClick={subirFoto}
-                  className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
-                >
-                  Subirfoto
-                </button> */}
-                {/* <button
-                  type="submit"
-                  onClick={() => {
-                    setActive(true);
-                  }}
-                  className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
-                >
-                  activar useEffect
-                </button> */}
-                {/* <button onClick={traerDatos}>VerPerfil</button> */}
               </div>
             </div>
           </div>

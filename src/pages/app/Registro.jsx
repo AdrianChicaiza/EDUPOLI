@@ -1,7 +1,7 @@
 
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export const Registro = () => {
 
@@ -12,7 +12,24 @@ export const Registro = () => {
   const [first_name,setfirst_name]=useState("");
   const [last_name, setlast_name] = useState("");
   const [role_id, setRole_id] = useState()
+  const Swal = require("sweetalert2");
+  const errorAlert = () => {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Algo salio mal",
+    });
+  };
 
+  const bienAlert = () => {
+    Swal.fire({
+      icon: "success",
+      title: "Bien!!",
+      text: "Todo salio bien",
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  };
 
 
   const registroF = async (e) => {
@@ -26,17 +43,16 @@ export const Registro = () => {
         setRole_id(2);
         if(password==password_confirmation){
           console.log("Se ha registrado con exito :D");  
-          setMensajeactivo("Se registro con exito ");
+          //setMensajeactivo("Se registro con exito ");
+          bienAlert();
+          Navigate("/");
          // console.log("Respuesta: ",response.data.data)
         }else{
           setMensajeactivo("No coinciden la contraseña");
         }
-        // navigate("/");
-        //  setActivo(true);
-        //  setActivo2(false);
     } catch (error) {
-        console.log(error.response.data.message, 'error no se registro D:');
-        setMensajeactivo("No se pudo registrar")
+        // console.log(error.response.data.message, 'error no se registro D:');
+        errorAlert()
         // setEmail('');  
         // setActivo2(true);
         // setActivo(false);
