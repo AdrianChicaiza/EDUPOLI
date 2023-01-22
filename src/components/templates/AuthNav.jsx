@@ -86,7 +86,7 @@ export const AuthNav = () => {
           </Navbar.Brand>
           <Nav className="me-auto">
             <Nav.Link href="/">Inicio</Nav.Link>
-            <Nav.Link href="#pricing">Sobre Nosotros</Nav.Link>
+            <Nav.Link href="/nosotros">Sobre Nosotros</Nav.Link>
           </Nav>
 
           <Navbar.Toggle />

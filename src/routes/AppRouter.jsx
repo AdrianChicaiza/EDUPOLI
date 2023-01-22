@@ -10,6 +10,7 @@ import { ConfirmarContra } from "../pages/app/ConfirmarContra";
 import { ConfirmarCorreo } from "../pages/app/ConfirmarCorreo";
 import { Dashboard } from "../pages/app/Dashboard";
 import { Ejemplos } from "../pages/app/Ejemplos";
+import { Nosotros } from "../pages/app/Nosotros";
 import { Registro } from "../pages/app/Registro";
 import { SemestrePage } from "../pages/app/SemestrePage";
 import { Login } from "../pages/auth/Login";
@@ -55,6 +56,7 @@ export const AppRouter = () => {
                 {/* <Route index path="/" element={<Ejemplos />} /> */}
                 <Route index path="/" element={<Dashboard />} />
                 <Route index path="/:semestreid" element={<SemestrePage />} />
+                <Route index path="/nosotros" element={<Nosotros />} />
 
                 </Route>
                

@@ -39,10 +39,16 @@ export const Dashboard = () => {
   const [carrerasA, setCarrerasA] = useState(null);
   const { user } = useContext(AuthContext);
   const [estadoModal, setEstadoModal] = useState(false);
+  const [estadoModal2, setEstadoModal2] = useState(false);
+  const [estadoModal3, setEstadoModal3] = useState(false);
+  const [encargado, setEncargado] = useState("");
   //variables para las nuevas carreras:
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const carreraSelect = useRef(-1);
+  const carreraSlectEdit = useRef(-1);
+  const [consultando, setConsultando] = useState(false);
+
   // iterar objetos:
   // https://mauriciogc.medium.com/react-map-filter-y-reduce-54777359d94
 
@@ -131,6 +137,44 @@ export const Dashboard = () => {
     }
   };
 
+  const crearCarrera = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/carreras/admin",
+        { nombre, descripcion,encargado },
+        //{ headers: { accept: "application/json" } },
+        config
+      );
+      console.log("Se creo la nueva carrera");
+      setNombre("");
+      setDescripcion("");
+      setEncargado("");
+      traerSemestreRol();
+      setEstadoModal(false);
+      window.location.href = window.location.href;
+    } catch (error) {
+      console.log(error.response.data.message, "error");
+    }
+  };
+
+  const editarCarrera=async()=>{
+    setConsultando(true);
+    try {      
+      const response = await axios.put(
+        "http://localhost:8000/api/v1/carreras/admin/" +carreraSelect.current,
+        { nombre, descripcion,encargado },
+        config
+      );
+      console.log("Se actualizo la carrera");
+      window.location.href = window.location.href;
+      setEstadoModal3(false);
+    } catch (error) {
+      console.log(error.response.data.message, "error");
+    }
+    setConsultando(false);
+
+  }
+
   const modalStyle = {
     position: "absolute",
     top: "50%",
@@ -146,9 +190,9 @@ export const Dashboard = () => {
     traerSemestreRol();
   }, []);
 
-  if (recargar || !carrerasA || !sem) {
-    return <Loading />;
-  }
+  // if (recargar || !carrerasA || !sem) {
+  //   return <Loading />;
+  // }
   return (
     <>
       <Modal isOpen={estadoModal} style={modalStyle}>
@@ -207,6 +251,141 @@ export const Dashboard = () => {
           </button>
         </ModalFooter>
       </Modal>
+      <Modal isOpen={estadoModal2} style={modalStyle}>
+        <ModalHeader>Crear Carrera</ModalHeader>
+        <ModalBody>
+          {/* <form className="mt-8 space-y-6" onSubmit={actualizarSemestre(semestre.id)}> */}
+          <div className="form-group">
+            <label htmlFor="nombre" className="font-medium">
+              Nombre
+            </label>
+            <input
+              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+              type="text"
+              name="nombre"
+              id="nombre"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+            />
+            <br />
+            <label htmlFor="descripcion" className="font-medium mt-2">
+              Descripcion
+            </label>
+            <input
+              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+              type="text"
+              name="descripcion"
+              id="descripcion"
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+            />
+            <br />
+            <label htmlFor="encargado" className="font-medium">
+              encargado
+            </label>
+            <input
+              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+              type="text"
+              name="encargado"
+              id="encargado"
+              value={encargado}
+              onChange={(e) => setEncargado(e.target.value)}
+            />
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          {/* <Button>a</Button> */}
+          <button
+            // type="submit"
+            onClick={() => {
+              // verSemestre(semestre.id);
+              //setEstadoModal(false);
+              // crearSemestre(carreraSelect.current);
+              crearCarrera();
+            }}
+            className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+          >
+            Crear
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              // verSemestre(semestre.id);
+              setEstadoModal2(false);
+            }}
+            className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+          >
+            Cerrar
+          </button>
+        </ModalFooter>
+      </Modal>
+      <Modal isOpen={estadoModal3} style={modalStyle}>
+        <ModalHeader>Editar Carrera</ModalHeader>
+        <ModalBody>
+          {/* <form className="mt-8 space-y-6" onSubmit={actualizarSemestre(semestre.id)}> */}
+          <div className="form-group">
+            <label htmlFor="nombre" className="font-medium">
+              Nombre
+            </label>
+            <input
+              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+              type="text"
+              name="nombre"
+              id="nombre"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+            />
+            <br />
+            <label htmlFor="descripcion" className="font-medium mt-2">
+              Descripcion
+            </label>
+            <input
+              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+              type="text"
+              name="descripcion"
+              id="descripcion"
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+            />
+            <br />
+            <label htmlFor="encargado" className="font-medium">
+              encargado
+            </label>
+            <input
+              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+              type="text"
+              name="encargado"
+              id="encargado"
+              value={encargado}
+              onChange={(e) => setEncargado(e.target.value)}
+            />
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          {/* <Button>a</Button> */}
+          <button
+            // type="submit"
+            onClick={() => {
+               console.log("Edite la Carrera escogida: ",carreraSelect.current);
+              editarCarrera();
+            }}
+            disabled={consultando}
+            className="inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+          >
+            {consultando?"Cargando...":"Editar"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              // verSemestre(semestre.id);
+              setEstadoModal3(false);
+            }}
+            className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+          >
+            Cerrar
+          </button>
+        </ModalFooter>
+      </Modal>
       {/* ___________________________________________________________________________________ */}
       {/* <div className="flex flex-row">
         <CardCarrera carrera={carrera} />
@@ -214,11 +393,29 @@ export const Dashboard = () => {
       </div> */}
       {/* <Carrusel carrera={carrera}/> */}
       <div>
-        <h1 className="pl-2">ESFOT</h1>
+        <div className="flex flex-row justify-between items-center">
+        <div className="pl-2 text-lg font-bold text-2xl">ESFOT</div>
+        {active ? (
+                <button
+                  onClick={() => {
+                    // carreraSelect.current = carrera.id;
+                    // setEstadoModal(true);
+                    setEstadoModal2(true);
+                  }}
+                  className=" inline-block px-3 ml-2 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+                >
+                  Crear Carrera
+                </button>
+              ) : (
+                <></>
+              )}
+
+        </div>
+        
 
         {carrerasA?.map((carrera) => {
           const semestress = [];
-          sem.map((semestrefilter) => {
+          sem?.map((semestrefilter) => {
             if (semestrefilter.carreras_id === carrera.id) {
               semestress.push(semestrefilter);
             }
@@ -226,7 +423,22 @@ export const Dashboard = () => {
           return (
             <div key={carrera.id}>
               <p className="pl-2 text-lg font-bold">{carrera.nombre}</p>
+              
               {active ? (
+                <div>
+                  <button
+                  onClick={() => {
+                    carreraSelect.current = carrera.id;
+                    setNombre(carrera.nombre);
+                    setDescripcion(carrera.descripcion);
+                    setEncargado(carrera.encargado);
+                    setEstadoModal3(true);
+                  }}
+                  
+                  className=" inline-block px-3 ml-2 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-900 active:shadow-lg transition duration-150 ease-in-out"
+                >
+                  Editar Carrera
+                </button>
                 <button
                   onClick={() => {
                     carreraSelect.current = carrera.id;
@@ -236,44 +448,15 @@ export const Dashboard = () => {
                 >
                   Crear Semestre
                 </button>
+                </div>
               ) : (
                 <></>
               )}
-              
-
               <Carrusel2 semestre={semestress} />
               <hr />
             </div>
           );
         })}
-        {/* ________________________________________________________________________________________ */}
-        <hr />
-
-        {/* _____________________________________________________________________________________________________________ */}
-        {/* <ComentarioCard persona={personas} className="p-25" /> */}
-        {/* <p className="pl-20 mt-4 text-lg font-bold">
-          Redes y Telecomunicaciones
-        </p>
-        <Carrusel2 carrera={carrera2} /> */}
-
-        {/* <ul>
-          {carreras.map((carrera) => (
-            <li
-              onClick={() => handleRemoveCarrera(carrera.id)}
-              key={carrera.id}
-            >
-              {carrera.titulo}
-            </li>
-          ))}
-        </ul> */}
-
-        {/* {sem?.map((elemento) => (
-          <div key={elemento.id}>
-            <Link to={"/semestre_" + elemento.id}>{elemento.nombre}</Link>
-          </div>
-        ))} */}
-
-        {/* <button onClick={handleAddCarrera}>Agregar Carrera</button> */}
       </div>
       {/* _______________________________________________________________________________ */}
     </>

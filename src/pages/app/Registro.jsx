@@ -88,20 +88,7 @@ export const Registro = () => {
                       placeholder="Apellido"
                       onChange={e => setlast_name(e.target.value)}
                     />
-                  </div>
-                  {/* <div>
-                    <label htmlFor="personal_phone" className="font-medium">
-                      Telefono
-                    </label>
-                    <input
-                      id="personal_phone"
-                      name="personal_phone"
-                      type="tel"
-                      pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
-                      className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                      placeholder="Telefono"
-                    />
-                  </div> */}
+                  </div>                 
                    <div>
                     <label htmlFor="email" className="font-medium">
                       Correo

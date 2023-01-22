@@ -1,17 +1,38 @@
-import React from 'react'
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
-export const ComentarioCard=({persona})=> {
+export const ComentarioCard = ({ comentario }) => {
+  const [personaCometa, setPersonaCometa] = useState(null);
+  const tokenUser = localStorage.getItem("token");
+  const config = {
+    headers: { Authorization: `${tokenUser}` },
+  };
+  const traerDatos = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/v1/profile/",
+        config
+      );
+      setPersonaCometa(response.data.data);
+      console.log("personas llamadas: ", response.data.data);
+    } catch (error) {
+      console.log(error.response.data.message, "error");
+    }
+  };
+
+  useEffect(() => {
+    traerDatos();
+  }, []);
+
   return (
-    <div>
-        <h1>Comentarios</h1>
-        <hr/>
-        <div className='flex flex-row  items-center p-10	'>
-            <img src={persona.urlImagen} alt='' className='mr-3 w-20 h-20'/>
-            <div className='media-body'>
-                <h5 className='mt-0 text-lg'>{persona.nombre}</h5>
-                <p className='text-sm'>{persona.texto}</p>
-            </div>
+    <div className="flex flex-row items-center p-1  mb-1	w-full">
+      <img src={personaCometa?.avatar} alt="" className="mr-2 w-10 h-10" />
+      <div className="items-center text-base " >
+        <div className="flex items-center text-base ">
+          {personaCometa?.user.first_name} {personaCometa?.user.last_name}
         </div>
+        <div className="flex text-sm items-center text-base ">{comentario?.comentario}</div>
+      </div>
     </div>
-  )
-}
+  );
+};

@@ -62,23 +62,6 @@ export const CardCarrera = ({ semestre }) => {
     }
   };
 
-  // const verSemestre = async (a) => {
-  //   // setRecargar(true);
-  //   try {
-  //     const response = await axios.get(
-  //       "http://localhost:8000/api/v1/semestres/admin/" + a,
-  //       //{ headers: { accept: "application/json" } },
-  //       config
-  //     );
-  //     console.log("Traje datos del semestre en card");
-  //     setNombre(response.data.data.nombre);
-  //     setDescripcion(response.data.data.descripcion);
-  //   } catch (error) {
-  //     console.log(error.response.data.message, "error");
-  //   }
-  //   // setRecargar(false);
-  // };
-
   const actualizarSemestre = async (a) => {
     //e.preventDefault();
     try {
