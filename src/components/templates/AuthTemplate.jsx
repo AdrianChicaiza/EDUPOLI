@@ -1,7 +1,5 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
-
-import { ShieldIcon } from '../atoms'
 import { Cover } from '../organisms';
 
 export const AuthTemplate = () => {

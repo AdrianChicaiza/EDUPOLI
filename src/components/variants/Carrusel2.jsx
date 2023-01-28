@@ -8,17 +8,17 @@ import { CardCarrera } from "./CardCarrera";
 // https://react-multi-carousel.surge.sh/?selectedKind=Carousel&selectedStory=Without%20infinite%20mode&full=0&addons=1&stories=1&panelRight=0&addonPanel=kadira%2Fjsx%2Fpanel
 export const Carrusel2 = ({ semestre }) => {
   const images = [...Array(semestre.length).keys()];
-  
+
   return (
     <Carousel
       additionalTransfrom={0}
       arrows
       autoPlaySpeed={3000}
       centerMode={false}
-      className="rounded"
+      className="rounded-[3px] mt-1 w-full bg-[#CAEAFF] "
       containerClass="container"
       dotListClass=""
-      draggable
+      draggable={false}
       focusOnSelect={false}
       infinite={false}
       itemClass=""
@@ -64,19 +64,10 @@ export const Carrusel2 = ({ semestre }) => {
       swipeable
     >
       {semestre.map((e, i) => (
-        <div
-          key={i}
-          //className="rounded-lg overflow-hidden shadow-lg bg-white max-w-xs"
-        >
+        <div key={i}>
           <CardCarrera semestre={e} />
         </div>
       ))}
-      {/* <CardCarrera carrera={carrera} /> */}
-      {/* <CardCarrera carrera={carrera} />
-      <CardCarrera carrera={carrera} />
-      <CardCarrera carrera={carrera} />
-      <CardCarrera carrera={carrera} />
-      <CardCarrera carrera={carrera} />       */}
     </Carousel>
   );
 };

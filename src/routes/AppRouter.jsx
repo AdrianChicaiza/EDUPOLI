@@ -1,20 +1,19 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-
+import "bootstrap/dist/css/bootstrap.min.css";
 import { AuthTemplate } from "../components";
 import { AuthNav } from "../components/templates";
 import { AuthProvider } from "../contexts";
-import { App } from "../pages/app/App";
+// import "../pages/app/App";
 import { CarrerasScreen } from "../pages/app/CarrerasScreen";
 import { ConfirmarContra } from "../pages/app/ConfirmarContra";
 import { ConfirmarCorreo } from "../pages/app/ConfirmarCorreo";
 import { Dashboard } from "../pages/app/Dashboard";
-import { Ejemplos } from "../pages/app/Ejemplos";
-import { Nosotros } from "../pages/app/Nosotros";
-import { Registro } from "../pages/app/Registro";
+
 import { SemestrePage } from "../pages/app/SemestrePage";
 import { Login } from "../pages/auth/Login";
 import { PerfilUsuario } from "../pages/auth/PerfilUsuario";
+import { Registro } from "../pages/auth/Registro";
 
 import { PrivateRoute } from "./PrivateRoute";
 import { PublicRoute } from "./PublicRoute";
@@ -51,15 +50,12 @@ export const AppRouter = () => {
             <PrivateRoute>
               <Routes>
                 {/* <Route index path='/' element={<App />} />  */}
-                <Route element={<AuthNav/>}>
-                  
-                {/* <Route index path="/" element={<Ejemplos />} /> */}
-                <Route index path="/" element={<Dashboard />} />
-                <Route index path="/:semestreid" element={<SemestrePage />} />
-                <Route index path="/nosotros" element={<Nosotros />} />
-
+                <Route element={<AuthNav />}>
+                  {/* <Route index path="/" element={<Ejemplos />} /> */}
+                  <Route index path="/" element={<Dashboard />} />
+                  <Route index path="/:semestreid" element={<SemestrePage />} />
                 </Route>
-               
+
                 <Route index path="/carreras" element={<CarrerasScreen />} />
                 <Route element={<AuthTemplate />}>
                   <Route index path="/perfil" element={<PerfilUsuario />} />

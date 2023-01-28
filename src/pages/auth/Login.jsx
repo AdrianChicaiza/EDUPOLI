@@ -3,26 +3,24 @@ import { useContext, useState } from "react";
 import axios from "axios";
 import { AuthContext } from "../../contexts";
 import { Link } from "react-router-dom";
-import swal from 'sweetalert';
 
 export const Login = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [activo, setActivo] = useState(false);
- // https://www.youtube.com/watch?v=I0yFDDeQG7I
- //crear spinner
- const Swal = require("sweetalert2");
- const errorAlert = () => {
-   Swal.fire({
-     icon: "error",
-     title: "Oops...",
-     text: "Algo salio mal",
-   });
- };
+  const [consultando, setConsultando] = useState(false);
+  const Swal = require("sweetalert2");
+  const errorAlert = () => {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Algo salio mal",
+    });
+  };
 
   const onLogin = async (e) => {
+    setConsultando(true);
     e.preventDefault();
     try {
       const response = await axios.post(
@@ -33,24 +31,20 @@ export const Login = () => {
       const { access_token, token_type, user } = response.data.data;
       login(user, `${token_type} ${access_token}`);
       navigate("/");
-      // console.log(token_type);
-      // console.log(access_token);
-      // console.log(user);
-      // console.log("el response es : ",response);
     } catch (error) {
       errorAlert();
       console.log(error.response.data.message, "error");
       setEmail("");
       setPassword("");
-      // setActivo(true);
     }
+    setConsultando(false);
   };
 
   return (
     <>
       <div className="flex flex-row justify-center ">
-        <div className="flex justify-center py-0 bg-white">
-          <div className="block p-3 rounded-lg shadow-xl shadow-cyan-500/50 border-2 max-w-sm bg-white">
+        <div className="flex justify-center items-center bg-white">
+          <div className="block p-2 rounded-[5px] shadow-xl shadow-cyan-500/80 border-2 max-w-sm bg-white ">
             <div className="flex min-h-full items-center justify-center pt-5 pb-5 px-4 sm:px-6 lg:px-8">
               <div className="w-full max-w-md space-y-8">
                 <div>
@@ -62,11 +56,11 @@ export const Login = () => {
                   <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
                     Ingresa en tu cuenta
                   </h2>
-                  <p className="mt-2 text-center text-sm text-gray-600">
+                  <p className="mt-2 text-center text-sm text-gray-600 ">
                     O puedes{" "}
                     <a
                       href="/registro"
-                      className="font-medium text-cyan-700 hover:text-cyan-500 "
+                      className="font-medium text-cyan-700 hover:text-cyan-500 no-underline "
                     >
                       Registrarte
                     </a>
@@ -85,7 +79,10 @@ export const Login = () => {
                         type="email"
                         value={email}
                         required
-                        className="relative block w-full appearance-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+                        className="relative block w-full border
+                        rounded-t-md border-gray-300 px-3
+                        placeholder-gray-500 focus:z-10                        
+                        focus:ring-cyan-700 sm:text-sm"
                         placeholder="Correo"
                         onChange={(e) => setEmail(e.target.value)}
                       />
@@ -100,20 +97,20 @@ export const Login = () => {
                         type="password"
                         value={password}
                         required
-                        className="relative block w-full appearance-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+                        className="relative block w-full border
+                        rounded-b-md border-gray-300 px-3
+                        placeholder-gray-500 focus:z-10                        
+                        focus:ring-cyan-700 sm:text-sm"
                         placeholder="Contraseña"
                         onChange={(e) => setPassword(e.target.value)}
                       />
                     </div>
                   </div>
-                  {/* <b className="block text-sm text-center text-cyan-700 tracking-wide">
-                    {activo ? "Las credenciales son incorrectas" : ""}
-                  </b> */}
                   <div className="flex items-center justify-center">
                     <div className="text-sm  ">
                       <Link
                         to="/confirmarCorreo"
-                        className="font-medium text-cyan-700 hover:text-cyan-500 "
+                        className="font-medium text-cyan-700 hover:text-cyan-500 no-underline"
                       >
                         ¿Olvidaste tu contraseña?
                       </Link>
@@ -123,9 +120,13 @@ export const Login = () => {
                   <div>
                     <button
                       type="submit"
-                      className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500"
+                      className="flex w-full 
+                      justify-center rounded-[4px] bg-cyan-700 
+                      py-2 px-4 text-sm font-medium 
+                      text-white hover:bg-cyan-600"
+                      disabled={consultando}
                     >
-                      Ingresar
+                      {consultando ? "Cargando..." : "Ingresar"}
                     </button>
                   </div>
                 </form>

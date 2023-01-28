@@ -1,1 +1,0 @@
-export { ShieldIcon } from './ShieldIcon';

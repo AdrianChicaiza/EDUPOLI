@@ -59,6 +59,9 @@ export const SemestrePage = () => {
   const [documentosBD, setDocumentosBD] = useState([]);
   const documentosMateria = [];
   const [consultando, setConsultando] = useState(false);
+  const [nombre_doc, setNombre_doc] = useState("");
+  const [buscador, setBuscador] = useState("");
+  const [materiasFiltradas, setMateriasFiltradas] = useState([]);
   const Swal = require("sweetalert2");
   const errorAlert = () => {
     Swal.fire({
@@ -67,14 +70,75 @@ export const SemestrePage = () => {
       text: "Algo salio mal",
     });
   };
-
   const bienAlert = () => {
     Swal.fire({
       icon: "success",
-      title: "Bien!!",
+      title: "Correcto!!",
       text: "Todo salio bien",
       showConfirmButton: false,
       timer: 2000,
+    });
+  };
+  const estadoMateriaAlert = () => {
+    Swal.fire({
+      title: "Estas seguro de cambiar el estado de la materia?",
+      showDenyButton: true,
+      confirmButtonText: "Confirmar",
+      confirmButtonColor: "#1080C9",
+      denyButtonText: `Cancelar`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        desactivarMateria();
+        //Swal.fire("Saved!", "", "success");
+      }
+    });
+  };
+
+  const actualizarMateriaAlert = () => {
+    Swal.fire({
+      title: "Estas seguro de actualizar la materia?",
+      showDenyButton: true,
+      confirmButtonText: "Confirmar",
+      confirmButtonColor: "#1080C9",
+      denyButtonText: `Cancelar`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        actualizarMateria();
+        //Swal.fire("Saved!", "", "success");
+      }
+    });
+  };
+  const eliminarDocumentoAlert = () => {
+    Swal.fire({
+      title: "Estas seguro de eliminar el documento?",
+      showDenyButton: true,
+      confirmButtonText: "Confirmar",
+      confirmButtonColor: "#1080C9",
+      denyButtonText: `Cancelar`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        eliminarDocumento();
+        //Swal.fire("Saved!", "", "success");
+      }
+    });
+  };
+
+  const subirDocumentoAlert = () => {
+    Swal.fire({
+      title: "Quieres subir el documento?",
+      showDenyButton: true,
+      confirmButtonText: "Confirmar",
+      confirmButtonColor: "#1080C9",
+      denyButtonText: `Cancelar`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        subirDocumento();
+        //Swal.fire("Saved!", "", "success");
+      }
     });
   };
 
@@ -87,30 +151,41 @@ export const SemestrePage = () => {
       console.log("El usuario es admin");
       setActive(true);
       traerMateriasAdmin();
+      verDocumentos();
+      verComentarios();
     } else {
       console.log("El usuario es estudiante");
       setActive(false);
       traerMaterias();
+      verDocumentos();
+      verComentarios();
     }
   };
 
   const traerMateriasAdmin = async () => {
-    setRecargar(true);
     try {
       const response = await axios.get(
         "http://localhost:8000/api/v1/materias/admin",
         config
       );
       console.log("Traje las materias en modo admin");
-      setMaterias(response.data.data);
+      const materias2 = [];
+
+      {
+        response.data.data?.map((elemento) => {
+          if (elemento.semestres_id == semestreid) {
+            materias2.push(elemento);
+          }
+        });
+      }
+      setMaterias(materias2);
+      setMateriasFiltradas(materias2);
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
-    setRecargar(false);
   };
 
   const traerMaterias = async () => {
-    setRecargar(true);
     try {
       const response = await axios.get(
         "http://localhost:8000/api/v1/materias/adminE",
@@ -122,7 +197,6 @@ export const SemestrePage = () => {
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
-    setRecargar(false);
   };
 
   //CRUD MATERIAS: _______________________________________________________________________________________________
@@ -148,14 +222,15 @@ export const SemestrePage = () => {
   const actualizarMateria = async () => {
     setConsultando(true);
     try {
-      const response = await axios.put(
+      await axios.put(
         "http://localhost:8000/api/v1/materias/admin/" + materiaSelect.current,
         { nombre, descripcion, encargado },
         config
       );
-      console.log("Se actualizo la materia");
-      setEstadoModal(false);
+
       bienAlert();
+      setEstadoModal2(false);
+      console.log("Se actualizo la materia");
       window.location.href = window.location.href;
     } catch (error) {
       errorAlert();
@@ -164,24 +239,12 @@ export const SemestrePage = () => {
     setConsultando(false);
   };
 
-  const traerCarrerasAdmin = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:8000/api/v1/carreras/admin",
-        config
-      );
-      console.log("Carreras: ", response.data.data);
-      setCarrerasA(response.data.data);
-    } catch (error) {
-      console.log(error.response.data.message, "error");
-    }
-  };
-
-  const desactivarMateria = async (a) => {
+  const desactivarMateria = async () => {
     setConsultando(true);
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/v1/materias/desactiva/admin/" + a,
+        "http://localhost:8000/api/v1/materias/desactiva/admin/" +
+          materiaSelect.current,
         config
       );
       console.log("Cambie estado materia ");
@@ -192,22 +255,6 @@ export const SemestrePage = () => {
       console.log(error.response.data.message, "error");
     }
     setConsultando(false);
-  };
-
-  const infoCarrera = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:8000/api/v1/carreras/admin/1",
-        config
-      );
-      console.log("Traje info de la carrera");
-      setNombreCarrera(response.data.data.nombre);
-      setDescripcionCarrera(response.data.data.descripcion);
-      setEncargadoCarrera(response.data.data.encargado);
-      //console.log("Info de la carrera 1: ",nombre+" "+encargado)
-    } catch (error) {
-      console.log(error.response.data.message, "error");
-    }
   };
 
   const subirDocumento = async () => {
@@ -305,6 +352,7 @@ export const SemestrePage = () => {
   };
 
   const verComentarios = async () => {
+    setRecargar(true);
     try {
       const response = await axios.get(
         "http://localhost:8000/api/v1/comentarios/admin/",
@@ -315,6 +363,7 @@ export const SemestrePage = () => {
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
+    setRecargar(false);
   };
 
   const editarComentario = async () => {
@@ -355,6 +404,25 @@ export const SemestrePage = () => {
     setConsultando(false);
   };
 
+  const IconEdit = () => {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth="1.5"
+        stroke="currentColor"
+        className="w-5 h-5"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+        />
+      </svg>
+    );
+  };
+
   const modalStyle = {
     position: "absolute",
     top: "50%",
@@ -366,15 +434,29 @@ export const SemestrePage = () => {
   };
 
   useEffect(() => {
-    //traerCarreras();
-    infoCarrera();
     traerMateriasRol();
-    verComentarios();
-    // traerCarrerasAdmin();
-    verDocumentos();
   }, []);
 
-  // if (recargar || !materias) {
+  const buscarMateria = () => {
+    if (materias) {
+      if (buscador === "") {
+        setMateriasFiltradas(materias);
+        return;
+      }
+      const filtrado = [];
+      materias?.map((materiaFil) => {
+        if (materiaFil.nombre.includes(buscador)) {
+          filtrado.push(materiaFil);
+        }
+      });
+      setMateriasFiltradas(filtrado);
+    }
+  };
+
+  // useEffect(() => {
+
+  // }, [buscador]);
+  // if (recargar || !comentarios) {
   //   return <Loading />;
   // }
   // _____________________________________________________________________________________________________________
@@ -422,7 +504,6 @@ export const SemestrePage = () => {
           </button>
         </ModalFooter>
       </Modal>
-      {/* __________________________________________________________________________ */}
       <Modal isOpen={estadoModal2} style={modalStyle}>
         <ModalHeader>Editar Materia</ModalHeader>
         <ModalBody>
@@ -444,10 +525,8 @@ export const SemestrePage = () => {
         <ModalFooter>
           <button
             onClick={() => {
-              //crearMateria(1);
               console.log("Materia seleccionada", materiaSelect.current);
-              actualizarMateria();
-              setEstadoModal2(false);
+              actualizarMateriaAlert();
             }}
             disabled={consultando}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
@@ -470,7 +549,18 @@ export const SemestrePage = () => {
       </Modal>
       <Modal isOpen={estadoModal3} style={modalStyle}>
         <ModalHeader>Editar Documento</ModalHeader>
-
+        <ModalBody>
+          <label>Nombre</label>
+          <InputCyan
+            id="nombre_doc"
+            name="nombre_doc"
+            type="text"
+            required
+            value={nombre_doc}
+            setvalue={setNombre_doc}
+            minLength={5}
+          />
+        </ModalBody>
         <ModalFooter>
           <input
             className="text-sm text-grey-500
@@ -559,35 +649,82 @@ export const SemestrePage = () => {
           </button>
         </ModalFooter>
       </Modal>
-      {/* {carrerasA.map((carrera)=>{
-        if(carrera)
-        return(
+      
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            buscarMateria();
+          }}
+          className="flex flex-row justify-end"
+        >
+          <InputCyan
+            id="buscador"
+            name="buscador"
+            type="text"
+            value={buscador}
+            setvalue={setBuscador}
+            placeholder="Buscar Materia "
+          />
+          <button
+            type="submit"
+            className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px]"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setMateriasFiltradas(materias);
+              setBuscador("");
+            }}
+            className="bg-red-800 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px]"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z"
+              />
+            </svg>
+          </button>
+        </form>
+      
 
-        );
-      })} */}
-
-      {/* <div className="w-full p-6 my-2 bg-white border border-gray-200 rounded-lg shadow-md  ">
-        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ">
-          {nombreCarrera}
-        </h5>
-        <p className="mb-3 font-normal text-gray-700 ">{descripcionCarrera}</p>
-      </div> */}
-
-      <div className="flex flex-row items-center justify-between">
-        <div className="font-semibold text-base">
-          Materias del Semestre {semestreid}
+      <div className="flex flex-row bg-[#B1E0FF] rounded-[2px]  items-center justify-between mt-1">
+        <div className="font-semibold text-base ml-2">
+          Materias
         </div>
 
         {active ? (
           <div className="flex flex-row items-center">
-            <div className="font-semibold  pl-3 mr-2">Crear Materia</div>
+            {/* <div className="font-semibold  pl-3 mr-2">Crear Materia</div> */}
             <button
               type="button"
               onClick={() => {
                 setEstadoModal(true);
                 materiaSelect.current = semestreid;
               }}
-              className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+              className="bg-green-700 hover:bg-green-900 text-white font-medium py-1 px-3 rounded-[3px]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -609,260 +746,229 @@ export const SemestrePage = () => {
           <></>
         )}
       </div>
-
-      <div>
-        {materias?.map((elemento) => {
-          if (elemento.semestres_id == semestreid) {
-            materiass.push(elemento);
-          }
-        })}
-
-        {materiass?.map((materiasSemestre) => {
-          {
-            documentosBD?.map((docs) => {
-              if (docs.materias_id === materiasSemestre.id) {
-                documentosMateria.push(docs);
-              }
-            });
-          }
-          return (
-            <div key={materiasSemestre.id}>
-              <div className="flex flex-row justify-between items-center rounded bg-sky-900 mt-1">
-                <div className="flex flex-row justify-between p-1 w-full">
-                  <div className=" text-stone-50 pl-3 mr-3 ">
-                    {materiasSemestre.nombre}
+      {materiasFiltradas?.length > 0 ? (
+        <div>
+          {materiasFiltradas?.map((materiasSemestre) => {
+            {
+              documentosBD?.map((docs) => {
+                if (docs.materias_id === materiasSemestre.id) {
+                  documentosMateria.push(docs);
+                }
+              });
+            }
+            return (
+              <div key={materiasSemestre.id}>
+                <div className="flex flex-row justify-between items-center rounded-[2px] bg-[#1F618D] mt-1">
+                  <div className="flex flex-row justify-between items-center p-1 w-full">
+                    <div className=" text-stone-50 pl-3 mr-3 ">
+                      {materiasSemestre.nombre}
+                    </div>
+                    {active ? (
+                      <div className="text-gray-300 text-xs font-medium italic">
+                        {materiasSemestre.estado ? "Activo" : "Inactivo"}
+                      </div>
+                    ) : (
+                      <></>
+                    )}
                   </div>
+
                   {active ? (
-                    <div className=" text-stone-50">
-                      {materiasSemestre.estado ? "Activo" : "Inactivo"}
+                    <div className="flex flex-row">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEstadoModal2(true);
+                          setNombre(materiasSemestre.nombre);
+                          materiaSelect.current = materiasSemestre.id;
+                          console.log(
+                            "Materia seleccionada",
+                            materiaSelect.current
+                          );
+                        }}
+                        className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px]"
+                      >
+                        {consultando ? "..." : <IconEdit />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          // desactivarMateria(materiasSemestre.id);
+                          materiaSelect.current = materiasSemestre.id;
+                          //console.log("Selecione la materia",materiaSelect.current)
+                          estadoMateriaAlert();
+                        }}
+                        disabled={consultando}
+                        className="bg-sky-900 hover:bg-sky-700 text-white font-medium py-1 px-3 rounded-[3px]"
+                      >
+                        {consultando ? (
+                          "..."
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            className="w-5 h-5"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        )}
+                      </button>
                     </div>
                   ) : (
                     <></>
                   )}
                 </div>
-
-                {active ? (
-                  <div className="flex flex-row">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEstadoModal2(true);
-                        // verMateriaEspecifica(materiasSemestre.id);
-                        setNombre(materiasSemestre.nombre);
-                        materiaSelect.current = materiasSemestre.id;
-                        console.log(
-                          "Materia seleccionada",
-                          materiaSelect.current
-                        );
-                        console.log(
-                          "Materia seleccionada2",
-                          materiasSemestre.id
-                        );
-                      }}
-                      className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded-l-lg shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                        />
-                      </svg>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        desactivarMateria(materiasSemestre.id);
-                      }}
-                      disabled={consultando}
-                      className=" inline-block px-3 py-1 h-9  bg-sky-900 text-white font-medium text-xs leading-tight uppercase rounded-r-lg shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
-                    >
-                      {consultando ? (
-                        "..."
-                      ) : (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="w-6 h-6"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                ) : (
-                  <></>
-                )}
-              </div>
-              <div className="flex flex-col h-auto justify-between items-start rounded bg-sky-500 mt-1 ml-5 h-10 px-2 py-1">
-                <div className="flex flex-col w-full rounded">
-                  {documentosMateria?.map((docs) => {
-                    if (docs.materias_id === materiasSemestre.id) {
-                      return (
-                        <div
-                          key={docs.id}
-                          className="flex flex-row justify-between items-center"
-                        >
-                          {/* <div> */}
-                          <a
-                            href={docs.path}
-                            className="flex justify-start h-7 w-full items-center px-1 no-underline text-white bg-sky-900 rounded "
+                <div className="flex flex-col h-auto justify-between items-start rounded-[2px] bg-[#B1E0FF] h-10 px-2 py-1">
+                  <div className="flex flex-col w-full rounded-[2px]">
+                    {documentosMateria?.map((docs) => {
+                      if (docs.materias_id === materiasSemestre.id) {
+                        return (
+                          <div
+                            key={docs.id}
+                            className="flex flex-row justify-between items-center rounded-[2px] bg-[#2874A6]"
                           >
-                            Documento {docs.id}
-                          </a>
-                          {/* </div> */}
-                          {active ? (
-                            <div className="flex flex-row">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  archivoSelect.current = docs.id;
-                                  console.log(
-                                    "id del doc",
-                                    archivoSelect.current
-                                  );
-                                  setEstadoModal3(true);
-                                }}
-                                className=" inline-block px-3 py-1 h-9 w-auto bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded-l-lg shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition ease-in-out"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth="1.5"
-                                  stroke="currentColor"
-                                  className="w-5 h-5"
+                            {/* <div> */}
+                            <a
+                              href={docs.path}
+                              className="flex justify-start h-7 w-full items-center px-1 no-underline text-white "
+                            >
+                              Documento {docs.id}
+                            </a>
+                            {/* </div> */}
+                            {active ? (
+                              <div className="flex flex-row">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    archivoSelect.current = docs.id;
+                                    console.log(
+                                      "id del doc",
+                                      archivoSelect.current
+                                    );
+                                    setEstadoModal3(true);
+                                  }}
+                                  className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px]"
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                                  />
-                                </svg>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  archivoSelect.current = docs.id;
-                                  eliminarDocumento();
-                                  console.log(
-                                    "Archivo select current",
-                                    archivoSelect.current
-                                  );
-                                  console.log(
-                                    "Archivo select doc",
-                                    archivoSelect.current
-                                  );
-                                }}
-                                disabled={consultando}
-                                className=" inline-block px-3 py-1 h-9  bg-sky-900 text-white font-medium text-xs leading-tight uppercase rounded-r-lg shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition ease-in-out"
-                              >
-                                {consultando ? (
-                                  "..."
-                                ) : (
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth="1.5"
-                                    stroke="currentColor"
-                                    className="w-6 h-6"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
-                                    />
-                                  </svg>
-                                )}
-                              </button>
-                            </div>
-                          ) : (
-                            <></>
-                          )}
-                        </div>
-                      );
-                    }
-                  })}
-                </div>
-                <div className="flex flex-row w-full justify-between items-center mt-2">
-                  {/* <form className="mt-0 space-y-1" onSubmit={subirDocumento}> */}
-                  <input
-                    className="text-sm text-grey-500
-                 bg-sky-800 p-1 rounded 
-                 file:mr-1 file:py-1 file:px-2
-                 file:rounded-lg file:border-0
-                 file:text-md file:font-semibold  file:text-white
-                 file:bg-sky-500  
-                 hover:file:cursor-pointer hover:file:opacity-80
-               "
-                    id="documentos1"
-                    type="file"
-                    // accept=".pdf"
-                    onChange={(e) => {
-                      //vistaPreliminarFoto(e);
-                      //console.log("e: ",e);
-                      // materiaSelect.current= materiasSemestre.id;
-                      setdocumentos(e.target.files[0]);
-                    }}
-                  />
-                  {/* </form> */}
-                  <button
-                    // type="submit"
-                    onClick={() => {
-                      materiaSelect.current = materiasSemestre.id;
-                      subirDocumento();
+                                  {consultando ? "..." : <IconEdit />}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    archivoSelect.current = docs.id;
 
-                      console.log(
-                        "envie el documento a la materia",
-                        materiasSemestre.id,
-                        "con el current: ",
-                        materiaSelect.current
-                      );
-                    }}
-                    className=" inline-block px-3 py-1 h-9 bg-sky-800 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
-                  >
-                    {consultando ? (
-                      "..."
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-6 h-6"
+                                    console.log(
+                                      "Archivo select current",
+                                      archivoSelect.current
+                                    );
+                                    eliminarDocumentoAlert();
+                                  }}
+                                  disabled={consultando}
+                                  className="bg-sky-900 hover:bg-sky-700 text-white font-medium py-1 px-3 rounded-[3px]"
+                                >
+                                  {consultando ? (
+                                    "..."
+                                  ) : (
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      strokeWidth="1.5"
+                                      stroke="currentColor"
+                                      className="w-5 h-5"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+                                      />
+                                    </svg>
+                                  )}
+                                </button>
+                              </div>
+                            ) : (
+                              <></>
+                            )}
+                          </div>
+                        );
+                      }
+                    })}
+                  </div>
+                  {active ? (
+                    <div className="flex flex-row w-full justify-between items-center mt-2">
+                      {/* <form className="mt-0 space-y-1" onSubmit={subirDocumento}> */}
+                      <input
+                        className="text-sm text-grey-500
+                      bg-[#1F618D] p-1 rounded-[2px] 
+                      file:mr-1 file:py-1 file:px-2
+                      file:rounded-[2px] file:border-0
+                      file:text-md file:font-semibold  file:text-white
+                      file:bg-sky-500  
+                      hover:file:cursor-pointer hover:file:opacity-80"
+                        id="documentos1"
+                        type="file"
+                        accept=".pdf"
+                        onChange={(e) => {
+                          setdocumentos(e.target.files[0]);
+                        }}
+                      />
+                      {/* </form> */}
+                      <button
+                        // type="submit"
+                        onClick={() => {
+                          materiaSelect.current = materiasSemestre.id;
+
+                          subirDocumentoAlert();
+                          console.log(
+                            "envie el documento a la materia",
+                            materiasSemestre.id,
+                            "con el current: ",
+                            materiaSelect.current
+                          );
+                        }}
+                        disabled={consultando}
+                        className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-2 px-3 rounded-[3px]"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
-                        />
-                      </svg>
-                    )}
-                  </button>
+                        {consultando ? (
+                          "..."
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            className="w-6 h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+                            />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
-      <div className="pt-2">Seccion de comentarios: </div>
-      <div className="flex flex-col justify-center items-start rounded bg-sky-900 mt-1 p-2">
+            );
+          })}
+        </div>
+      ) : materias?.length === 0 ? (
+        "No hay materia de momento"
+      ) : (
+        "No se encontro la materia"
+      )}
+      <div className="font-semibold text-base mt-2">Comentarios </div>
+      <div className="flex flex-col justify-center items-start rounded-[2px] bg-[#1F618D] mt-1 p-2">
         <form
           onSubmit={comentar}
           className="flex justify-between items-center w-full"
@@ -875,16 +981,28 @@ export const SemestrePage = () => {
               type="text"
               value={comentario}
               required
-              className="relative block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
-              placeholder="comentario"
+              className="w-full rounded-[2px] border
+              border-gray-300 px-3 py-1 placeholder-gray-500 
+              focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+              placeholder="Comentario"
               onChange={(e) => setComentario(e.target.value)}
             />
+            {/* <InputCyan
+                      id="comentario"
+                      name="comentario"
+                      type="text"
+                      required
+                      value={comentario}
+                      setvalue={setComentario}
+                      placeholder="Comentario"
+                      minLength={5}
+                    /> */}
 
             <button
               type="submit"
               // onClick={()=>{comentar()}}
               disabled={consultando}
-              className=" inline-block px-3 py-1 h-9 bg-sky-800 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+              className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 h-9 rounded-[3px]"
             >
               {consultando ? (
                 "..."
@@ -917,12 +1035,14 @@ export const SemestrePage = () => {
             {/* <div className="flex flex-row bg-sky-300 mb-1 px-1 rounded"> */}
 
             <div
-              className="flex flex-col w-full mb-1 bg-sky-300 rounded justify-start items-center"
+              className="flex flex-col w-full mb-1 rounded-[2px] bg-[#B1E0FF] justify-start items-center"
               key={elemento.id}
             >
               <ComentarioCard comentario={elemento} />
               {/* <div className="w-full">{elemento.comentario}</div> */}
-              <div className="flex flex-row justify-start w-full">
+
+              {/* validar comentarios pendiente==================================================== */}
+              <div className="flex flex-row justify-start w-full ">
                 <button
                   type="button"
                   onClick={() => {
@@ -934,22 +1054,9 @@ export const SemestrePage = () => {
                     );
                     setEstadoModal4(true);
                   }}
-                  className=" inline-block px-3 py-1 h-9 w-auto bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded-l-lg shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition ease-in-out"
+                  className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 "
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                    />
-                  </svg>
+                  {consultando ? "" : <IconEdit />}
                 </button>
                 <button
                   type="button"
@@ -958,7 +1065,7 @@ export const SemestrePage = () => {
                     eliminarComentarios();
                   }}
                   disabled={consultando}
-                  className=" inline-block px-3 py-1 h-9  bg-sky-900 text-white font-medium text-xs leading-tight uppercase rounded-r-lg shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition ease-in-out"
+                  className="bg-sky-900 hover:bg-sky-700 text-white font-medium py-1 px-3 "
                 >
                   {consultando ? (
                     "..."
@@ -969,12 +1076,12 @@ export const SemestrePage = () => {
                       viewBox="0 0 24 24"
                       strokeWidth="1.5"
                       stroke="currentColor"
-                      className="w-6 h-6"
+                      className="w-5 h-5"
                     >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
                       />
                     </svg>
                   )}
