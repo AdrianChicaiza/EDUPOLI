@@ -26,11 +26,19 @@ export const Dashboard = () => {
   const [estadoModal2, setEstadoModal2] = useState(false);
   const [estadoModal3, setEstadoModal3] = useState(false);
   const [encargado, setEncargado] = useState("");
+  const [buscador, setBuscador] = useState("");
   //variables para las nuevas carreras:
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const carreraSelect = useRef(-1);
   const [consultando, setConsultando] = useState(false);
+  const [errorNombre, setErrorNombre] = useState("");
+  const [errorDescripcion, setErrorDescripcion] = useState("");
+  const [errorEncargado, setErrorEncargado] = useState("");
+  const [carrerasFiltradas, setCarrerasFiltradas] = useState([]);
+
+  let hasErrorsCarrera = false;
+  let hasErrorsSemestre = false;
   const Swal = require("sweetalert2");
   // iterar objetos:
   // https://mauriciogc.medium.com/react-map-filter-y-reduce-54777359d94
@@ -91,15 +99,16 @@ export const Dashboard = () => {
 
   const traerSemestreRol = async () => {
     if (user.role_id === 1) {
-      console.log("El usuario es admin semestre");
-      traerSemestresAdmin();
-      traerCarrerasAdmin();
+      // console.log("El usuario es admin semestre");
       setActive(true);
-    } else {
-      console.log("El usuario es estudiante semestre");
-      traerSemestres();
       traerCarrerasAdmin();
+      traerSemestresAdmin();
+    } else {
+      //console.log("El usuario es estudiante semestre");
       setActive(false);
+      traerSemestres();
+      traerCarrerasEstudiante();
+      
     }
   };
 
@@ -109,8 +118,28 @@ export const Dashboard = () => {
         "http://localhost:8000/api/v1/carreras/admin",
         config
       );
-      console.log("Carreras: ", response.data.data);
+      const carrerasfiltradasconts = [];
+      //console.log("Carreras: ", response.data.data);
       setCarrerasA(response.data.data);
+      setCarrerasFiltradas(response.data.data);
+      carrerasfiltradasconts.push(response.data.data);
+      //console.log("Carreras con const: ", carrerasfiltradasconts);
+    } catch (error) {
+      console.log(error.response.data.message, "error");
+    }
+  };
+  const traerCarrerasEstudiante = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/v1/carreras/estudianteE",
+        config
+      );
+      const carrerasfiltradasconts = [];
+      //console.log("Carreras Estudiante: ", response.data.data);
+      setCarrerasA(response.data.data);
+      setCarrerasFiltradas(response.data.data);
+      carrerasfiltradasconts.push(response.data.data);
+      //console.log("Carreras con const: ", carrerasfiltradasconts);
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
@@ -122,10 +151,6 @@ export const Dashboard = () => {
       const response = await axios.get(
         "http://localhost:8000/api/v1/semestres/adminE",
         config
-      );
-      console.log(
-        "Traje semestres modo admin los semestres son: ",
-        response.data.data
       );
       //console.log("Id Semetres: ",response.data.data.carreras_id);
 
@@ -140,10 +165,10 @@ export const Dashboard = () => {
     setRecargar(true);
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/v1/semestres/admin",
+        "http://localhost:8000/api/v1/semestres/estudiante",
         config
       );
-      console.log("Traje semestres modo estudiante");
+      //console.log("Traje semestres modo estudiante");
       setSem(response.data.data);
     } catch (error) {
       console.log(error.response.data.message, "error");
@@ -160,13 +185,15 @@ export const Dashboard = () => {
         //{ headers: { accept: "application/json" } },
         config
       );
-      console.log("Se creo el nuevo semestre");
+
+      setEstadoModal(false);
       setNombre("");
       setDescripcion("");
-      traerSemestreRol();
-      setEstadoModal(false);
-      bienAlert();
+      setErrorNombre("");
+      setErrorDescripcion("");
+
       window.location = window.location.href;
+      bienAlert();
     } catch (error) {
       errorAlert();
       console.log(error.response.data.message, "error");
@@ -183,19 +210,22 @@ export const Dashboard = () => {
         //{ headers: { accept: "application/json" } },
         config
       );
-      console.log("Se creo la nueva carrera");
+      //console.log("Se creo la nueva carrera");
       setNombre("");
       setDescripcion("");
       setEncargado("");
+      setErrorNombre("");
+      setErrorEncargado("");
+      setErrorDescripcion("");
       // traerSemestreRol();
       setEstadoModal(false);
       bienAlert();
       window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      //console.log(error.response.data.message, "error");
     }
-    setConsultando(true);
+    setConsultando(false);
   };
 
   const editarCarrera = async () => {
@@ -204,16 +234,19 @@ export const Dashboard = () => {
       await axios.put(
         "http://localhost:8000/api/v1/carreras/admin/" + carreraSelect.current,
         { nombre, descripcion, encargado },
-        { headers: { accept: "application/json" } },
         config
       );
-      console.log("Se actualizo la carrera");
+      ////console.log("Se actualizo la carrera");
       setEstadoModal3(false);
+      setErrorNombre("");
+      setErrorEncargado("");
+      setErrorDescripcion("");
       bienAlert();
       window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error x");
+      ////console.log(error.response.data.message, "error x");
+      ////console.log(error.response.data.errors, "error 2");
     }
     setConsultando(false);
   };
@@ -226,12 +259,12 @@ export const Dashboard = () => {
           carreraSelect.current,
         config
       );
-      console.log("Traje semestres modo estudiante");
+      //console.log("Traje semestres modo estudiante");
       bienAlert();
       window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
@@ -244,6 +277,70 @@ export const Dashboard = () => {
     width: 1000,
     //background:"black",
     //padding:10
+  };
+  const buscarCarrera = () => {
+    if (carrerasA) {
+      if (buscador === "") {
+        setCarrerasFiltradas(carrerasA);
+        return;
+      }
+      const filtrado = [];
+      carrerasA?.map((carreraFil) => {
+        if (carreraFil.nombre.includes(buscador)) {
+          filtrado.push(carreraFil);
+          //console.log("estas carreras estan para filtrar? ", carrerasA);
+        }
+      });
+      setCarrerasFiltradas(filtrado);
+    }
+  };
+
+  const validacionCarrera = () => {
+    if (nombre === null || nombre === "") {
+      setErrorNombre("Este campo nombre es obligatorio");
+      hasErrorsCarrera = true;
+      // return true;
+    } else if (nombre.length < 3) {
+      setErrorNombre("El nombre debe tener mas de 4 caracteres");
+      hasErrorsCarrera = true;
+    }
+    if (descripcion === null || descripcion === "") {
+      setErrorDescripcion("Este campo descripción es obligatorio");
+      hasErrorsCarrera = true;
+      // return true;
+    } else if (descripcion.length < 3) {
+      setErrorDescripcion("La descripcion debe tener mas de 4 caracteres");
+      hasErrorsCarrera = true;
+    }
+    if (encargado === null || encargado === "") {
+      setErrorEncargado("Este campo encargado es obligatorio");
+      hasErrorsCarrera = true;
+      // return true;
+    } else if (encargado.length < 3) {
+      setErrorEncargado("El encargado debe tener mas de 4 caracteres");
+      hasErrorsCarrera = true;
+    }
+
+    // return false;
+  };
+  const validacionSemestre = () => {
+    if (nombre === null || nombre === "") {
+      setErrorNombre("Este campo nombre es obligatorio");
+      hasErrorsSemestre = true;
+      // return true;
+    } else if (nombre.length < 3) {
+      setErrorNombre("El nombre debe tener mas de 4 caracteres");
+      hasErrorsSemestre = true;
+    }
+    if (descripcion === null || descripcion === "") {
+      setErrorDescripcion("Este campo descripción es obligatorio");
+      hasErrorsSemestre = true;
+      // return true;
+    } else if (descripcion.length < 3) {
+      setErrorDescripcion("La descripcion debe tener mas de 4 caracteres");
+      hasErrorsSemestre = true;
+    }
+    // return false;
   };
 
   useEffect(() => {
@@ -263,33 +360,58 @@ export const Dashboard = () => {
             <label htmlFor="nombre" className="font-medium">
               Nombre
             </label>
-            <input
-              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
-              type="text"
-              name="nombre"
+            <InputCyan
               id="nombre"
+              name="nombre"
+              type="text"
+              required
               value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              setvalue={(e) => {
+                setNombre(e);
+                setErrorNombre("");
+              }}
+              placeholder="Nombre del Semestre"
+              minLength={3}
+              tamaño={50}
             />
-            <br />
+            <p className="text-red-500 text-xs italic">{errorNombre}</p>
             <label htmlFor="descripcion" className="font-medium mt-2">
               Descripcion
             </label>
-            <input
-              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
-              type="text"
-              name="descripcion"
+            <textarea
               id="descripcion"
+              name="descripcion"
+              type="text"
+              className="w-full 
+              rounded-[2px] border
+              border-gray-300 px-3 py-2 
+              placeholder-gray-500 focus:z-10 focus:border-cyan-700 
+              focus:outline-none focus:ring-cyan-700 sm:text-sm"
+              // required={true}
               value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
+              onChange={(e) => {
+                setDescripcion(e.target.value);
+                setErrorDescripcion("");
+              }}
+              maxLength={249}
+              placeholder="Descripcion del Semestre"
+              // minLength={3}
             />
+            <p className="text-red-500 text-xs italic">{errorDescripcion}</p>
             <br />
           </div>
         </ModalBody>
         <ModalFooter>
           <button
             onClick={() => {
-              crearSemestre(carreraSelect.current);
+              validacionSemestre(true);
+              if (hasErrorsSemestre) {
+                //console.log("Hubo errores no se puede crear");
+                return;
+              } else {
+                //console.log("Ya todo salio bien :D");
+                crearSemestre();
+              }
             }}
             disabled={consultando}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
@@ -316,44 +438,77 @@ export const Dashboard = () => {
             <label htmlFor="nombre" className="font-medium">
               Nombre
             </label>
-            <input
-              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
-              type="text"
-              name="nombre"
+            <InputCyan
               id="nombre"
+              name="nombre"
+              type="text"
+              required
               value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              setvalue={(e) => {
+                setNombre(e);
+                setErrorNombre("");
+              }}
+              placeholder="Nombre de la Carrera"
+              minLength={3}
+              tamaño={50}
             />
-            <br />
+            <p className="text-red-500 text-xs italic">{errorNombre}</p>
+            <label htmlFor="encargado" className="font-medium">
+              Encargado
+            </label>
+            <InputCyan
+              id="encargado"
+              name="encargado"
+              type="text"
+              required
+              value={encargado}
+              setvalue={(e) => {
+                const newText = e.replace(/[^a-zA-Z ]/g, "");
+                setEncargado(newText);
+                setErrorEncargado("");
+              }}
+              placeholder="Encargado de la Carrera"
+              minLength={3}
+              tamaño={10}
+            />
+            <p className="text-red-500 text-xs italic">{errorEncargado}</p>
             <label htmlFor="descripcion" className="font-medium mt-2">
               Descripcion
             </label>
-            <input
-              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
-              type="text"
-              name="descripcion"
-              id="descripcion"
-              value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
-            />
             <br />
-            <label htmlFor="encargado" className="font-medium">
-              encargado
-            </label>
-            <input
-              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
+            <textarea
+              id="descripcion"
+              name="descripcion"
               type="text"
-              name="encargado"
-              id="encargado"
-              value={encargado}
-              onChange={(e) => setEncargado(e.target.value)}
+              className="w-full 
+              rounded-[2px] border
+              border-gray-300 px-3 py-2 
+              placeholder-gray-500 focus:z-10 focus:border-cyan-700 
+              focus:outline-none focus:ring-cyan-700 sm:text-sm"
+              // required={true}
+              value={descripcion}
+              onChange={(e) => {
+                setDescripcion(e.target.value);
+                setErrorDescripcion("");
+              }}
+              maxLength={249}
+              placeholder="Descripcion de la Carrera"
+              // minLength={3}
             />
+            <p className="text-red-500 text-xs italic">{errorDescripcion}</p>
           </div>
         </ModalBody>
         <ModalFooter>
           <button
             onClick={() => {
-              crearCarrera();
+              validacionCarrera(true);
+              if (hasErrorsCarrera) {
+                //console.log("Hubo errores no se puede crear");
+                return;
+              } else {
+                //console.log("Ya todo salio bien :D");
+                crearCarrera();
+              }
             }}
             disabled={consultando}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
@@ -364,6 +519,9 @@ export const Dashboard = () => {
             type="button"
             onClick={() => {
               // verSemestre(semestre.id);
+              setErrorNombre("");
+              setErrorDescripcion("");
+              setErrorEncargado("");
               setEstadoModal2(false);
             }}
             disabled={consultando}
@@ -385,23 +543,15 @@ export const Dashboard = () => {
               id="nombre"
               name="nombre"
               type="text"
-              required
               value={nombre}
-              setvalue={setNombre}
+              setvalue={(e) => {
+                setNombre(e);
+                setErrorNombre("");
+              }}
               minLength={5}
+              tamaño={50}
             />
-            <label htmlFor="descripcion" className="font-medium mt-2">
-              Descripcion
-            </label>
-            <InputCyan
-              id="descripcion"
-              name="descripcion"
-              type="text"
-              required
-              value={descripcion}
-              setvalue={setDescripcion}
-              minLength={5}
-            />
+            <p className="text-red-500 text-xs italic">{errorNombre}</p>
             <label htmlFor="encargado" className="font-medium">
               Encargado
             </label>
@@ -411,17 +561,52 @@ export const Dashboard = () => {
               type="text"
               required
               value={encargado}
-              setvalue={setEncargado}
+              setvalue={(e) => {
+                const newText = e.replace(/[^a-zA-Z ]/g, "");
+                setEncargado(newText);
+                setErrorEncargado("");
+              }}
               minLength={5}
+              tamaño={10}
             />
+            <p className="text-red-500 text-xs italic">{errorEncargado}</p>
+            <label htmlFor="descripcion" className="font-medium mt-2">
+              Descripcion
+            </label>
+            <textarea
+              id="descripcion"
+              name="descripcion"
+              type="text"
+              className="w-full 
+              rounded-[2px] border
+              border-gray-300 px-3 py-2 
+              placeholder-gray-500 focus:z-10 focus:border-cyan-700 
+              focus:outline-none focus:ring-cyan-700 sm:text-sm"
+              // required={true}
+              value={descripcion}
+              onChange={(e) => {
+                setDescripcion(e.target.value);
+                setErrorDescripcion("");
+              }}
+              maxLength={249}
+              placeholder="Descripcion de la Carrera"
+              // minLength={3}
+            />
+            <p className="text-red-500 text-xs italic">{errorDescripcion}</p>
           </div>
           {/* </form> */}
         </ModalBody>
         <ModalFooter>
           <button
             onClick={() => {
-              console.log("Edite la Carrera escogida: ", carreraSelect.current);
-              actualizarCarreraAlert();
+              validacionCarrera(true);
+              if (hasErrorsCarrera) {
+                //console.log("Hubo errores no se puede actualizar");
+                return;
+              } else {
+                //console.log("Ya todo salio bien :D");
+                actualizarCarreraAlert();
+              }
             }}
             className="inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
             disabled={consultando}
@@ -441,7 +626,69 @@ export const Dashboard = () => {
         </ModalFooter>
       </Modal>
       {/* ___________________________________________________________________________________ */}
-
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          buscarCarrera();
+        }}
+        className="flex flex-row justify-start mb-1"
+      >
+        <input
+          id="buscador"
+          name="buscador"
+          type="text"
+          value={buscador}
+          onChange={(e) => {
+            setBuscador(e.target.value);
+          }}
+          placeholder="Buscar Materia "
+          className="rounded-l-lg h-[35px] 
+        border-gray-300 
+        focus:outline-none focus:ring-cyan-700 border"
+        />
+        <button
+          type="submit"
+          className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 "
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setCarrerasFiltradas(carrerasA);
+            setBuscador("");
+          }}
+          className="bg-red-800 hover:bg-red-900 text-white font-medium py-1 px-3 rounded-r-lg"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z"
+            />
+          </svg>
+        </button>
+      </form>
       <div className="flex flex-row justify-between items-center rounded-[2px] bg-[#2874A6] mb-2">
         <div className="pl-2 text-lg font-bold text-white text-2xl">ESFOT</div>
         {active ? (
@@ -463,7 +710,7 @@ export const Dashboard = () => {
         )}
       </div>
 
-      {carrerasA?.map((carrera) => {
+      {carrerasFiltradas?.map((carrera) => {
         const semestress = [];
         sem?.map((semestrefilter) => {
           if (semestrefilter?.carreras_id === carrera.id) {
@@ -476,18 +723,26 @@ export const Dashboard = () => {
             <div className="flex flex-row w-full justify-between items-center px-2 pt-1">
               <div className="text-lg font-bold">{carrera?.nombre}</div>
               <div className="text-gray-700 text-xs font-medium italic">
-                {carrera?.estado ? "Carrera activa" : "Carrera desactivada"}
+                {active ? (
+                  carrera?.estado ? (
+                    "Carrera activa"
+                  ) : (
+                    "Carrera desactivada"
+                  )
+                ) : (
+                  <></>
+                )}
               </div>
             </div>
             <div className="text-gray-700 text-sm line-clamp-2 text-justify font-medium h-[40px] px-2">
               {carrera?.descripcion}
             </div>
 
-            {active ? (
-              <div className="flex items-center  w-full ">
-                <div className=" px-2 text-gray-700 text-sm font-medium italic">
-                  #{carrera?.encargado}
-                </div>
+            <div className="flex items-center w-full ">
+              <div className=" px-2 text-gray-700 w-full text-sm font-medium italic">
+                #{carrera?.encargado}
+              </div>
+              {active ? (
                 <div className=" flex w-full justify-end">
                   <button
                     onClick={() => {
@@ -551,6 +806,8 @@ export const Dashboard = () => {
                   <button
                     onClick={() => {
                       carreraSelect.current = carrera.id;
+                      setNombre("");
+                      setDescripcion("");
                       setEstadoModal(true);
                     }}
                     disabled={consultando}
@@ -576,13 +833,13 @@ export const Dashboard = () => {
                     )}
                   </button>
                 </div>
-              </div>
-            ) : (
-              <></>
-            )}
+              ) : (
+                <></>
+              )}
+            </div>
             <Carrusel2 semestre={semestress} />
             <hr />
-            <Contenido/>
+            <Contenido />
           </div>
         );
       })}

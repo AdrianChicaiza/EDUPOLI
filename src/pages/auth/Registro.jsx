@@ -9,9 +9,15 @@ export const Registro = () => {
   const [password_confirmation, setpassword_confirmation] = useState("");
   const [email, setemail] = useState("");
   const [first_name, setfirst_name] = useState("");
+  const [errorNombre, setErrorNombre] = useState("");
+  const [errorApellido, setErrorApellido] = useState("");
+  const [errorEmail, setErrorEmail] = useState("");
+  const [errorContrasena, setErrorContrasena] = useState("");
+  const [errorContrasenaConfirm, setErrorContrasenaConfirm] = useState("");
   const [last_name, setlast_name] = useState("");
   const [consultando, setConsultando] = useState(false);
   const role_id = 2;
+  let hasErrorsRegistro = false;
   const Swal = require("sweetalert2");
   const errorAlert = () => {
     Swal.fire({
@@ -38,8 +44,7 @@ export const Registro = () => {
     });
   };
 
-  const registroF = async (e) => {
-    e.preventDefault();
+  const registroF = async () => {
     setConsultando(true);
     try {
       await axios.post(
@@ -57,8 +62,6 @@ export const Registro = () => {
       if (password === password_confirmation) {
         bienAlert();
         navigate("/");
-
-        // console.log("Se ha registrado con exito :D");
       } else {
         errorPasswordAlert();
       }
@@ -66,6 +69,54 @@ export const Registro = () => {
       errorAlert();
     }
     setConsultando(false);
+  };
+  const validacionRegistro = () => {
+    if (first_name === null || first_name === "") {
+      setErrorNombre("Este campo nombre es obligatorio");
+      hasErrorsRegistro = true;
+    } else if (first_name.length < 3) {
+      setErrorNombre("El nombre debe tener mas de 4 caracteres");
+      hasErrorsRegistro = true;
+    }
+    if (last_name === null || last_name === "") {
+      setErrorApellido("Este campo apellido es obligatorio");
+      hasErrorsRegistro = true;
+    } else if (last_name.length < 3) {
+      setErrorApellido("El apellido debe tener mas de 4 caracteres");
+      hasErrorsRegistro = true;
+    }
+    var validRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+    if (email === null || email === "") {
+      setErrorEmail("Este campo correo es obligatorio");
+      hasErrorsRegistro = true;
+      // return true;
+    } else if (email.length < 3) {
+      setErrorEmail("El correo debe tener mas de 4 caracteres");
+      hasErrorsRegistro = true;
+    } else if (!email.match(validRegex)) {
+      setErrorEmail("Ingrese un correo válido");
+      hasErrorsRegistro = true;
+    }
+    if (password === null || password === "") {
+      setErrorContrasena("Este campo contraseña es obligatorio");
+      hasErrorsRegistro = true;
+      // return true;
+    } else if (password.length < 6) {
+      setErrorContrasena("La contraseña debe tener mas de 6 caracteres");
+      hasErrorsRegistro = true;
+    }
+    if (password_confirmation === null || password_confirmation === "") {
+      setErrorContrasenaConfirm(
+        "Este campo confirmar contraseña es obligatorio"
+      );
+      hasErrorsRegistro = true;
+      // return true;
+    } else if (password_confirmation.length < 6) {
+      setErrorContrasenaConfirm("La contraseña debe tener mas de 6 caracteres");
+      hasErrorsRegistro = true;
+    }
+
+    // return false;
   };
 
   return (
@@ -94,12 +145,16 @@ export const Registro = () => {
                       id="first_name"
                       name="first_name"
                       type="text"
-                      required
                       value={first_name}
-                      setvalue={setfirst_name}
+                      setvalue={(e) => {
+                        const newText = e.replace(/[^a-zA-Z ]/g, "");
+                        setfirst_name(newText);
+                        setErrorNombre("");
+                      }}
                       placeholder="Nombre"
-                      minLength={3}
+                      tamaño={10}
                     />
+                    <p className="text-red-500 text-xs italic">{errorNombre}</p>
                   </div>
                   <div>
                     <label htmlFor="last_name" className="font-medium">
@@ -109,12 +164,18 @@ export const Registro = () => {
                       id="last_name"
                       name="last_name"
                       type="text"
-                      required
                       value={last_name}
-                      setvalue={setlast_name}
+                      setvalue={(e) => {
+                        const newText = e.replace(/[^a-zA-Z ]/g, "");
+                        setlast_name(newText);
+                        setErrorApellido("");
+                      }}
                       placeholder="Apellido"
-                      minLength={3}
+                      tamaño={10}
                     />
+                    <p className="text-red-500 text-xs italic">
+                      {errorApellido}
+                    </p>
                   </div>
                   <div>
                     <label htmlFor="email" className="font-medium">
@@ -124,12 +185,15 @@ export const Registro = () => {
                       id="email"
                       name="email"
                       type="email"
-                      required
                       value={email}
-                      setvalue={setemail}
+                      setvalue={(e) => {
+                        setemail(e);
+                        setErrorEmail("");
+                      }}
                       placeholder="Correo"
-                      minLength={3}
+                      tamaño={60}
                     />
+                    <p className="text-red-500 text-xs italic">{errorEmail}</p>
                   </div>
                   <div>
                     <label htmlFor="password" className="font-medium">
@@ -139,12 +203,16 @@ export const Registro = () => {
                       id="password"
                       name="password"
                       type="password"
-                      required
                       value={password}
-                      setvalue={setpassword}
+                      setvalue={(e) => {
+                        setpassword(e);
+                        setErrorContrasena("");
+                      }}
                       placeholder="Contraseña"
-                      minLength={5}
                     />
+                    <p className="text-red-500 text-xs italic">
+                      {errorContrasena}
+                    </p>
                   </div>
                   <div>
                     <label htmlFor="password" className="sr-only">
@@ -154,19 +222,31 @@ export const Registro = () => {
                       id="password_confirmation"
                       name="password_confirmation"
                       type="password"
-                      required
                       value={password_confirmation}
-                      setvalue={setpassword_confirmation}
+                      setvalue={(e) => {
+                        setpassword_confirmation(e);
+                        setErrorContrasenaConfirm("");
+                      }}
                       placeholder="Confirmar Contraseña"
-                      minLength={5}
                     />
+                    <p className="text-red-500 text-xs italic">
+                      {errorContrasenaConfirm}
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex flex-row justify-center space-x-4">
                   <div>
                     <button
-                      type="submit"
+                      type="button"
+                      onClick={() => {
+                        validacionRegistro(true);
+                        if (hasErrorsRegistro) {
+                          return;
+                        } else {
+                          registroF();
+                        }
+                      }}
                       disabled={consultando}
                       className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 "
                     >

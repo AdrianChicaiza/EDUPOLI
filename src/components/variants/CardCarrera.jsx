@@ -18,13 +18,17 @@ export const CardCarrera = ({ semestre }) => {
   const navigate = useNavigate();
   const [consultando, setConsultando] = useState(false);
   const semestreSelected = useRef(-1);
+  const [errorNombre, setErrorNombre] = useState("");
+  const [errorDescripcion, setErrorDescripcion] = useState("");
   //variables para las nuevas carreras:
   const [nombre, setNombre] = useState(semestre.nombre);
   const [descripcion, setDescripcion] = useState(semestre.descripcion);
   const Swal = require("sweetalert2");
   // https://heroicons.com
   //imagen de carrera
-  const [image, setImage] = useState("https://i.pinimg.com/236x/54/8c/ef/548cef32272216e98f17b2855a44e783.jpg");
+  const [image, setImage] = useState(
+    "https://i.pinimg.com/236x/54/8c/ef/548cef32272216e98f17b2855a44e783.jpg"
+  );
   const vistaPreliminarFoto = (e) => {
     const leer_img = new FileReader();
     const id_img = document.getElementById("imgFoto");
@@ -97,10 +101,10 @@ export const CardCarrera = ({ semestre }) => {
 
   const comprobarRole = () => {
     if (user.role_id === 1) {
-      console.log("Soy admin");
+      //console.log("Soy admin");
       setActive(true);
     } else {
-      console.log("Soy estudiante");
+      //console.log("Soy estudiante");
       setActive(false);
     }
   };
@@ -118,11 +122,13 @@ export const CardCarrera = ({ semestre }) => {
 
       console.log("Se actualizo el semestre");
       setEstadoModal(false);
+      setErrorNombre("");
+      setErrorDescripcion("");
       actualizarSemestreAlert();
       window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
@@ -136,13 +142,35 @@ export const CardCarrera = ({ semestre }) => {
         config
       );
       estadoMateriaAlert();
-      console.log("Se cambio el estado del semestre");
+      //console.log("Se cambio el estado del semestre");
       window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
+  };
+
+  let hasErrorsSemestre = false;
+
+  const validacionSemestre = () => {
+    if (nombre === null || nombre === "") {
+      setErrorNombre("Este campo nombre es obligatorio");
+      hasErrorsSemestre = true;
+      // return true;
+    } else if (nombre.length < 3) {
+      setErrorNombre("El nombre debe tener mas de 4 caracteres");
+      hasErrorsSemestre = true;
+    }
+    if (descripcion === null || descripcion === "") {
+      setErrorDescripcion("Este campo descripción es obligatorio");
+      hasErrorsSemestre = true;
+      // return true;
+    } else if (descripcion.length < 3) {
+      setErrorDescripcion("La descripcion debe tener mas de 4 caracteres");
+      hasErrorsSemestre = true;
+    }
+    // return false;
   };
 
   useEffect(() => {
@@ -195,15 +223,6 @@ export const CardCarrera = ({ semestre }) => {
                 }}
               />
             </div>
-           
-            {/* <p
-                className="mt-1 text-sm text-gray-500 dark:text-gray-300"
-                id="file_input_help"
-              >
-                SVG, PNG, JPG or GIF (MAX. 800x400px).
-              </p> */}
-            {/* </form> */}
-            {/* </div> */}
             <label htmlFor="nombre" className="font-medium">
               Nombre
             </label>
@@ -213,29 +232,51 @@ export const CardCarrera = ({ semestre }) => {
               type="text"
               required
               value={nombre}
-              setvalue={setNombre}
+              setvalue={(e) => {
+                setNombre(e);
+                setErrorNombre("");
+              }}
               minLength={5}
             />
+            <p className="text-red-500 text-xs italic">{errorNombre}</p>
+
             <label htmlFor="descripcion" className="font-medium mt-2">
               Descripcion
             </label>
-            <InputCyan
+            <textarea
               id="descripcion"
               name="descripcion"
               type="text"
-              required
+              className="w-full 
+              rounded-[2px] border
+              border-gray-300 px-3 py-2 
+              placeholder-gray-500 focus:z-10 focus:border-cyan-700 
+              focus:outline-none focus:ring-cyan-700 sm:text-sm"
+              // required={true}
               value={descripcion}
-              setvalue={setDescripcion}
-              minLength={5}
+              onChange={(e) => {
+                setDescripcion(e.target.value);
+                setErrorDescripcion("");
+              }}
+              maxLength={249}
+              placeholder="Descripcion del Semestre"
+              // minLength={3}
             />
+            <p className="text-red-500 text-xs italic">{errorDescripcion}</p>
           </div>
         </ModalBody>
         <ModalFooter>
           <button
             onClick={() => {
-              console.log("Aplaste el actualizar");
               semestreSelected.current = semestre.id;
-              estadoActualizarAlert();
+              validacionSemestre(true);
+              if (hasErrorsSemestre) {
+                //console.log("Hubo errores no se puede crear");
+                return;
+              } else {
+                //console.log("Ya todo salio bien :D");
+                estadoActualizarAlert();
+              }
             }}
             disabled={consultando}
             className="bg-sky-600 hover:bg-sky-900 text-white font-bold py-1 px-3 rounded-[3px]"
@@ -245,6 +286,8 @@ export const CardCarrera = ({ semestre }) => {
           <button
             type="button"
             onClick={() => {
+              setErrorNombre("");
+              setErrorDescripcion("");
               setEstadoModal(false);
             }}
             disabled={consultando}
@@ -261,20 +304,25 @@ export const CardCarrera = ({ semestre }) => {
           src={
             semestre?.url
               ? semestre.url
-              : "https://i.pinimg.com/236x/54/8c/ef/548cef32272216e98f17b2855a44e783.jpg"
+              : "https://static.vecteezy.com/system/resources/thumbnails/001/632/448/small/dark-blue-stripes-geometric-overlapping-background-free-vector.jpg"
           }
           alt="Imagen Semestre"
         />
         <div className="px-3 pb-3">
-          <div className="text-gray-900 text-xl font-medium">
+          <div className="text-sky-900 text-base font-medium font-bold">
             {semestre?.nombre}
           </div>
           <div className="text-gray-700 text-sm line-clamp-3 text-justify font-medium h-[60px]">
             {semestre?.descripcion}
           </div>
-          <p className="text-gray-700 text-xs mb-2 font-medium italic">
-            {semestre?.estado ? "Semestre activo" : "Semestre desactivo"}
-          </p>
+          {active ? (
+            <p className="text-gray-700 text-xs mb-2 font-medium italic">
+              {semestre?.estado ? "Semestre activo" : "Semestre desactivo"}
+            </p>
+          ) : (
+            <></>
+          )}
+
           {/* __________________________BOTONES______________________________________________________________________ */}
           <div className="flex flex-row w-full justify-between items-center">
             <button
@@ -318,10 +366,10 @@ export const CardCarrera = ({ semestre }) => {
                     // desactivarSemestre(semestre.id);
                     option();
                     semestreSelected.current = semestre.id;
-                    console.log(
-                      "Smestre seleccionado",
-                      semestreSelected.current
-                    );
+                    // console.log(
+                    //   "Smestre seleccionado",
+                    //   semestreSelected.current
+                    // );
                   }}
                   disabled={consultando}
                   className="bg-sky-900 hover:bg-sky-600 text-white font-bold py-1 px-3 rounded-[3px]"

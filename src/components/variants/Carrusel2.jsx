@@ -15,7 +15,7 @@ export const Carrusel2 = ({ semestre }) => {
       arrows
       autoPlaySpeed={3000}
       centerMode={false}
-      className="rounded-[3px] mt-1 w-full bg-[#CAEAFF] "
+      className="rounded-[3px] mt-1 w-full bg-[#CAEAFF]"
       containerClass="container"
       dotListClass=""
       draggable={false}
@@ -51,6 +51,22 @@ export const Carrusel2 = ({ semestre }) => {
             min: 464,
           },
           items: 2,
+          partialVisibilityGutter: 30,
+        },
+        desktopr: {
+          breakpoint: {
+            max: 763,
+            min: 0,
+          },
+          items: 1,
+          partialVisibilityGutter: 30,
+        },
+        desktomin: {
+          breakpoint: {
+            max: 565,
+            min: 0,
+          },
+          items: 1,
           partialVisibilityGutter: 30,
         },
       }}

@@ -4,9 +4,7 @@ import { useNavigate } from "react-router-dom";
 import InputCyan from "../../components/variants/InputCyan";
 
 export const ConfirmarCorreo = () => {
-  // const [activo, setActivo] = useState(false);
   const [email, setEmail] = useState("");
-  // const [activo2, setActivo2] = useState(false);
   const [consultando, setConsultando] = useState(false);
   const navigate = useNavigate();
   const Swal = require("sweetalert2");
@@ -68,20 +66,6 @@ export const ConfirmarCorreo = () => {
                     <label htmlFor="email" className="sr-only">
                       Correo
                     </label>
-                    {/* <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={email}
-                      required
-                      className="relative block w-full appearance-none 
-                      rounded  border border-gray-300 px-3 py-2 
-                      text-gray-900 placeholder-gray-500 focus:z-10 
-                      focus:border-cyan-700 focus:outline-none 
-                      focus:ring-cyan-700 sm:text-sm"
-                      placeholder="Correo"
-                      onChange={(e) => setEmail(e.target.value)}
-                    /> */}
                     <InputCyan
                       id="email"
                       name="email"
@@ -100,7 +84,7 @@ export const ConfirmarCorreo = () => {
                     <button
                       type="submit"
                       disabled={consultando}
-                      className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 "
+                      className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px] mr-1"
                     >
                       {consultando ? "Enviando..." : "Enviar"}
                     </button>
@@ -111,7 +95,7 @@ export const ConfirmarCorreo = () => {
                       navigate("/");
                     }}
                     disabled={consultando}
-                    className="group relative flex justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-600 "
+                    className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px]"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -129,12 +113,6 @@ export const ConfirmarCorreo = () => {
                     </svg>
                   </button>
                 </div>
-                {/* <b className="block text-sm text-center text-violet-700 tracking-wide">
-                  {activo ? "Mensaje enviado : Revisa tu correo" : ""}
-                </b>
-                <b className="block text-sm text-center text-violet-700 tracking-wide">
-                  {activo2 ? "Correo Invalido" : ""}
-                </b> */}
               </form>
             </div>
           </div>

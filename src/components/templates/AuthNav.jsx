@@ -109,7 +109,7 @@ export const AuthNav = () => {
         <main className="px-20 py-2">
           <Outlet />
         </main>
-        
+        {/* <div className="bg-black">asas</div> */}
       </div>
 
       {/* _______________________________________________________________________________ */}

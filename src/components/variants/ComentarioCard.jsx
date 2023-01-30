@@ -9,43 +9,14 @@ export const ComentarioCard = ({ comentario }) => {
   const config = {
     headers: { Authorization: `${tokenUser}` },
   };
-  // const traerDatos = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       "http://localhost:8000/api/v1/profile/",
-  //       config
-  //     );
-  //     setPersonaCometa(response.data.data);
-  //     console.log("personas llamadas: ", response.data.data);
-  //   } catch (error) {
-  //     console.log(error.response.data.message, "error");
-  //   }
-  // };
-  const traerDatos = async () => {
-   
-    try {
-      const response = await axios.get(
-        "http://localhost:8000/api/v1/profile/",
-        config
-      );
-      // setImage(response.data.data.avatar);
-      // setEmail(response.data.data.user.email);
-      // // setFull_name(user.full_name);
-      // setFirst_name(response.data.data.user.first_name);
-      // setLast_name(response.data.data.user.last_name);
-      console.log("personas con foto? : ", response.data.data);
-    } catch (error) {
-      console.log(error.response.data.message, "error");
-    }
 
-  };
   const traerUsuariosEspecifico = async () => {
     try {
       const response = await axios.get(
         "http://localhost:8000/api/v1/usuarios/" + comentario.user_id,
         config
       );
-      console.log("personas : ", response.data.data);
+      // console.log("personas : ", response.data.data);
       setUsuarioComentario(response.data.data);
     } catch (error) {
       console.log(error.response.data.message, "error");
@@ -54,24 +25,10 @@ export const ComentarioCard = ({ comentario }) => {
 
   useEffect(() => {
     traerUsuariosEspecifico();
-    // traerDatos();
-    // traerDatos();
-    //traerUsuarios();
   }, []);
 
   return (
     <div className="flex flex-row items-center p-1  mb-1	w-full">
-      {/* {
-        usuarioComentario?.map((comentariosUser)=>{
-          if(comentariosUser.id ===comentario.user_id){
-            usercoment.push(comentariosUser);
-          }
-        })
-      }
-
-      {
-        usercoment.map((comentarioUss)=>(console.log("comentario persona",comentarioUss)))
-      } */}
       <img
         src={
           usuarioComentario?.avatar
@@ -83,8 +40,7 @@ export const ComentarioCard = ({ comentario }) => {
       />
       <div className="items-center text-base ">
         <div className="flex items-center text-base ">
-          {usuarioComentario?.first_name} {usuarioComentario?.last_name} 
-          {/* {personaCometa?.user.last_name} */}
+          {usuarioComentario?.first_name} {usuarioComentario?.last_name}
         </div>
         <div className="flex text-sm items-center text-base ">
           {comentario?.comentario}

@@ -9,6 +9,9 @@ export const PerfilUsuario = () => {
   const [first_name, setFirst_name] = useState("");
   const [last_name, setLast_name] = useState("");
   const [email, setEmail] = useState("");
+  const [errorFirstName, setErrorFirstName] = useState("");
+  const [errorLastName, setErrorLastName] = useState("");
+  const [errorEmail, setErrorEmail] = useState("");
   // const [full_name, setFull_name] = useState("");
   // const { user } = useContext(AuthContext);
   const tokenUser = localStorage.getItem("token");
@@ -52,6 +55,8 @@ export const PerfilUsuario = () => {
         //Swal.fire("Saved!", "", "success");
       } else if (result.isDenied) {
         Swal.fire("Los cambios no se guardaron", "", "info");
+        setEditar(false);
+        window.location = window.location.href;
       }
     });
   };
@@ -77,15 +82,29 @@ export const PerfilUsuario = () => {
       await axios.post("http://localhost:8000/api/v1/profile/avatar", f, {
         headers: { Authorization: `Bearer: ${tokenUser}` },
       });
-      console.log("Se subio la imagen");
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
   };
-
+  const traerDatos = async () => {
+    setRecargar(true);
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/v1/profile/",
+        config
+      );
+      setImage(response.data.data.avatar);
+      setEmail(response.data.data.user.email);
+      // setFull_name(user.full_name);
+      setFirst_name(response.data.data.user.first_name);
+      setLast_name(response.data.data.user.last_name);
+    } catch (error) {
+      console.log(error.response.data.message, "error");
+    }
+    setRecargar(false);
+  };
   const actualizarUsusario = async () => {
     setConsultando(true);
-
     try {
       await axios.post(
         "http://localhost:8000/api/v1/profile/",
@@ -96,44 +115,58 @@ export const PerfilUsuario = () => {
       subirFoto();
       setEditar(false);
       bienAlert();
-      console.log("Se actualizaron los cambios :D");
     } catch (error) {
-      console.log(error.response.data.message, "error no se guardo D:");
       errorAlert();
     }
     setConsultando(false);
   };
 
+  let hasErrorsUsuario = false;
+  const validacionUsuario = () => {
+    if (first_name === null || first_name === "") {
+      setErrorFirstName("Este campo nombre es obligatorio");
+      hasErrorsUsuario = true;
+      // return true;
+    } else if (first_name.length < 3) {
+      setErrorFirstName("El nombre debe tener mas de 4 caracteres");
+      hasErrorsUsuario = true;
+    }
+    var validRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+    if (email === null || email === "") {
+      setErrorEmail("Este campo correo es obligatorio");
+      hasErrorsUsuario = true;
+      // return true;
+    } else if (email.length < 3) {
+      setErrorEmail("El correo debe tener mas de 4 caracteres");
+      hasErrorsUsuario = true;
+    } else if (!email.match(validRegex)) {
+      setErrorEmail("Ingrese un correo válido");
+      hasErrorsUsuario = true;
+    }
+
+    if (last_name === null || last_name === "") {
+      setErrorLastName("Este campo apellido es obligatorio");
+      hasErrorsUsuario = true;
+      // return true;
+    } else if (last_name.length < 3) {
+      setErrorLastName("El apellido debe tener mas de 4 caracteres");
+      hasErrorsUsuario = true;
+    }
+  };
+
   useEffect(() => {
-    const traerDatos = async () => {
-      setRecargar(true);
-      try {
-        const response = await axios.get(
-          "http://localhost:8000/api/v1/profile/",
-          config
-        );
-        setImage(response.data.data.avatar);
-        setEmail(response.data.data.user.email);
-        // setFull_name(user.full_name);
-        setFirst_name(response.data.data.user.first_name);
-        setLast_name(response.data.data.user.last_name);
-      } catch (error) {
-        console.log(error.response.data.message, "error");
-      }
-      setRecargar(false);
-    };
     traerDatos();
   }, []);
 
-  // if (recargar) {
-  //   return <Loading />;
-  // }
+  if (recargar) {
+    return <Loading />;
+  }
   return (
     <>
       <div className="flex flex-col justify-center ">
         <div className="flex justify-center bg-white rounded-[2px]  shadow-xl shadow-cyan-500/80">
           {/* <div className="p-3 bg-green-800 w-2/3"> */}
-          <div className="flex items-center justify-center pt-5 pb-5 px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center rounded-[2px] w-full justify-center pt-5 pb-5 px-4 sm:px-6 lg:px-8">
             <div className="w-full max-w-md space-y-3">
               <div className="text-center text-3xl font-bold tracking-tight text-gray-900">
                 PerfilUsuario
@@ -145,7 +178,7 @@ export const PerfilUsuario = () => {
                     src={image}
                     id="imgFoto"
                     alt="Imagen Usuario"
-                    className="flex items-center justify-center rounded-[5px] w-[280px] h-[200px] object-cover"
+                    className="flex items-center justify-center rounded-full w-[150px] h-[150px] object-cover"
                   />
                 </div>
                 <div className="flex flex-col justify-center items-center mt-1">
@@ -153,9 +186,9 @@ export const PerfilUsuario = () => {
                   {editar ? (
                     <input
                       className="text-sm text-grey-500
-                      bg-[#1F618D] rounded-[2px] 
-                      file:mr-1 file:py-1 file:px-2
-                      file:rounded-[2px] file:border-0
+                      bg-[#1F618D] rounded-[5px] 
+                      file:mr-1 file:py-2 file:px-2
+                      file:rounded-[5px] file:border-0
                       file:text-md file:font-semibold  file:text-white
                       file:bg-sky-500  
                       hover:file:cursor-pointer hover:file:opacity-80"
@@ -170,14 +203,6 @@ export const PerfilUsuario = () => {
                   ) : (
                     <></>
                   )}
-
-                  {/* <p
-                className="mt-1 text-sm text-gray-500 dark:text-gray-300"
-                id="file_input_help"
-              >
-                SVG, PNG, JPG or GIF (MAX. 800x400px).
-              </p> */}
-                  {/* </form> */}
                 </div>
                 {/* //__________________________________________________________________ */}
               </div>
@@ -185,42 +210,71 @@ export const PerfilUsuario = () => {
                 <label className="font-medium">Correo</label>
                 <InputCyan
                   id="email"
-                  required
                   value={email}
-                  setvalue={setEmail}
+                  setvalue={(e) => {
+                    setEmail(e);
+                    setErrorEmail("");
+                  }}
+                  className={
+                    editar
+                      ? "w-full rounded-[2px] border-1 border-sky-300 px-3 py-2 focus:border-sky-300 focus:ring-sky-300 sm:text-sm"
+                      : "w-full rounded-[2px] border border-gray-300 px-3 py-2 sm:text-sm"
+                  }
                   type="email"
                   name="email"
                   lectura={editar ? false : true}
                 />
+                <p className="text-red-500 text-xs italic">{errorEmail}</p>
                 <label className="font-medium">Nombre</label>
                 <InputCyan
                   id="first_name"
-                  required
                   value={first_name}
-                  setvalue={setFirst_name}
+                  setvalue={(e) => {
+                    setFirst_name(e);
+                    setErrorFirstName("");
+                  }}
+                  className={
+                    editar
+                      ? "w-full rounded-[2px] border-1 border-sky-300 px-3 py-2 focus:border-sky-300 focus:ring-sky-300 sm:text-sm"
+                      : "w-full rounded-[2px] border border-gray-300 px-3 py-2 sm:text-sm"
+                  }
                   type="text"
                   name="first_name"
-                  min={3}
                   lectura={editar ? false : true}
                 />
+                <p className="text-red-500 text-xs italic">{errorFirstName}</p>
                 <label className="font-medium">Apellido</label>
                 <InputCyan
                   id="last_name"
-                  required
                   value={last_name}
-                  setvalue={setLast_name}
+                  setvalue={(e) => {
+                    setLast_name(e);
+                    setErrorLastName("");
+                  }}
+                  className={
+                    editar
+                      ? "w-full rounded-[2px] border-1 border-sky-300 px-3 py-2 focus:border-sky-300 focus:ring-sky-300 sm:text-sm"
+                      : "w-full rounded-[2px] border border-gray-300 px-3 py-2 sm:text-sm"
+                  }
                   type="text"
-                  min={3}
                   lectura={editar ? false : true}
                 />
+                <p className="text-red-500 text-xs italic">{errorLastName}</p>
               </form>
 
               <div className="flex flex-row">
                 {editar ? (
                   <button
                     //  type="submit"
-                    onClick={option}
-                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-600"
+                    onClick={() => {
+                      validacionUsuario(true);
+                      if (hasErrorsUsuario) {
+                        return;
+                      } else {
+                        option();
+                      }
+                    }}
+                    className="bg-sky-500 hover:bg-sky-900 text-white w-full font-medium py-1 px-3 rounded-[3px] mr-1 h-[35px]"
                     disabled={consultando}
                   >
                     {consultando ? "Cargando..." : "Actualizar"}
@@ -231,7 +285,7 @@ export const PerfilUsuario = () => {
                     onClick={() => {
                       setEditar(true);
                     }}
-                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-600 "
+                    className="bg-sky-700 hover:bg-sky-900 w-full text-white font-medium py-1 px-3 rounded-[3px] mr-1 h-[35px]"
                   >
                     Editar
                   </button>
@@ -243,7 +297,7 @@ export const PerfilUsuario = () => {
                       navigate("/");
                     }}
                     disabled={consultando}
-                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-600 "
+                    className="flex items-center bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px] h-[35px]"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

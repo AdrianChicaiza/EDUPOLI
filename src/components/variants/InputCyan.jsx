@@ -10,7 +10,9 @@ export default function InputCyan({
   tamaño,
   lectura,
   min,
-  placeholder
+  placeholder,
+  disabled,
+  className = "w-full rounded-[2px] border   border-gray-300 px-3 py-2  placeholder-gray-500 focus:z-10 focus:border-cyan-700   focus:outline-none focus:ring-cyan-700 sm:text-sm",
 }) {
   return (
     <div>
@@ -21,15 +23,12 @@ export default function InputCyan({
         value={value}
         required={required}
         maxLength={tamaño}
-        className="w-full 
-        rounded-[2px] border
-        border-gray-300 px-3 py-2 
-        placeholder-gray-500 focus:z-10 focus:border-cyan-700 
-        focus:outline-none focus:ring-cyan-700 sm:text-sm"
+        className={className}
         placeholder={placeholder}
         minLength={min}
         onChange={(e) => setvalue(e.target.value)}
         readOnly={lectura}
+        disabled={disabled}
       />
     </div>
   );

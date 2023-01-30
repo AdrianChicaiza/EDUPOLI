@@ -3,13 +3,15 @@ import { useContext, useState } from "react";
 import axios from "axios";
 import { AuthContext } from "../../contexts";
 import { Link } from "react-router-dom";
-
+import InputCyan from "../../components/variants/InputCyan";
 export const Login = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [consultando, setConsultando] = useState(false);
+  const [errorEmail, setErrorEmail] = useState("");
+  const [errorContrasena, setErrorContrasena] = useState("");
   const Swal = require("sweetalert2");
   const errorAlert = () => {
     Swal.fire({
@@ -19,9 +21,9 @@ export const Login = () => {
     });
   };
 
-  const onLogin = async (e) => {
+  const onLogin = async () => {
     setConsultando(true);
-    e.preventDefault();
+    
     try {
       const response = await axios.post(
         "http://localhost:8000/api/v1/login",
@@ -33,11 +35,34 @@ export const Login = () => {
       navigate("/");
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
       setEmail("");
       setPassword("");
     }
     setConsultando(false);
+  };
+
+  let haserrorsLogin = false;
+
+  const validarLogin = () => {
+    var validRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+    if (email === null || email === "") {
+      setErrorEmail("Este campo correo es obligatorio");
+      haserrorsLogin = true;
+      // return true;
+    } else if (email.length < 3) {
+      setErrorEmail("El correo debe tener mas de 4 caracteres");
+      haserrorsLogin = true;
+    } else if (!email.match(validRegex)) {
+      setErrorEmail("Ingrese un correo válido");
+      haserrorsLogin = true;
+    }
+    if (password === null || password === "") {
+      setErrorContrasena("Este campo contraseña es obligatorio");
+      haserrorsLogin = true;
+    } else if (password.length < 6) {
+      setErrorContrasena("La contraseña debe tener las de 6 caracteres");
+      haserrorsLogin = true;
+    }
   };
 
   return (
@@ -73,7 +98,7 @@ export const Login = () => {
                       <label htmlFor="email" className="sr-only">
                         Correo
                       </label>
-                      <input
+                      {/* <input
                         id="email"
                         name="email"
                         type="email"
@@ -85,13 +110,29 @@ export const Login = () => {
                         focus:ring-cyan-700 sm:text-sm"
                         placeholder="Correo"
                         onChange={(e) => setEmail(e.target.value)}
+                      /> */}
+                      <InputCyan
+                        id="email"
+                        name="email"
+                        type="text"
+                        required
+                        value={email}
+                        setvalue={(e) => {
+                          setEmail(e);
+                          setErrorEmail("");
+                        }}
+                        placeholder="Ingrese su correo"
+                        tamaño={30}
                       />
+                      <p className="text-red-500 text-xs italic">
+                        {errorEmail}
+                      </p>
                     </div>
                     <div>
                       <label htmlFor="password" className="sr-only">
                         Contraseña
                       </label>
-                      <input
+                      {/* <input
                         id="password"
                         name="password"
                         type="password"
@@ -103,7 +144,23 @@ export const Login = () => {
                         focus:ring-cyan-700 sm:text-sm"
                         placeholder="Contraseña"
                         onChange={(e) => setPassword(e.target.value)}
+                      /> */}
+                      <InputCyan
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        value={password}
+                        setvalue={(e) => {
+                          setPassword(e);
+                          setErrorContrasena("");
+                        }}
+                        placeholder="Ingrese su contraseña"
+                        tamaño={20}
                       />
+                      <p className="text-red-500 text-xs italic">
+                        {errorContrasena}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center justify-center">
@@ -119,7 +176,16 @@ export const Login = () => {
 
                   <div>
                     <button
-                      type="submit"
+                      type="button"
+                      onClick={() => {
+                        validarLogin(true);
+                        if (haserrorsLogin) {
+                          console.log("Hubo errores no se puede actualizar");
+                          return;
+                        } else {
+                          onLogin();
+                        }
+                      }}
                       className="flex w-full 
                       justify-center rounded-[4px] bg-cyan-700 
                       py-2 px-4 text-sm font-medium 

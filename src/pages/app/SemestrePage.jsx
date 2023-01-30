@@ -2,28 +2,10 @@ import axios from "axios";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AuthContext } from "../../contexts";
-import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  FormGroup,
-  Input,
-  Label,
-  Form,
-} from "reactstrap";
-import swal from "sweetalert";
+import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import Loading from "./loading";
-import { faE, faEarth } from "@fortawesome/free-solid-svg-icons";
 import InputCyan from "../../components/variants/InputCyan";
 import { ComentarioCard } from "../../components/variants/ComentarioCard";
-
-const initialValues = {
-  archivo: null,
-  archivoNombre: "",
-  archivoUrl: "",
-};
 
 export const SemestrePage = () => {
   const { semestreid } = useParams();
@@ -34,15 +16,9 @@ export const SemestrePage = () => {
   const [estadoModal4, setEstadoModal4] = useState(false);
   const [active, setActive] = useState(false);
 
-  //variables del APIREST para carrera
-  const [nombreCarrera, setNombreCarrera] = useState("");
-  const [descripcionCarrera, setDescripcionCarrera] = useState("");
-  const [encargadoCarrera, setEncargadoCarrera] = useState("");
   const { user } = useContext(AuthContext);
   //variables del APIREST para materias
-  const [nombreMateria, setNombreMateria] = useState("");
   const [materias, setMaterias] = useState(null);
-  const materiass = [];
   const materiaSelect = useRef(-1);
   const archivoSelect = useRef(-1);
   const comentSelect = useRef(-1);
@@ -51,8 +27,7 @@ export const SemestrePage = () => {
   const [descripcion, setDescripcion] = useState("descripcion");
   const [encargado, setEncargado] = useState("encargado");
   const [recargar, setRecargar] = useState(true);
-  //const [descripcion, setDescripcion] = useState("");
-  const [carrerasA, setCarrerasA] = useState(null);
+  let hasErrorsMateria = false;
   const [documentos1, setdocumentos] = useState("");
   const [comentarios, setComentarios] = useState([]);
   const [comentario, setComentario] = useState("");
@@ -62,6 +37,7 @@ export const SemestrePage = () => {
   const [nombre_doc, setNombre_doc] = useState("");
   const [buscador, setBuscador] = useState("");
   const [materiasFiltradas, setMateriasFiltradas] = useState([]);
+  const [errorNombreMateria, seterrorNombreMateria] = useState("");
   const Swal = require("sweetalert2");
   const errorAlert = () => {
     Swal.fire({
@@ -147,14 +123,14 @@ export const SemestrePage = () => {
   };
   // _____________________________________________________________________________________________________________
   const traerMateriasRol = async () => {
-    if (user.role_id == 1) {
-      console.log("El usuario es admin");
+    if (user.role_id === 1) {
+      //console.log("El usuario es admin");
       setActive(true);
       traerMateriasAdmin();
       verDocumentos();
       verComentarios();
     } else {
-      console.log("El usuario es estudiante");
+      //console.log("El usuario es estudiante");
       setActive(false);
       traerMaterias();
       verDocumentos();
@@ -168,16 +144,15 @@ export const SemestrePage = () => {
         "http://localhost:8000/api/v1/materias/admin",
         config
       );
-      console.log("Traje las materias en modo admin");
+      //console.log("Traje las materias en modo admin");
       const materias2 = [];
 
-      {
-        response.data.data?.map((elemento) => {
-          if (elemento.semestres_id == semestreid) {
-            materias2.push(elemento);
-          }
-        });
-      }
+      response.data.data?.map((elemento) => {
+        if (elemento.semestres_id == semestreid) {
+          materias2.push(elemento);
+        }
+      });
+
       setMaterias(materias2);
       setMateriasFiltradas(materias2);
     } catch (error) {
@@ -191,9 +166,18 @@ export const SemestrePage = () => {
         "http://localhost:8000/api/v1/materias/adminE",
         config
       );
-      console.log("Traje las meterias en modo estudiante");
-      //setNombreMateria(response.data.nombre);
-      setMaterias(response.data.data);
+      //console.log("Traje las materias en modo estudiante");
+      const materias2 = [];
+
+      response.data.data?.map((elemento) => {
+        if (elemento.semestres_id == semestreid) {
+          materias2.push(elemento);
+        }
+      });
+
+      setMaterias(materias2);
+      setMateriasFiltradas(materias2);
+      //console.log("Materias que encontre", response.data.data);
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
@@ -203,18 +187,19 @@ export const SemestrePage = () => {
   const crearMateria = async () => {
     setConsultando(true);
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:8000/api/v1/materias/admin/" + materiaSelect.current,
         { nombre, descripcion, encargado },
         config
       );
-      console.log("Se creo la materia");
+      //console.log("Se creo la materia");
+      seterrorNombreMateria("");
       setEstadoModal(false);
       bienAlert();
-      window.location.href = window.location.href;
+      window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
@@ -230,11 +215,11 @@ export const SemestrePage = () => {
 
       bienAlert();
       setEstadoModal2(false);
-      console.log("Se actualizo la materia");
-      window.location.href = window.location.href;
+      //console.log("Se actualizo la materia");
+      window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
@@ -242,17 +227,17 @@ export const SemestrePage = () => {
   const desactivarMateria = async () => {
     setConsultando(true);
     try {
-      const response = await axios.get(
+      await axios.get(
         "http://localhost:8000/api/v1/materias/desactiva/admin/" +
           materiaSelect.current,
         config
       );
-      console.log("Cambie estado materia ");
+      //console.log("Cambie estado materia ");
       bienAlert();
-      window.location.href = window.location.href;
+      window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
@@ -262,18 +247,18 @@ export const SemestrePage = () => {
     const doc = new FormData();
     doc.append("documentos", documentos1);
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:8000/api/v1/documentos/admin/" +
           materiaSelect.current,
         doc,
         config
       );
-      console.log("Se subio el documento");
+      //console.log("Se subio el documento");
       bienAlert();
-      window.location.href = window.location.href;
+      window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
@@ -284,7 +269,7 @@ export const SemestrePage = () => {
         "http://localhost:8000/api/v1/documentos/admin",
         config
       );
-      console.log("Traje documentos: ", response.data.data);
+      //console.log("Traje documentos: ", response.data.data);
       setDocumentosBD(response.data.data);
     } catch (error) {
       console.log(error.response.data.message, "error");
@@ -294,17 +279,17 @@ export const SemestrePage = () => {
   const eliminarDocumento = async () => {
     setConsultando(true);
     try {
-      const response = await axios.delete(
+      await axios.delete(
         "http://localhost:8000/api/v1/documentos/admin/" +
           archivoSelect.current,
         config
       );
-      console.log("Elimine el documento", archivoSelect.current);
+      //console.log("Elimine el documento", archivoSelect.current);
       bienAlert();
-      window.location.href = window.location.href;
+      window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
@@ -314,21 +299,21 @@ export const SemestrePage = () => {
     const doc = new FormData();
     doc.append("documentos", documentos1);
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:8000/api/v1/documentos/admin/actualizar/" +
           archivoSelect.current,
         doc,
         config
       );
-      console.log("Se actualizo el documento");
+      //console.log("Se actualizo el documento");
       bienAlert();
-      window.location.href = window.location.href;
+      window.location = window.location.href;
       //alerta();
-      //window.location.href = window.location.href;
+      //window.location = window.location.href;
       //setEstadoModal(false);
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
@@ -337,16 +322,16 @@ export const SemestrePage = () => {
     setConsultando(true);
     e.preventDefault();
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:8000/api/v1/comentarios/admin/1",
         { comentario },
         config
       );
-      console.log("Se creo un comentario");
-      window.location.href = window.location.href;
+      //console.log("Se creo un comentario");
+      window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
@@ -359,6 +344,7 @@ export const SemestrePage = () => {
         config
       );
       console.log("Traje estos comentarios: ", response.data.data);
+      console.log("user: ", user);
       setComentarios(response.data.data);
     } catch (error) {
       console.log(error.response.data.message, "error");
@@ -370,18 +356,18 @@ export const SemestrePage = () => {
     //e.preventDefault();
     setConsultando(true);
     try {
-      const response = await axios.put(
+      await axios.put(
         "http://localhost:8000/api/v1/comentarios/admin/" +
           comentSelect.current,
         { comentario },
         config
       );
-      console.log("Se actualizo un comentario", comentSelect.current);
+      //console.log("Se actualizo un comentario", comentSelect.current);
       bienAlert();
-      window.location.href = window.location.href;
+      window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
@@ -389,17 +375,17 @@ export const SemestrePage = () => {
   const eliminarComentarios = async () => {
     setConsultando(true);
     try {
-      const response = await axios.delete(
+      await axios.delete(
         "http://localhost:8000/api/v1/comentarios/admin/" +
           comentSelect.current,
         config
       );
-      console.log("Elimine el comentario", comentSelect.current);
+      //console.log("Elimine el comentario", comentSelect.current);
       bienAlert();
-      window.location.href = window.location.href;
+      window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
@@ -433,10 +419,6 @@ export const SemestrePage = () => {
     //padding:10
   };
 
-  useEffect(() => {
-    traerMateriasRol();
-  }, []);
-
   const buscarMateria = () => {
     if (materias) {
       if (buscador === "") {
@@ -453,12 +435,22 @@ export const SemestrePage = () => {
     }
   };
 
-  // useEffect(() => {
-
-  // }, [buscador]);
-  // if (recargar || !comentarios) {
-  //   return <Loading />;
-  // }
+  const validacionMateria = () => {
+    if (nombre === null || nombre === "") {
+      seterrorNombreMateria("Este campo nombre es obligatorio");
+      hasErrorsMateria = true;
+      // return true;
+    } else if (nombre.length < 3) {
+      seterrorNombreMateria("El nombre debe tener mas de 4 caracteres");
+      hasErrorsMateria = true;
+    }
+  };
+  useEffect(() => {
+    traerMateriasRol();
+  }, []);
+  if (recargar || !comentarios) {
+    return <Loading />;
+  }
   // _____________________________________________________________________________________________________________
   return (
     <>
@@ -471,20 +463,32 @@ export const SemestrePage = () => {
             <label htmlFor="nombre" className="font-medium">
               Nombre
             </label>
-            <input
-              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
-              type="text"
-              name="nombre"
+            <InputCyan
               id="nombre"
+              name="nombre"
+              type="text"
               value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              setvalue={(e) => {
+                setNombre(e);
+                seterrorNombreMateria("");
+              }}
+              placeholder="Nombre de la materia"
+              tamaño={50}
             />
+            <p className="text-red-500 text-xs italic">{errorNombreMateria}</p>
           </div>
         </ModalBody>
         <ModalFooter>
           <button
             onClick={() => {
-              crearMateria(materiaSelect.current);
+              validacionMateria(true);
+              if (hasErrorsMateria) {
+                //console.log("Hubo errores no se puede crear");
+                return;
+              } else {
+                //console.log("Ya todo salio bien :D");
+                crearMateria();
+              }
             }}
             disabled={consultando}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
@@ -495,6 +499,7 @@ export const SemestrePage = () => {
             type="button"
             onClick={() => {
               // verSemestre(semestre.id);
+              seterrorNombreMateria("");
               setEstadoModal(false);
             }}
             disabled={consultando}
@@ -512,21 +517,34 @@ export const SemestrePage = () => {
             <label htmlFor="nombre" className="font-medium">
               Nombre
             </label>
-            <input
-              className="relative  w-full h-10 rounded appearance-none border border-gray-300 px-3 py-1 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
-              type="text"
-              name="nombre"
+            <InputCyan
               id="nombre"
+              name="nombre"
+              type="text"
               value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              setvalue={(e) => {
+                setNombre(e);
+                seterrorNombreMateria("");
+              }}
+              placeholder="Nombre de la Materia"
+              tamaño={50}
             />
+            <p className="text-red-500 text-xs italic">{errorNombreMateria}</p>
           </div>
         </ModalBody>
         <ModalFooter>
           <button
             onClick={() => {
-              console.log("Materia seleccionada", materiaSelect.current);
-              actualizarMateriaAlert();
+              //  //console.log("Materia seleccionada", materiaSelect.current);
+
+              validacionMateria(true);
+              if (hasErrorsMateria) {
+                //console.log("Hubo errores no se puede crear");
+                return;
+              } else {
+                //console.log("Ya todo salio bien :D");
+                actualizarMateriaAlert();
+              }
             }}
             disabled={consultando}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
@@ -581,7 +599,7 @@ export const SemestrePage = () => {
           <button
             onClick={() => {
               //crearMateria(1);
-              console.log("Cambie el doc", archivoSelect.current);
+              //console.log("Cambie el doc", archivoSelect.current);
               editarDocumento();
               // actualizarMateria();
               //setEstadoModal3(false);
@@ -626,7 +644,7 @@ export const SemestrePage = () => {
           <button
             onClick={() => {
               //crearMateria(1);
-              console.log("Materia seleccionada", comentSelect.current);
+              //console.log("Materia seleccionada", comentSelect.current);
               editarComentario();
               // setEstadoModal4(false);
             }}
@@ -649,71 +667,72 @@ export const SemestrePage = () => {
           </button>
         </ModalFooter>
       </Modal>
-      
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            buscarMateria();
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          buscarMateria();
+        }}
+        className="flex flex-row justify-start"
+      >
+        <input
+          id="buscador"
+          name="buscador"
+          type="text"
+          value={buscador}
+          onChange={(e) => {
+            setBuscador(e.target.value);
           }}
-          className="flex flex-row justify-end"
+          placeholder="Buscar Materia "
+          className="rounded-l-lg h-[35px] 
+          border-gray-300 
+          focus:outline-none focus:ring-cyan-700 border"
+        />
+        <button
+          type="submit"
+          className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 "
         >
-          <InputCyan
-            id="buscador"
-            name="buscador"
-            type="text"
-            value={buscador}
-            setvalue={setBuscador}
-            placeholder="Buscar Materia "
-          />
-          <button
-            type="submit"
-            className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px]"
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-6 h-6"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-              />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMateriasFiltradas(materias);
-              setBuscador("");
-            }}
-            className="bg-red-800 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px]"
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setMateriasFiltradas(materias);
+            setBuscador("");
+          }}
+          className="bg-red-800 hover:bg-red-900 text-white font-medium py-1 px-3 rounded-r-lg"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-6 h-6"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z"
-              />
-            </svg>
-          </button>
-        </form>
-      
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z"
+            />
+          </svg>
+        </button>
+      </form>
 
       <div className="flex flex-row bg-[#B1E0FF] rounded-[2px]  items-center justify-between mt-1">
-        <div className="font-semibold text-base ml-2">
-          Materias
-        </div>
+        <div className="font-semibold text-3xl ml-2">Materias</div>
 
         {active ? (
           <div className="flex flex-row items-center">
@@ -780,10 +799,10 @@ export const SemestrePage = () => {
                           setEstadoModal2(true);
                           setNombre(materiasSemestre.nombre);
                           materiaSelect.current = materiasSemestre.id;
-                          console.log(
-                            "Materia seleccionada",
-                            materiaSelect.current
-                          );
+                          // console.log(
+                          //   "Materia seleccionada",
+                          //   materiaSelect.current
+                          // );
                         }}
                         className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px]"
                       >
@@ -826,78 +845,102 @@ export const SemestrePage = () => {
                 </div>
                 <div className="flex flex-col h-auto justify-between items-start rounded-[2px] bg-[#B1E0FF] h-10 px-2 py-1">
                   <div className="flex flex-col w-full rounded-[2px]">
-                    {documentosMateria?.map((docs) => {
-                      if (docs.materias_id === materiasSemestre.id) {
-                        return (
-                          <div
-                            key={docs.id}
-                            className="flex flex-row justify-between items-center rounded-[2px] bg-[#2874A6]"
-                          >
-                            {/* <div> */}
-                            <a
-                              href={docs.path}
-                              className="flex justify-start h-7 w-full items-center px-1 no-underline text-white "
-                            >
-                              Documento {docs.id}
-                            </a>
-                            {/* </div> */}
-                            {active ? (
-                              <div className="flex flex-row">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    archivoSelect.current = docs.id;
-                                    console.log(
-                                      "id del doc",
-                                      archivoSelect.current
-                                    );
-                                    setEstadoModal3(true);
-                                  }}
-                                  className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px]"
-                                >
-                                  {consultando ? "..." : <IconEdit />}
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    archivoSelect.current = docs.id;
+                    {/* {documentosMateria?.length > 0 ? (
+                      <> */}
 
-                                    console.log(
-                                      "Archivo select current",
-                                      archivoSelect.current
-                                    );
-                                    eliminarDocumentoAlert();
-                                  }}
-                                  disabled={consultando}
-                                  className="bg-sky-900 hover:bg-sky-700 text-white font-medium py-1 px-3 rounded-[3px]"
+                    <div>
+                      {documentosMateria?.map((docs) => {
+                        if (docs.materias_id === materiasSemestre.id) {
+                          {
+                            /* {documentosMateria.length > 0 ? ( */
+                          }
+                          return (
+                            <div
+                              key={docs.id}
+                              className="flex flex-row justify-between items-center rounded-[2px] bg-[#2874A6] mb-1 ml-2"
+                            >
+                              {/* {documentosMateria.length > 0 ? ( */}
+                              <div className="line-clamp-1">
+                                <a
+                                  href={docs.path}
+                                  className="flex justify-start  h-7 w-full items-center px-1 no-underline text-white"
                                 >
-                                  {consultando ? (
-                                    "..."
-                                  ) : (
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      strokeWidth="1.5"
-                                      stroke="currentColor"
-                                      className="w-5 h-5"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
-                                      />
-                                    </svg>
-                                  )}
-                                </button>
+                                  {/* {docs.path} */} Documento {docs.id}
+                                </a>
                               </div>
-                            ) : (
-                              <></>
-                            )}
-                          </div>
-                        );
-                      }
-                    })}
+                              {/* </div> */}
+                              {active ? (
+                                <div className="flex flex-row">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      archivoSelect.current = docs.id;
+                                      // console.log(
+                                      //   "id del doc",
+                                      //   archivoSelect.current
+                                      // );
+                                      setEstadoModal3(true);
+                                    }}
+                                    className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px]"
+                                  >
+                                    {consultando ? "..." : <IconEdit />}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      archivoSelect.current = docs.id;
+
+                                      // console.log(
+                                      //   "Archivo select current",
+                                      //   archivoSelect.current
+                                      // );
+                                      eliminarDocumentoAlert();
+                                    }}
+                                    disabled={consultando}
+                                    className="bg-sky-900 hover:bg-sky-700 text-white font-medium py-1 px-3 rounded-[3px]"
+                                  >
+                                    {consultando ? (
+                                      "..."
+                                    ) : (
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth="1.5"
+                                        stroke="currentColor"
+                                        className="w-5 h-5"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+                                        />
+                                      </svg>
+                                    )}
+                                  </button>
+                                </div>
+                              ) : (
+                                <></>
+                              )}
+
+                              {/* // ) : (
+                              //   "no se q hay aqui "
+                              // )} */}
+                            </div>
+                          );
+                          {
+                            /* // ) : (
+                              //   "no se q hay aqui "
+                              // )} */
+                          }
+                        }
+                      })}
+                    </div>
+
+                    {/* </>
+                    ) : documentosBD?.length===0? (
+                      "No hay Documentos de esta Materia"
+                    ):"a"} */}
                   </div>
                   {active ? (
                     <div className="flex flex-row w-full justify-between items-center mt-2">
@@ -924,12 +967,12 @@ export const SemestrePage = () => {
                           materiaSelect.current = materiasSemestre.id;
 
                           subirDocumentoAlert();
-                          console.log(
-                            "envie el documento a la materia",
-                            materiasSemestre.id,
-                            "con el current: ",
-                            materiaSelect.current
-                          );
+                          // console.log(
+                          //   "envie el documento a la materia",
+                          //   materiasSemestre.id,
+                          //   "con el current: ",
+                          //   materiaSelect.current
+                          // );
                         }}
                         disabled={consultando}
                         className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-2 px-3 rounded-[3px]"
@@ -963,7 +1006,7 @@ export const SemestrePage = () => {
           })}
         </div>
       ) : materias?.length === 0 ? (
-        "No hay materia de momento"
+        "No hay materias de momento"
       ) : (
         "No se encontro la materia"
       )}
@@ -1048,10 +1091,10 @@ export const SemestrePage = () => {
                   onClick={() => {
                     comentSelect.current = elemento.id;
                     setComentario(elemento.comentario);
-                    console.log(
-                      "comentario seleccionado current: ",
-                      comentSelect.current
-                    );
+                    // console.log(
+                    //   "comentario seleccionado current: ",
+                    //   comentSelect.current
+                    // );
                     setEstadoModal4(true);
                   }}
                   className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 "
@@ -1087,6 +1130,7 @@ export const SemestrePage = () => {
                   )}
                 </button>
               </div>
+              {/* _______________________________________________________________________________________________k */}
             </div>
             {/* </div> */}
           </div>

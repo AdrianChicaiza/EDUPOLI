@@ -5,7 +5,6 @@ import { AuthTemplate } from "../components";
 import { AuthNav } from "../components/templates";
 import { AuthProvider } from "../contexts";
 // import "../pages/app/App";
-import { CarrerasScreen } from "../pages/app/CarrerasScreen";
 import { ConfirmarContra } from "../pages/app/ConfirmarContra";
 import { ConfirmarCorreo } from "../pages/app/ConfirmarCorreo";
 import { Dashboard } from "../pages/app/Dashboard";
@@ -56,7 +55,7 @@ export const AppRouter = () => {
                   <Route index path="/:semestreid" element={<SemestrePage />} />
                 </Route>
 
-                <Route index path="/carreras" element={<CarrerasScreen />} />
+                {/* <Route index path="/carreras" element={<CarrerasScreen />} /> */}
                 <Route element={<AuthTemplate />}>
                   <Route index path="/perfil" element={<PerfilUsuario />} />
                 </Route>
