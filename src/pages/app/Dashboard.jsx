@@ -29,6 +29,7 @@ export const Dashboard = () => {
   const [buscador, setBuscador] = useState("");
   //variables para las nuevas carreras:
   const [nombre, setNombre] = useState("");
+  const [path, setPath] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const carreraSelect = useRef(-1);
   const [consultando, setConsultando] = useState(false);
@@ -36,7 +37,9 @@ export const Dashboard = () => {
   const [errorDescripcion, setErrorDescripcion] = useState("");
   const [errorEncargado, setErrorEncargado] = useState("");
   const [carrerasFiltradas, setCarrerasFiltradas] = useState([]);
-
+const [image, setImage] = useState(
+    "https://i.pinimg.com/236x/54/8c/ef/548cef32272216e98f17b2855a44e783.jpg"
+  );
   let hasErrorsCarrera = false;
   let hasErrorsSemestre = false;
   const Swal = require("sweetalert2");
@@ -108,7 +111,6 @@ export const Dashboard = () => {
       setActive(false);
       traerSemestres();
       traerCarrerasEstudiante();
-      
     }
   };
 
@@ -181,7 +183,7 @@ export const Dashboard = () => {
     try {
       await axios.post(
         "http://localhost:8000/api/v1/semestres/admin/" + carreraSelect.current,
-        { nombre, descripcion },
+        { nombre, descripcion, path },
         //{ headers: { accept: "application/json" } },
         config
       );
@@ -342,6 +344,16 @@ export const Dashboard = () => {
     }
     // return false;
   };
+  const vistaPreliminarFoto = (e) => {
+    const leer_img = new FileReader();
+    const id_img = document.getElementById("imgFoto");
+    leer_img.onload = () => {
+      if (leer_img.readyState === 2) {
+        id_img.src = leer_img.result;
+      }
+    };
+    leer_img.readAsDataURL(e.target.files[0]);
+  };
 
   useEffect(() => {
     traerSemestreRol();
@@ -357,6 +369,32 @@ export const Dashboard = () => {
         <ModalBody>
           {/* <form className="mt-8 space-y-6" onSubmit={actualizarSemestre(semestre.id)}> */}
           <div className="form-group">
+            <div className="flex justify-center">
+              <img
+                src={image}
+                id="imgFoto"
+                alt="Imagen Usuario"
+                className="flex items-center justify-center  w-[280px] h-[200px] object-cover bg-black"
+              />
+            </div>
+            <div className="flex justify-center">
+              <input
+                className="text-sm text-grey-500
+                bg-[#1F618D] rounded-[2px] 
+                file:mr-1 file:py-1 file:px-2
+                file:rounded-[2px] file:border-0
+                file:text-md file:font-semibold  file:text-white
+                file:bg-sky-500  
+                hover:file:cursor-pointer hover:file:opacity-80"
+                id="image"
+                accept=".jpg"
+                type="file"
+                onChange={(e) => {
+                  vistaPreliminarFoto(e);
+                  setImage(e.target.files[0]);
+                }}
+              />
+            </div>
             <label htmlFor="nombre" className="font-medium">
               Nombre
             </label>
@@ -709,140 +747,147 @@ export const Dashboard = () => {
           <></>
         )}
       </div>
+      {carrerasFiltradas?.length > 0 ? (
+        <div>
+          {carrerasFiltradas?.map((carrera) => {
+            const semestress = [];
+            sem?.map((semestrefilter) => {
+              if (semestrefilter?.carreras_id === carrera.id) {
+                semestress.push(semestrefilter);
+              }
+            });
 
-      {carrerasFiltradas?.map((carrera) => {
-        const semestress = [];
-        sem?.map((semestrefilter) => {
-          if (semestrefilter?.carreras_id === carrera.id) {
-            semestress.push(semestrefilter);
-          }
-        });
-
-        return (
-          <div key={carrera.id} className="rounded-[2px] bg-[#B1E0FF] ">
-            <div className="flex flex-row w-full justify-between items-center px-2 pt-1">
-              <div className="text-lg font-bold">{carrera?.nombre}</div>
-              <div className="text-gray-700 text-xs font-medium italic">
-                {active ? (
-                  carrera?.estado ? (
-                    "Carrera activa"
-                  ) : (
-                    "Carrera desactivada"
-                  )
-                ) : (
-                  <></>
-                )}
-              </div>
-            </div>
-            <div className="text-gray-700 text-sm line-clamp-2 text-justify font-medium h-[40px] px-2">
-              {carrera?.descripcion}
-            </div>
-
-            <div className="flex items-center w-full ">
-              <div className=" px-2 text-gray-700 w-full text-sm font-medium italic">
-                #{carrera?.encargado}
-              </div>
-              {active ? (
-                <div className=" flex w-full justify-end">
-                  <button
-                    onClick={() => {
-                      carreraSelect.current = carrera.id;
-                      setNombre(carrera.nombre);
-                      setDescripcion(carrera.descripcion);
-                      setEncargado(carrera.encargado);
-                      setEstadoModal3(true);
-                    }}
-                    disabled={consultando}
-                    className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px] mr-1"
-                  >
-                    {consultando ? (
-                      "..."
+            return (
+              <div key={carrera.id} className="rounded-[2px] bg-[#B1E0FF] ">
+                <div className="flex flex-row w-full justify-between items-center px-2 pt-1">
+                  <div className="text-lg font-bold">{carrera?.nombre}</div>
+                  <div className="text-gray-700 text-xs font-medium italic">
+                    {active ? (
+                      carrera?.estado ? (
+                        "Carrera activa"
+                      ) : (
+                        "Carrera desactivada"
+                      )
                     ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                        />
-                      </svg>
+                      <></>
                     )}
-                  </button>
-                  <button
-                    onClick={() => {
-                      carreraSelect.current = carrera.id;
-                      //console.log("carrera seleccionada",carreraSelect.current)
-                      estadoCarreraAlert();
-                      // desactivarCarrera();
-                    }}
-                    disabled={consultando}
-                    className="bg-sky-900 hover:bg-sky-600 text-white font-bold py-1 px-3 rounded-[3px] mr-1"
-                  >
-                    {consultando ? (
-                      "..."
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M3 3l1.664 1.664M21 21l-1.5-1.5m-5.485-1.242L12 17.25 4.5 21V8.742m.164-4.078a2.15 2.15 0 011.743-1.342 48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185V19.5M4.664 4.664L19.5 19.5"
-                        />
-                      </svg>
-                    )}
-                  </button>
-                  <button
-                    onClick={() => {
-                      carreraSelect.current = carrera.id;
-                      setNombre("");
-                      setDescripcion("");
-                      setEstadoModal(true);
-                    }}
-                    disabled={consultando}
-                    className="bg-green-700 hover:bg-green-900 text-white font-medium py-1 px-3 rounded-[3px] mr-2"
-                  >
-                    {consultando ? (
-                      "..."
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    )}
-                  </button>
+                  </div>
                 </div>
-              ) : (
-                <></>
-              )}
-            </div>
-            <Carrusel2 semestre={semestress} />
-            <hr />
-            <Contenido />
-          </div>
-        );
-      })}
+                <div className="text-gray-700 text-sm line-clamp-2 text-justify font-medium h-[40px] px-2">
+                  {carrera?.descripcion}
+                </div>
+
+                <div className="flex items-center w-full ">
+                  <div className=" px-2 text-gray-700 w-full text-sm font-medium italic">
+                    #{carrera?.encargado}
+                  </div>
+                  {active ? (
+                    <div className=" flex w-full justify-end">
+                      <button
+                        onClick={() => {
+                          carreraSelect.current = carrera.id;
+                          setNombre(carrera.nombre);
+                          setDescripcion(carrera.descripcion);
+                          setEncargado(carrera.encargado);
+                          setEstadoModal3(true);
+                        }}
+                        disabled={consultando}
+                        className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px] mr-1"
+                      >
+                        {consultando ? (
+                          "..."
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            className="w-6 h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                            />
+                          </svg>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => {
+                          carreraSelect.current = carrera.id;
+                          //console.log("carrera seleccionada",carreraSelect.current)
+                          estadoCarreraAlert();
+                          // desactivarCarrera();
+                        }}
+                        disabled={consultando}
+                        className="bg-sky-900 hover:bg-sky-600 text-white font-bold py-1 px-3 rounded-[3px] mr-1"
+                      >
+                        {consultando ? (
+                          "..."
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            className="w-6 h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M3 3l1.664 1.664M21 21l-1.5-1.5m-5.485-1.242L12 17.25 4.5 21V8.742m.164-4.078a2.15 2.15 0 011.743-1.342 48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185V19.5M4.664 4.664L19.5 19.5"
+                            />
+                          </svg>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => {
+                          carreraSelect.current = carrera.id;
+                          setNombre("");
+                          setDescripcion("");
+                          setEstadoModal(true);
+                        }}
+                        disabled={consultando}
+                        className="bg-green-700 hover:bg-green-900 text-white font-medium py-1 px-3 rounded-[3px] mr-2"
+                      >
+                        {consultando ? (
+                          "..."
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            className="w-6 h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+                <Carrusel2 semestre={semestress} />
+                <hr />
+                <Contenido />
+              </div>
+            );
+          })}
+        </div>
+      ) : carrerasA?.length === 0 ? (
+        <div className="italic ml-2">No hay carreras de momento </div>
+      ) : (
+        <div className="italic ml-2">No se encontro la carrera </div>
+      )}
 
       {/* _______________________________________________________________________________ */}
     </>

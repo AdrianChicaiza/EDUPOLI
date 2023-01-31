@@ -14,6 +14,7 @@ export const SemestrePage = () => {
   const [estadoModal2, setEstadoModal2] = useState(false);
   const [estadoModal3, setEstadoModal3] = useState(false);
   const [estadoModal4, setEstadoModal4] = useState(false);
+  const [estadoModal5, setEstadoModal5] = useState(false);
   const [active, setActive] = useState(false);
 
   const { user } = useContext(AuthContext);
@@ -70,7 +71,36 @@ export const SemestrePage = () => {
       }
     });
   };
-
+  const eliminarComentarioAlert = () => {
+    Swal.fire({
+      title: "Estas seguro de eliminar el comentario?",
+      showDenyButton: true,
+      confirmButtonText: "Confirmar",
+      confirmButtonColor: "#1080C9",
+      denyButtonText: `Cancelar`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        eliminarComentarios();
+        //Swal.fire("Saved!", "", "success");
+      }
+    });
+  };
+  const editarComentarioAlert = () => {
+    Swal.fire({
+      title: "Estas seguro de editar el comentario?",
+      showDenyButton: true,
+      confirmButtonText: "Confirmar",
+      confirmButtonColor: "#1080C9",
+      denyButtonText: `Cancelar`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        editarComentario();
+        //Swal.fire("Saved!", "", "success");
+      }
+    });
+  };
   const actualizarMateriaAlert = () => {
     Swal.fire({
       title: "Estas seguro de actualizar la materia?",
@@ -250,7 +280,7 @@ export const SemestrePage = () => {
       await axios.post(
         "http://localhost:8000/api/v1/documentos/admin/" +
           materiaSelect.current,
-        doc,
+        {doc,nombre_doc},
         config
       );
       //console.log("Se subio el documento");
@@ -645,7 +675,8 @@ export const SemestrePage = () => {
             onClick={() => {
               //crearMateria(1);
               //console.log("Materia seleccionada", comentSelect.current);
-              editarComentario();
+
+              editarComentarioAlert();
               // setEstadoModal4(false);
             }}
             disabled={consultando}
@@ -657,8 +688,62 @@ export const SemestrePage = () => {
             type="button"
             onClick={() => {
               // verSemestre(semestre.id);
+              setComentario("");
               setEstadoModal4(false);
               // setNombre("");
+            }}
+            disabled={consultando}
+            className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+          >
+            {consultando ? "..." : "Cerrar"}
+          </button>
+        </ModalFooter>
+      </Modal>
+      <Modal isOpen={estadoModal5} style={modalStyle}>
+        <ModalHeader>Subir Documento</ModalHeader>
+        <ModalBody>
+          <label>Nombre</label>
+          <InputCyan
+            id="nombre_doc"
+            name="nombre_doc"
+            type="text"
+            required
+            value={nombre_doc}
+            setvalue={setNombre_doc}
+            minLength={5}
+          />
+        </ModalBody>
+        <ModalFooter>
+          <input
+            className="text-sm text-grey-500
+                 bg-sky-800 p-1 rounded 
+                 file:mr-1 file:py-1 file:px-2
+                 file:rounded-lg file:border-0
+                 file:text-md file:font-semibold  file:text-white
+                 file:bg-sky-500  
+                 hover:file:cursor-pointer hover:file:opacity-80
+               "
+            id="documentos1"
+            type="file"
+            accept=".pdf"
+            onChange={(e) => {
+              setdocumentos(e.target.files[0]);
+            }}
+          />
+          <button
+            onClick={() => {
+              subirDocumento();
+            }}
+            disabled={consultando}
+            className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+          >
+            {consultando ? "Cargando..." : "Subir"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              // verSemestre(semestre.id);
+              setEstadoModal5(false);
             }}
             disabled={consultando}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
@@ -775,6 +860,7 @@ export const SemestrePage = () => {
                 }
               });
             }
+            let counter = 0;
             return (
               <div key={materiasSemestre.id}>
                 <div className="flex flex-row justify-between items-center rounded-[2px] bg-[#1F618D] mt-1">
@@ -845,21 +931,17 @@ export const SemestrePage = () => {
                 </div>
                 <div className="flex flex-col h-auto justify-between items-start rounded-[2px] bg-[#B1E0FF] h-10 px-2 py-1">
                   <div className="flex flex-col w-full rounded-[2px]">
-                    {/* {documentosMateria?.length > 0 ? (
-                      <> */}
-
                     <div>
                       {documentosMateria?.map((docs) => {
                         if (docs.materias_id === materiasSemestre.id) {
                           {
-                            /* {documentosMateria.length > 0 ? ( */
+                            counter += 1;
                           }
                           return (
                             <div
                               key={docs.id}
                               className="flex flex-row justify-between items-center rounded-[2px] bg-[#2874A6] mb-1 ml-2"
                             >
-                              {/* {documentosMateria.length > 0 ? ( */}
                               <div className="line-clamp-1">
                                 <a
                                   href={docs.path}
@@ -868,7 +950,7 @@ export const SemestrePage = () => {
                                   {/* {docs.path} */} Documento {docs.id}
                                 </a>
                               </div>
-                              {/* </div> */}
+
                               {active ? (
                                 <div className="flex flex-row">
                                   <button
@@ -922,30 +1004,21 @@ export const SemestrePage = () => {
                               ) : (
                                 <></>
                               )}
-
-                              {/* // ) : (
-                              //   "no se q hay aqui "
-                              // )} */}
                             </div>
                           );
-                          {
-                            /* // ) : (
-                              //   "no se q hay aqui "
-                              // )} */
-                          }
                         }
                       })}
+                      {counter === 0 && (
+                        <div className="italic ml-2">
+                          No se encontro documentos en esta materia
+                        </div>
+                      )}
                     </div>
-
-                    {/* </>
-                    ) : documentosBD?.length===0? (
-                      "No hay Documentos de esta Materia"
-                    ):"a"} */}
                   </div>
                   {active ? (
                     <div className="flex flex-row w-full justify-between items-center mt-2">
                       {/* <form className="mt-0 space-y-1" onSubmit={subirDocumento}> */}
-                      <input
+                      {/* <input
                         className="text-sm text-grey-500
                       bg-[#1F618D] p-1 rounded-[2px] 
                       file:mr-1 file:py-1 file:px-2
@@ -959,14 +1032,14 @@ export const SemestrePage = () => {
                         onChange={(e) => {
                           setdocumentos(e.target.files[0]);
                         }}
-                      />
+                      /> */}
                       {/* </form> */}
                       <button
                         // type="submit"
                         onClick={() => {
                           materiaSelect.current = materiasSemestre.id;
-
-                          subirDocumentoAlert();
+                          setEstadoModal5(true);
+                          // subirDocumentoAlert();
                           // console.log(
                           //   "envie el documento a la materia",
                           //   materiasSemestre.id,
@@ -1075,64 +1148,63 @@ export const SemestrePage = () => {
             className="w-full"
             styles={{ height: "500px", overflowY: "scroll" }}
           >
-            {/* <div className="flex flex-row bg-sky-300 mb-1 px-1 rounded"> */}
-
             <div
               className="flex flex-col w-full mb-1 rounded-[2px] bg-[#B1E0FF] justify-start items-center"
               key={elemento.id}
             >
               <ComentarioCard comentario={elemento} />
-              {/* <div className="w-full">{elemento.comentario}</div> */}
+              {user.id === elemento.user_id || user.role_id === 1 ? (
+                <div className="flex flex-row justify-start w-full ">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      comentSelect.current = elemento.id;
+                      setComentario(elemento.comentario);
+                      // console.log(
+                      //   "comentario seleccionado current: ",
+                      //   comentSelect.current
+                      // );
+                      setEstadoModal4(true);
+                    }}
+                    className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 "
+                  >
+                    {consultando ? "" : <IconEdit />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      comentSelect.current = elemento.id;
+                      eliminarComentarioAlert();
+                    }}
+                    disabled={consultando}
+                    className="bg-sky-900 hover:bg-sky-700 text-white font-medium py-1 px-3 "
+                  >
+                    {consultando ? (
+                      "..."
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className="w-5 h-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <></>
+              )}
 
-              {/* validar comentarios pendiente==================================================== */}
-              <div className="flex flex-row justify-start w-full ">
-                <button
-                  type="button"
-                  onClick={() => {
-                    comentSelect.current = elemento.id;
-                    setComentario(elemento.comentario);
-                    // console.log(
-                    //   "comentario seleccionado current: ",
-                    //   comentSelect.current
-                    // );
-                    setEstadoModal4(true);
-                  }}
-                  className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 "
-                >
-                  {consultando ? "" : <IconEdit />}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    comentSelect.current = elemento.id;
-                    eliminarComentarios();
-                  }}
-                  disabled={consultando}
-                  className="bg-sky-900 hover:bg-sky-700 text-white font-medium py-1 px-3 "
-                >
-                  {consultando ? (
-                    "..."
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      className="w-5 h-5"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                      />
-                    </svg>
-                  )}
-                </button>
-              </div>
               {/* _______________________________________________________________________________________________k */}
             </div>
-            {/* </div> */}
           </div>
         ))}
       </div>
