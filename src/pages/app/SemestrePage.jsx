@@ -29,13 +29,15 @@ export const SemestrePage = () => {
   const [encargado, setEncargado] = useState("encargado");
   const [recargar, setRecargar] = useState(true);
   let hasErrorsMateria = false;
-  const [documentos1, setdocumentos] = useState("");
+  const [documentos, setdocumentos] = useState("");
   const [comentarios, setComentarios] = useState([]);
   const [comentario, setComentario] = useState("");
   const [documentosBD, setDocumentosBD] = useState([]);
   const documentosMateria = [];
+  const [path, setPath] = useState("");
   const [consultando, setConsultando] = useState(false);
   const [nombre_doc, setNombre_doc] = useState("");
+  //const [documentos, setDocumentos] = useState("");
   const [buscador, setBuscador] = useState("");
   const [materiasFiltradas, setMateriasFiltradas] = useState([]);
   const [errorNombreMateria, seterrorNombreMateria] = useState("");
@@ -274,21 +276,20 @@ export const SemestrePage = () => {
 
   const subirDocumento = async () => {
     setConsultando(true);
-    const doc = new FormData();
-    doc.append("documentos", documentos1);
+   console.log("lo que trae path",documentos)
     try {
       await axios.post(
         "http://localhost:8000/api/v1/documentos/admin/" +
-          materiaSelect.current,
-        {doc,nombre_doc},
-        config
+          materiaSelect.current,{nombre_doc,documentos},
+          { headers: { 'Content-Type': 'multipart/form-data', 'authorization': `${tokenUser}` } },
+
       );
       //console.log("Se subio el documento");
       bienAlert();
       window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      //console.log(error.response.data.message, "error");
+      console.log(error.response.data.errors, "error");
     }
     setConsultando(false);
   };
@@ -326,14 +327,15 @@ export const SemestrePage = () => {
 
   const editarDocumento = async () => {
     setConsultando(true);
-    const doc = new FormData();
-    doc.append("documentos", documentos1);
+    console.log("path del doc",documentos);
+    console.log("nombre doc",nombre_doc);
+
     try {
       await axios.post(
         "http://localhost:8000/api/v1/documentos/admin/actualizar/" +
           archivoSelect.current,
-        doc,
-        config
+          {nombre_doc,documentos},
+          { headers: { 'Content-Type': 'multipart/form-data', 'authorization': `${tokenUser}` } },
       );
       //console.log("Se actualizo el documento");
       bienAlert();
@@ -478,9 +480,9 @@ export const SemestrePage = () => {
   useEffect(() => {
     traerMateriasRol();
   }, []);
-  if (recargar || !comentarios) {
-    return <Loading />;
-  }
+//  if (recargar || !comentarios) {
+//    return <Loading />;
+//  }
   // _____________________________________________________________________________________________________________
   return (
     <>
@@ -598,6 +600,7 @@ export const SemestrePage = () => {
       <Modal isOpen={estadoModal3} style={modalStyle}>
         <ModalHeader>Editar Documento</ModalHeader>
         <ModalBody>
+        <form onSubmit={editarDocumento}>
           <label>Nombre</label>
           <InputCyan
             id="nombre_doc"
@@ -608,8 +611,6 @@ export const SemestrePage = () => {
             setvalue={setNombre_doc}
             minLength={5}
           />
-        </ModalBody>
-        <ModalFooter>
           <input
             className="text-sm text-grey-500
                  bg-sky-800 p-1 rounded 
@@ -619,13 +620,17 @@ export const SemestrePage = () => {
                  file:bg-sky-500  
                  hover:file:cursor-pointer hover:file:opacity-80
                "
-            id="documentos1"
+            id="documentos"
             type="file"
             accept=".pdf"
             onChange={(e) => {
               setdocumentos(e.target.files[0]);
             }}
           />
+          </form>
+        </ModalBody>
+        <ModalFooter>
+          
           <button
             onClick={() => {
               //crearMateria(1);
@@ -702,6 +707,7 @@ export const SemestrePage = () => {
       <Modal isOpen={estadoModal5} style={modalStyle}>
         <ModalHeader>Subir Documento</ModalHeader>
         <ModalBody>
+        <form onSubmit={subirDocumento}>
           <label>Nombre</label>
           <InputCyan
             id="nombre_doc"
@@ -712,9 +718,7 @@ export const SemestrePage = () => {
             setvalue={setNombre_doc}
             minLength={5}
           />
-        </ModalBody>
-        <ModalFooter>
-          <input
+           <input
             className="text-sm text-grey-500
                  bg-sky-800 p-1 rounded 
                  file:mr-1 file:py-1 file:px-2
@@ -723,13 +727,17 @@ export const SemestrePage = () => {
                  file:bg-sky-500  
                  hover:file:cursor-pointer hover:file:opacity-80
                "
-            id="documentos1"
+            id="documentos"
             type="file"
             accept=".pdf"
             onChange={(e) => {
               setdocumentos(e.target.files[0]);
             }}
           />
+          </form>
+        </ModalBody>
+        <ModalFooter>
+         
           <button
             onClick={() => {
               subirDocumento();
@@ -947,7 +955,7 @@ export const SemestrePage = () => {
                                   href={docs.path}
                                   className="flex justify-start  h-7 w-full items-center px-1 no-underline text-white"
                                 >
-                                  {/* {docs.path} */} Documento {docs.id}
+                                  {/* {docs.path} */}{docs.nombre_doc}.pdf
                                 </a>
                               </div>
 
@@ -961,6 +969,7 @@ export const SemestrePage = () => {
                                       //   "id del doc",
                                       //   archivoSelect.current
                                       // );
+                                      setNombre_doc(docs.nombre_doc);
                                       setEstadoModal3(true);
                                     }}
                                     className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px]"
@@ -1026,7 +1035,7 @@ export const SemestrePage = () => {
                       file:text-md file:font-semibold  file:text-white
                       file:bg-sky-500  
                       hover:file:cursor-pointer hover:file:opacity-80"
-                        id="documentos1"
+                        id="documentos"
                         type="file"
                         accept=".pdf"
                         onChange={(e) => {

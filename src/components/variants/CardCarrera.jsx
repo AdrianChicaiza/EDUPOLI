@@ -117,7 +117,7 @@ export const CardCarrera = ({ semestre }) => {
         "http://localhost:8000/api/v1/semestres/admin/" +
           semestreSelected.current,
         { nombre, descripcion },
-        config
+        { headers: { 'Content-Type': 'multipart/form-data', 'authorization': `${tokenUser}` } }      
       );
 
       console.log("Se actualizo el semestre");
@@ -302,8 +302,8 @@ export const CardCarrera = ({ semestre }) => {
         <img
           className="semestreImg"
           src={
-            semestre?.url
-              ? semestre.url
+            semestre?.path
+              ? semestre.path
               : "https://static.vecteezy.com/system/resources/thumbnails/001/632/448/small/dark-blue-stripes-geometric-overlapping-background-free-vector.jpg"
           }
           alt="Imagen Semestre"

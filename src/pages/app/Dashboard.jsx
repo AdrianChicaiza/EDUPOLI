@@ -29,7 +29,7 @@ export const Dashboard = () => {
   const [buscador, setBuscador] = useState("");
   //variables para las nuevas carreras:
   const [nombre, setNombre] = useState("");
-  const [path, setPath] = useState("");
+  const [path, setPath] = useState("https://i.pinimg.com/236x/54/8c/ef/548cef32272216e98f17b2855a44e783.jpg");
   const [descripcion, setDescripcion] = useState("");
   const carreraSelect = useRef(-1);
   const [consultando, setConsultando] = useState(false);
@@ -37,7 +37,7 @@ export const Dashboard = () => {
   const [errorDescripcion, setErrorDescripcion] = useState("");
   const [errorEncargado, setErrorEncargado] = useState("");
   const [carrerasFiltradas, setCarrerasFiltradas] = useState([]);
-const [image, setImage] = useState(
+  const [image, setImage] = useState(
     "https://i.pinimg.com/236x/54/8c/ef/548cef32272216e98f17b2855a44e783.jpg"
   );
   let hasErrorsCarrera = false;
@@ -180,12 +180,13 @@ const [image, setImage] = useState(
 
   const crearSemestre = async () => {
     setConsultando(true);
+    console.log(path)
     try {
       await axios.post(
         "http://localhost:8000/api/v1/semestres/admin/" + carreraSelect.current,
         { nombre, descripcion, path },
-        //{ headers: { accept: "application/json" } },
-        config
+        { headers: { 'Content-Type': 'multipart/form-data', 'authorization': `${tokenUser}` } }
+
       );
 
       setEstadoModal(false);
@@ -198,7 +199,7 @@ const [image, setImage] = useState(
       bienAlert();
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      console.log(error.response.data.errors, "error");
     }
     setConsultando(false);
   };
@@ -258,7 +259,7 @@ const [image, setImage] = useState(
     try {
       await axios.get(
         "http://localhost:8000/api/v1/carreras/desactiva/admin/" +
-          carreraSelect.current,
+        carreraSelect.current,
         config
       );
       //console.log("Traje semestres modo estudiante");
@@ -359,85 +360,86 @@ const [image, setImage] = useState(
     traerSemestreRol();
   }, []);
 
-  if (recargar || !carrerasA || !sem) {
-    return <Loading />;
-  }
+  //if (recargar || !carrerasA || !sem) {
+  // return <Loading />;
+  //}
   return (
     <>
       <Modal isOpen={estadoModal} style={modalStyle}>
         <ModalHeader>Crear Semestre</ModalHeader>
         <ModalBody>
-          {/* <form className="mt-8 space-y-6" onSubmit={actualizarSemestre(semestre.id)}> */}
-          <div className="form-group">
-            <div className="flex justify-center">
-              <img
-                src={image}
-                id="imgFoto"
-                alt="Imagen Usuario"
-                className="flex items-center justify-center  w-[280px] h-[200px] object-cover bg-black"
-              />
-            </div>
-            <div className="flex justify-center">
-              <input
-                className="text-sm text-grey-500
+          <form className="mt-8 space-y-6" onSubmit={crearSemestre}>
+            <div className="form-group">
+              <div className="flex justify-center">
+                <img
+                  src={path}
+                  id="imgFoto"
+                  alt="Imagen Usuario"
+                  className="flex items-center justify-center  w-[280px] h-[200px] object-cover bg-black"
+                />
+              </div>
+              <div className="flex justify-center">
+                <input
+                  className="text-sm text-grey-500
                 bg-[#1F618D] rounded-[2px] 
                 file:mr-1 file:py-1 file:px-2
                 file:rounded-[2px] file:border-0
                 file:text-md file:font-semibold  file:text-white
                 file:bg-sky-500  
                 hover:file:cursor-pointer hover:file:opacity-80"
-                id="image"
-                accept=".jpg"
-                type="file"
-                onChange={(e) => {
-                  vistaPreliminarFoto(e);
-                  setImage(e.target.files[0]);
+                  id="image"
+                  accept=".jpg"
+                  type="file"
+                  onChange={(e) => {
+                    vistaPreliminarFoto(e);
+                    setPath(e.target.files[0]);
+                  }}
+                />
+              </div>
+              <label htmlFor="nombre" className="font-medium">
+                Nombre
+              </label>
+              <InputCyan
+                id="nombre"
+                name="nombre"
+                type="text"
+                required
+                value={nombre}
+                setvalue={(e) => {
+                  setNombre(e);
+                  setErrorNombre("");
                 }}
+                placeholder="Nombre del Semestre"
+                minLength={3}
+                tamaño={50}
               />
-            </div>
-            <label htmlFor="nombre" className="font-medium">
-              Nombre
-            </label>
-            <InputCyan
-              id="nombre"
-              name="nombre"
-              type="text"
-              required
-              value={nombre}
-              setvalue={(e) => {
-                setNombre(e);
-                setErrorNombre("");
-              }}
-              placeholder="Nombre del Semestre"
-              minLength={3}
-              tamaño={50}
-            />
-            <p className="text-red-500 text-xs italic">{errorNombre}</p>
-            <label htmlFor="descripcion" className="font-medium mt-2">
-              Descripcion
-            </label>
-            <textarea
-              id="descripcion"
-              name="descripcion"
-              type="text"
-              className="w-full 
+              <p className="text-red-500 text-xs italic">{errorNombre}</p>
+              <label htmlFor="descripcion" className="font-medium mt-2">
+                Descripcion
+              </label>
+              <textarea
+                id="descripcion"
+                name="descripcion"
+                type="text"
+                className="w-full 
               rounded-[2px] border
               border-gray-300 px-3 py-2 
               placeholder-gray-500 focus:z-10 focus:border-cyan-700 
               focus:outline-none focus:ring-cyan-700 sm:text-sm"
-              // required={true}
-              value={descripcion}
-              onChange={(e) => {
-                setDescripcion(e.target.value);
-                setErrorDescripcion("");
-              }}
-              maxLength={249}
-              placeholder="Descripcion del Semestre"
+                // required={true}
+                value={descripcion}
+                onChange={(e) => {
+                  setDescripcion(e.target.value);
+                  setErrorDescripcion("");
+                }}
+                maxLength={249}
+                placeholder="Descripcion del Semestre"
               // minLength={3}
-            />
-            <p className="text-red-500 text-xs italic">{errorDescripcion}</p>
-            <br />
-          </div>
+              />
+              <p className="text-red-500 text-xs italic">{errorDescripcion}</p>
+              <br />
+            </div>
+          </form>
         </ModalBody>
         <ModalFooter>
           <button
@@ -531,7 +533,7 @@ const [image, setImage] = useState(
               }}
               maxLength={249}
               placeholder="Descripcion de la Carrera"
-              // minLength={3}
+            // minLength={3}
             />
             <p className="text-red-500 text-xs italic">{errorDescripcion}</p>
           </div>
@@ -628,7 +630,7 @@ const [image, setImage] = useState(
               }}
               maxLength={249}
               placeholder="Descripcion de la Carrera"
-              // minLength={3}
+            // minLength={3}
             />
             <p className="text-red-500 text-xs italic">{errorDescripcion}</p>
           </div>
