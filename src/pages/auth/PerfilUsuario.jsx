@@ -4,6 +4,7 @@ import InputCyan from "../../components/variants/InputCyan";
 // import { AuthContext } from "../../contexts/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Loading from "../app/loading";
+import { BACKEND } from "../VariableBck";
 
 export const PerfilUsuario = () => {
   const [first_name, setFirst_name] = useState("");
@@ -12,16 +13,13 @@ export const PerfilUsuario = () => {
   const [errorFirstName, setErrorFirstName] = useState("");
   const [errorLastName, setErrorLastName] = useState("");
   const [errorEmail, setErrorEmail] = useState("");
-  // const [full_name, setFull_name] = useState("");
-  // const { user } = useContext(AuthContext);
   const tokenUser = localStorage.getItem("token");
   const [image, setImage] = useState("");
   const [editar, setEditar] = useState(false);
   const [recargar, setRecargar] = useState(true);
-  // const [activo, setActivo] = useState(false);
-  // const [activo2, setActivo2] = useState(false);
   const [consultando, setConsultando] = useState(false);
   const navigate = useNavigate();
+  // const BACKEND="https://proyectoedupoli.herokuapp.com";
 
   const Swal = require("sweetalert2");
   const errorAlert = () => {
@@ -79,7 +77,7 @@ export const PerfilUsuario = () => {
     const f = new FormData();
     f.append("image", image);
     try {
-      await axios.post("http://localhost:8000/api/v1/profile/avatar", f, {
+      await axios.post(BACKEND + "/api/v1/profile/avatar", f, {
         headers: { Authorization: `Bearer: ${tokenUser}` },
       });
     } catch (error) {
@@ -89,13 +87,10 @@ export const PerfilUsuario = () => {
   const traerDatos = async () => {
     setRecargar(true);
     try {
-      const response = await axios.get(
-        "http://localhost:8000/api/v1/profile/",
-        config
-      );
+      const response = await axios.get(BACKEND + "/api/v1/profile", config);
+      console.log("datos de mi usuario: ",response.data.data);
       setImage(response.data.data.avatar);
       setEmail(response.data.data.user.email);
-      // setFull_name(user.full_name);
       setFirst_name(response.data.data.user.first_name);
       setLast_name(response.data.data.user.last_name);
     } catch (error) {
@@ -107,7 +102,7 @@ export const PerfilUsuario = () => {
     setConsultando(true);
     try {
       await axios.post(
-        "http://localhost:8000/api/v1/profile/",
+        BACKEND + "/api/v1/profile",
         { first_name, last_name, email },
         { headers: { Authorization: `Bearer: ${tokenUser}` } },
         { headers: { accept: "application/json" } }
@@ -155,7 +150,7 @@ export const PerfilUsuario = () => {
   };
 
   useEffect(() => {
-    traerDatos();
+    traerDatos()
   }, []);
 
   if (recargar) {

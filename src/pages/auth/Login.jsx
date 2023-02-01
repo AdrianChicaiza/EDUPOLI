@@ -4,6 +4,7 @@ import axios from "axios";
 import { AuthContext } from "../../contexts";
 import { Link } from "react-router-dom";
 import InputCyan from "../../components/variants/InputCyan";
+import { BACKEND } from "../VariableBck";
 export const Login = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ export const Login = () => {
   const [errorEmail, setErrorEmail] = useState("");
   const [errorContrasena, setErrorContrasena] = useState("");
   const Swal = require("sweetalert2");
+  // const BACKEND="https://proyectoedupoli.herokuapp.com";
+  
   const errorAlert = () => {
     Swal.fire({
       icon: "error",
@@ -26,12 +29,14 @@ export const Login = () => {
     
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/v1/login",
+        
+        BACKEND+"/api/v1/login",
         { email, password },
         { headers: { accept: "application/json" } }
       );
       const { access_token, token_type, user } = response.data.data;
       login(user, `${token_type} ${access_token}`);
+      console.log("Datos usuario logeado: ",response.data.data);
       navigate("/");
     } catch (error) {
       errorAlert();
@@ -97,20 +102,7 @@ export const Login = () => {
                     <div>
                       <label htmlFor="email" className="sr-only">
                         Correo
-                      </label>
-                      {/* <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={email}
-                        required
-                        className="relative block w-full border
-                        rounded-t-md border-gray-300 px-3
-                        placeholder-gray-500 focus:z-10                        
-                        focus:ring-cyan-700 sm:text-sm"
-                        placeholder="Correo"
-                        onChange={(e) => setEmail(e.target.value)}
-                      /> */}
+                      </label>                      
                       <InputCyan
                         id="email"
                         name="email"
@@ -131,20 +123,7 @@ export const Login = () => {
                     <div>
                       <label htmlFor="password" className="sr-only">
                         Contraseña
-                      </label>
-                      {/* <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        value={password}
-                        required
-                        className="relative block w-full border
-                        rounded-b-md border-gray-300 px-3
-                        placeholder-gray-500 focus:z-10                        
-                        focus:ring-cyan-700 sm:text-sm"
-                        placeholder="Contraseña"
-                        onChange={(e) => setPassword(e.target.value)}
-                      /> */}
+                      </label>                     
                       <InputCyan
                         id="password"
                         name="password"

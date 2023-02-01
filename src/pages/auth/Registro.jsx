@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import InputCyan from "../../components/variants/InputCyan";
+import { BACKEND } from "../VariableBck";
 
 export const Registro = () => {
   const [password, setpassword] = useState("");
@@ -16,6 +17,7 @@ export const Registro = () => {
   const [errorContrasenaConfirm, setErrorContrasenaConfirm] = useState("");
   const [last_name, setlast_name] = useState("");
   const [consultando, setConsultando] = useState(false);
+  // const BACKEND="https://proyectoedupoli.herokuapp.com";
   const role_id = 2;
   let hasErrorsRegistro = false;
   const Swal = require("sweetalert2");
@@ -48,7 +50,7 @@ export const Registro = () => {
     setConsultando(true);
     try {
       await axios.post(
-        "http://localhost:8000/api/v1/register",
+        BACKEND+"/api/v1/register",
         {
           role_id,
           first_name,

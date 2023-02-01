@@ -8,6 +8,7 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { useRef } from "react";
 import InputCyan from "../../components/variants/InputCyan";
 import { Contenido } from "./ChatBot";
+import { BACKEND } from "../VariableBck";
 
 // import { ComentarioCard } from "../../components/variants/ComentarioCard";
 // https://tailwind-elements.com/docs/standard/components/video-carousel/
@@ -29,7 +30,7 @@ export const Dashboard = () => {
   const [buscador, setBuscador] = useState("");
   //variables para las nuevas carreras:
   const [nombre, setNombre] = useState("");
-  const [path, setPath] = useState("https://i.pinimg.com/236x/54/8c/ef/548cef32272216e98f17b2855a44e783.jpg");
+  const [path, setPath] = useState("https://w7.pngwing.com/pngs/370/8/png-transparent-file-transfer-protocol-computer-icons-upload-personal-use-angle-rectangle-triangle.png");
   const [descripcion, setDescripcion] = useState("");
   const carreraSelect = useRef(-1);
   const [consultando, setConsultando] = useState(false);
@@ -37,11 +38,9 @@ export const Dashboard = () => {
   const [errorDescripcion, setErrorDescripcion] = useState("");
   const [errorEncargado, setErrorEncargado] = useState("");
   const [carrerasFiltradas, setCarrerasFiltradas] = useState([]);
-  const [image, setImage] = useState(
-    "https://i.pinimg.com/236x/54/8c/ef/548cef32272216e98f17b2855a44e783.jpg"
-  );
   let hasErrorsCarrera = false;
   let hasErrorsSemestre = false;
+  // const BACKEND="https://proyectoedupoli.herokuapp.com";
   const Swal = require("sweetalert2");
   // iterar objetos:
   // https://mauriciogc.medium.com/react-map-filter-y-reduce-54777359d94
@@ -117,7 +116,7 @@ export const Dashboard = () => {
   const traerCarrerasAdmin = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/v1/carreras/admin",
+        BACKEND+"/api/v1/carreras/admin",
         config
       );
       const carrerasfiltradasconts = [];
@@ -133,7 +132,7 @@ export const Dashboard = () => {
   const traerCarrerasEstudiante = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/v1/carreras/estudianteE",
+        BACKEND+"/api/v1/carreras/estudianteE",
         config
       );
       const carrerasfiltradasconts = [];
@@ -151,7 +150,7 @@ export const Dashboard = () => {
     setRecargar(true);
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/v1/semestres/adminE",
+        BACKEND+"/api/v1/semestres/adminE",
         config
       );
       //console.log("Id Semetres: ",response.data.data.carreras_id);
@@ -167,7 +166,7 @@ export const Dashboard = () => {
     setRecargar(true);
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/v1/semestres/estudiante",
+        BACKEND+"/api/v1/semestres/estudiante",
         config
       );
       //console.log("Traje semestres modo estudiante");
@@ -183,7 +182,7 @@ export const Dashboard = () => {
     console.log(path)
     try {
       await axios.post(
-        "http://localhost:8000/api/v1/semestres/admin/" + carreraSelect.current,
+        BACKEND+"/api/v1/semestres/admin/" + carreraSelect.current,
         { nombre, descripcion, path },
         { headers: { 'Content-Type': 'multipart/form-data', 'authorization': `${tokenUser}` } }
 
@@ -194,9 +193,8 @@ export const Dashboard = () => {
       setDescripcion("");
       setErrorNombre("");
       setErrorDescripcion("");
-
-      window.location = window.location.href;
       bienAlert();
+      window.location = window.location.href;      
     } catch (error) {
       errorAlert();
       console.log(error.response.data.errors, "error");
@@ -208,7 +206,7 @@ export const Dashboard = () => {
     setConsultando(true);
     try {
       await axios.post(
-        "http://localhost:8000/api/v1/carreras/admin",
+        BACKEND+"/api/v1/carreras/admin",
         { nombre, descripcion, encargado },
         //{ headers: { accept: "application/json" } },
         config
@@ -235,7 +233,7 @@ export const Dashboard = () => {
     setConsultando(true);
     try {
       await axios.put(
-        "http://localhost:8000/api/v1/carreras/admin/" + carreraSelect.current,
+        BACKEND+"/api/v1/carreras/admin/" + carreraSelect.current,
         { nombre, descripcion, encargado },
         config
       );
@@ -258,7 +256,7 @@ export const Dashboard = () => {
     setConsultando(true);
     try {
       await axios.get(
-        "http://localhost:8000/api/v1/carreras/desactiva/admin/" +
+        BACKEND+"/api/v1/carreras/desactiva/admin/" +
         carreraSelect.current,
         config
       );
@@ -360,15 +358,15 @@ export const Dashboard = () => {
     traerSemestreRol();
   }, []);
 
-  //if (recargar || !carrerasA || !sem) {
-  // return <Loading />;
-  //}
+  if (recargar || !carrerasA || !sem) {
+  return <Loading />;
+  }
   return (
     <>
       <Modal isOpen={estadoModal} style={modalStyle}>
         <ModalHeader>Crear Semestre</ModalHeader>
         <ModalBody>
-          <form className="mt-8 space-y-6" onSubmit={crearSemestre}>
+          <form className="space-y-6" onSubmit={crearSemestre}>
             <div className="form-group">
               <div className="flex justify-center">
                 <img
@@ -426,7 +424,7 @@ export const Dashboard = () => {
               border-gray-300 px-3 py-2 
               placeholder-gray-500 focus:z-10 focus:border-cyan-700 
               focus:outline-none focus:ring-cyan-700 sm:text-sm"
-                // required={true}
+             
                 value={descripcion}
                 onChange={(e) => {
                   setDescripcion(e.target.value);
@@ -434,10 +432,10 @@ export const Dashboard = () => {
                 }}
                 maxLength={249}
                 placeholder="Descripcion del Semestre"
-              // minLength={3}
+             
               />
               <p className="text-red-500 text-xs italic">{errorDescripcion}</p>
-              <br />
+              
             </div>
           </form>
         </ModalBody>
@@ -462,6 +460,8 @@ export const Dashboard = () => {
             type="button"
             onClick={() => {
               setEstadoModal(false);
+              setErrorDescripcion("");
+              setErrorNombre("");
             }}
             disabled={consultando}
             className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"

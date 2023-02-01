@@ -3,8 +3,6 @@ import React, { useContext, useState } from "react";
 import { AuthContext } from "../../contexts/auth/AuthContext";
 import { Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -12,6 +10,8 @@ import { NavDropdown } from "react-bootstrap";
 import { useEffect } from "react";
 import "../templates/imageAvatar.css";
 import { Footer } from "flowbite-react";
+import { BACKEND } from "../../pages/VariableBck";
+// const BACKEND = "https://proyectoedupoli.herokuapp.com";
 // https://tailwind-elements.com/docs/standard/components/video-carousel/
 export const AuthNav = () => {
   //-------------------------------------------------------------------------------
@@ -20,6 +20,8 @@ export const AuthNav = () => {
   const [image, setImage] = useState("");
   const { user, logout } = useContext(AuthContext);
   const tokenUser = localStorage.getItem("token");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   const config = {
     headers: { Authorization: `${tokenUser}` },
@@ -28,7 +30,7 @@ export const AuthNav = () => {
     e.preventDefault();
     try {
       await axios.post(
-        "http://localhost:8000/api/v1/logout",
+        BACKEND + "/api/v1/logout",
         { headers: { accept: "application/json" } },
         config
       );
@@ -41,10 +43,7 @@ export const AuthNav = () => {
 
   const traerDatos = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8000/api/v1/profile/",
-        config
-      );
+      const response = await axios.get(BACKEND + "/api/v1/profile", config);
       setImage(response.data.data.avatar);
     } catch (error) {
       console.log(error.response.data.message, "error");
@@ -79,9 +78,8 @@ export const AuthNav = () => {
             </Nav>
 
             <Navbar.Toggle />
-            
+
             <Navbar.Collapse className="justify-content-end">
-            
               <Nav>
                 <img
                   className="avatarImg"

@@ -8,6 +8,7 @@ import InputCyan from "./InputCyan";
 import Loading from "../../pages/app/loading";
 import "../variants/imageSemestre.css";
 import { useRef } from "react";
+import { BACKEND } from "../../pages/VariableBck";
 
 export const CardCarrera = ({ semestre }) => {
   const { user } = useContext(AuthContext);
@@ -20,15 +21,15 @@ export const CardCarrera = ({ semestre }) => {
   const semestreSelected = useRef(-1);
   const [errorNombre, setErrorNombre] = useState("");
   const [errorDescripcion, setErrorDescripcion] = useState("");
-  //variables para las nuevas carreras:
+  const [errorImagen, setErrorImagen] = useState("");
+  // const BACKEND="https://proyectoedupoli.herokuapp.com";
   const [nombre, setNombre] = useState(semestre.nombre);
   const [descripcion, setDescripcion] = useState(semestre.descripcion);
   const Swal = require("sweetalert2");
-  // https://heroicons.com
-  //imagen de carrera
-  const [image, setImage] = useState(
-    "https://i.pinimg.com/236x/54/8c/ef/548cef32272216e98f17b2855a44e783.jpg"
+  const [path, setPath] = useState(
+    "https://w7.pngwing.com/pngs/370/8/png-transparent-file-transfer-protocol-computer-icons-upload-personal-use-angle-rectangle-triangle.png"
   );
+
   const vistaPreliminarFoto = (e) => {
     const leer_img = new FileReader();
     const id_img = document.getElementById("imgFoto");
@@ -56,10 +57,10 @@ export const CardCarrera = ({ semestre }) => {
     });
   };
 
-  const estadoMateriaAlert = () => {
+  const estadoSemestreAlert = () => {
     Swal.fire({
       icon: "success",
-      title: "Se cambio el estado de la materia",
+      title: "Se cambio el estado del semestre",
       showConfirmButton: false,
       timer: 2000,
     });
@@ -112,12 +113,19 @@ export const CardCarrera = ({ semestre }) => {
   const actualizarSemestre = async () => {
     setConsultando(true);
     //e.preventDefault();
+    console.log("la imagen es", path);
+    //setPath("https://w7.pngwing.com/pngs/370/8/png-transparent-file-transfer-protocol-computer-icons-upload-personal-use-angle-rectangle-triangle.png");
     try {
-      await axios.put(
-        "http://localhost:8000/api/v1/semestres/admin/" +
+      await axios.post(
+        BACKEND+"/api/v1/semestres/admin/update/" +
           semestreSelected.current,
-        { nombre, descripcion },
-        { headers: { 'Content-Type': 'multipart/form-data', 'authorization': `${tokenUser}` } }      
+        { nombre, descripcion, path },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            authorization: `${tokenUser}`,
+          },
+        }
       );
 
       console.log("Se actualizo el semestre");
@@ -137,11 +145,11 @@ export const CardCarrera = ({ semestre }) => {
     setConsultando(true);
     try {
       await axios.get(
-        "http://localhost:8000/api/v1/semestres/desactiva/admin/" +
+        BACKEND+"/api/v1/semestres/desactiva/admin/" +
           semestreSelected.current,
         config
       );
-      estadoMateriaAlert();
+      estadoSemestreAlert();
       //console.log("Se cambio el estado del semestre");
       window.location = window.location.href;
     } catch (error) {
@@ -170,6 +178,11 @@ export const CardCarrera = ({ semestre }) => {
       setErrorDescripcion("La descripcion debe tener mas de 4 caracteres");
       hasErrorsSemestre = true;
     }
+
+    if (path === null || path === "") {
+      setErrorImagen("Debes subir una imagen");
+      hasErrorsSemestre = true;
+    }
     // return false;
   };
 
@@ -194,12 +207,12 @@ export const CardCarrera = ({ semestre }) => {
         <ModalHeader>Editar Semestre</ModalHeader>
         <ModalBody>
           {/* <form className="mt-8 space-y-6" onSubmit={actualizarSemestre(semestre.id)}> */}
-          <div className="form-group">
-            {/* <div className="flex flex-col justify-center items-center mt-2"> */}
-            {/* <form method="post" enctype="multipart/form-data"> */}
+          {/* <div className="form-group"> */}
+          {/* <div className="flex flex-col justify-center items-center mt-2"> */}
+          <form onSubmit={actualizarSemestre}>
             <div className="flex justify-center">
               <img
-                src={image}
+                src={path}
                 id="imgFoto"
                 alt="Imagen Usuario"
                 className="flex items-center justify-center  w-[280px] h-[200px] object-cover bg-black"
@@ -219,9 +232,10 @@ export const CardCarrera = ({ semestre }) => {
                 type="file"
                 onChange={(e) => {
                   vistaPreliminarFoto(e);
-                  setImage(e.target.files[0]);
+                  setPath(e.target.files[0]);
                 }}
               />
+              <p className="text-red-500 text-xs italic">{errorImagen}</p>
             </div>
             <label htmlFor="nombre" className="font-medium">
               Nombre
@@ -230,12 +244,12 @@ export const CardCarrera = ({ semestre }) => {
               id="nombre"
               name="nombre"
               type="text"
-              required
               value={nombre}
               setvalue={(e) => {
                 setNombre(e);
                 setErrorNombre("");
               }}
+              placeholder="Ingresa el nombre del semestre"
               minLength={5}
             />
             <p className="text-red-500 text-xs italic">{errorNombre}</p>
@@ -263,7 +277,8 @@ export const CardCarrera = ({ semestre }) => {
               // minLength={3}
             />
             <p className="text-red-500 text-xs italic">{errorDescripcion}</p>
-          </div>
+          </form>
+          {/* </div> */}
         </ModalBody>
         <ModalFooter>
           <button
@@ -271,10 +286,8 @@ export const CardCarrera = ({ semestre }) => {
               semestreSelected.current = semestre.id;
               validacionSemestre(true);
               if (hasErrorsSemestre) {
-                //console.log("Hubo errores no se puede crear");
                 return;
               } else {
-                //console.log("Ya todo salio bien :D");
                 estadoActualizarAlert();
               }
             }}
@@ -341,6 +354,9 @@ export const CardCarrera = ({ semestre }) => {
                 <button
                   type="button"
                   onClick={() => {
+                    // setPath(semestre.path);
+                    setNombre("");
+                    setDescripcion("");
                     setEstadoModal(true);
                   }}
                   className="bg-sky-600 hover:bg-sky-900 text-white font-bold py-1 px-3 rounded-[3px] mr-1"

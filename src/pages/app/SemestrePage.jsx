@@ -6,6 +6,7 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import Loading from "./loading";
 import InputCyan from "../../components/variants/InputCyan";
 import { ComentarioCard } from "../../components/variants/ComentarioCard";
+import { BACKEND } from "../VariableBck";
 
 export const SemestrePage = () => {
   const { semestreid } = useParams();
@@ -16,7 +17,7 @@ export const SemestrePage = () => {
   const [estadoModal4, setEstadoModal4] = useState(false);
   const [estadoModal5, setEstadoModal5] = useState(false);
   const [active, setActive] = useState(false);
-
+  const comentariosSemestre = [];
   const { user } = useContext(AuthContext);
   //variables del APIREST para materias
   const [materias, setMaterias] = useState(null);
@@ -41,12 +42,20 @@ export const SemestrePage = () => {
   const [buscador, setBuscador] = useState("");
   const [materiasFiltradas, setMateriasFiltradas] = useState([]);
   const [errorNombreMateria, seterrorNombreMateria] = useState("");
+  // const BACKEND="https://proyectoedupoli.herokuapp.com";
   const Swal = require("sweetalert2");
   const errorAlert = () => {
     Swal.fire({
       icon: "error",
       title: "Oops...",
       text: "Algo salio mal",
+    });
+  };
+  const errorDoc = () => {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Debes subir un documento",
     });
   };
   const bienAlert = () => {
@@ -173,7 +182,7 @@ export const SemestrePage = () => {
   const traerMateriasAdmin = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/v1/materias/admin",
+        BACKEND+"/api/v1/materias/admin",
         config
       );
       //console.log("Traje las materias en modo admin");
@@ -195,7 +204,7 @@ export const SemestrePage = () => {
   const traerMaterias = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/v1/materias/adminE",
+        BACKEND+"/api/v1/materias/adminE",
         config
       );
       //console.log("Traje las materias en modo estudiante");
@@ -220,7 +229,7 @@ export const SemestrePage = () => {
     setConsultando(true);
     try {
       await axios.post(
-        "http://localhost:8000/api/v1/materias/admin/" + materiaSelect.current,
+        BACKEND+"/api/v1/materias/admin/" + materiaSelect.current,
         { nombre, descripcion, encargado },
         config
       );
@@ -240,18 +249,15 @@ export const SemestrePage = () => {
     setConsultando(true);
     try {
       await axios.put(
-        "http://localhost:8000/api/v1/materias/admin/" + materiaSelect.current,
+        BACKEND+"/api/v1/materias/admin/" + materiaSelect.current,
         { nombre, descripcion, encargado },
         config
       );
-
-      bienAlert();
       setEstadoModal2(false);
-      //console.log("Se actualizo la materia");
       window.location = window.location.href;
+      bienAlert();     
     } catch (error) {
       errorAlert();
-      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
@@ -260,33 +266,37 @@ export const SemestrePage = () => {
     setConsultando(true);
     try {
       await axios.get(
-        "http://localhost:8000/api/v1/materias/desactiva/admin/" +
+        BACKEND+"/api/v1/materias/desactiva/admin/" +
           materiaSelect.current,
         config
-      );
-      //console.log("Cambie estado materia ");
-      bienAlert();
+      );      
       window.location = window.location.href;
+      bienAlert();
     } catch (error) {
       errorAlert();
-      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
 
   const subirDocumento = async () => {
     setConsultando(true);
-   console.log("lo que trae path",documentos)
+    console.log("lo que trae path", documentos);
     try {
       await axios.post(
-        "http://localhost:8000/api/v1/documentos/admin/" +
-          materiaSelect.current,{nombre_doc,documentos},
-          { headers: { 'Content-Type': 'multipart/form-data', 'authorization': `${tokenUser}` } },
-
+        BACKEND+"/api/v1/documentos/admin/" +
+          materiaSelect.current,
+        { nombre_doc, documentos },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            authorization: `${tokenUser}`,
+          },
+        }
       );
       //console.log("Se subio el documento");
-      bienAlert();
       window.location = window.location.href;
+      bienAlert();
+      
     } catch (error) {
       errorAlert();
       console.log(error.response.data.errors, "error");
@@ -297,7 +307,7 @@ export const SemestrePage = () => {
   const verDocumentos = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/v1/documentos/admin",
+        BACKEND+"/api/v1/documentos/admin",
         config
       );
       //console.log("Traje documentos: ", response.data.data);
@@ -311,31 +321,34 @@ export const SemestrePage = () => {
     setConsultando(true);
     try {
       await axios.delete(
-        "http://localhost:8000/api/v1/documentos/admin/" +
+        BACKEND+"/api/v1/documentos/admin/" +
           archivoSelect.current,
         config
       );
-      //console.log("Elimine el documento", archivoSelect.current);
       bienAlert();
-      window.location = window.location.href;
+      window.location = window.location.href;      
     } catch (error) {
       errorAlert();
-      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
 
   const editarDocumento = async () => {
     setConsultando(true);
-    console.log("path del doc",documentos);
-    console.log("nombre doc",nombre_doc);
+    console.log("path del doc", documentos);
+    console.log("nombre doc", nombre_doc);
 
     try {
       await axios.post(
-        "http://localhost:8000/api/v1/documentos/admin/actualizar/" +
+        BACKEND+"/api/v1/documentos/admin/actualizar/" +
           archivoSelect.current,
-          {nombre_doc,documentos},
-          { headers: { 'Content-Type': 'multipart/form-data', 'authorization': `${tokenUser}` } },
+        { nombre_doc, documentos },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            authorization: `${tokenUser}`,
+          },
+        }
       );
       //console.log("Se actualizo el documento");
       bienAlert();
@@ -355,15 +368,13 @@ export const SemestrePage = () => {
     e.preventDefault();
     try {
       await axios.post(
-        "http://localhost:8000/api/v1/comentarios/admin/1",
+        BACKEND+"/api/v1/comentarios/admin/cambio/2",
         { comentario },
         config
       );
-      //console.log("Se creo un comentario");
       window.location = window.location.href;
     } catch (error) {
       errorAlert();
-      //console.log(error.response.data.message, "error");
     }
     setConsultando(false);
   };
@@ -372,7 +383,7 @@ export const SemestrePage = () => {
     setRecargar(true);
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/v1/comentarios/admin/",
+        BACKEND+"/api/v1/comentarios/admin",
         config
       );
       console.log("Traje estos comentarios: ", response.data.data);
@@ -389,7 +400,7 @@ export const SemestrePage = () => {
     setConsultando(true);
     try {
       await axios.put(
-        "http://localhost:8000/api/v1/comentarios/admin/" +
+        BACKEND+"/api/v1/comentarios/admin/" +
           comentSelect.current,
         { comentario },
         config
@@ -408,7 +419,7 @@ export const SemestrePage = () => {
     setConsultando(true);
     try {
       await axios.delete(
-        "http://localhost:8000/api/v1/comentarios/admin/" +
+        BACKEND+"/api/v1/comentarios/admin/" +
           comentSelect.current,
         config
       );
@@ -471,7 +482,6 @@ export const SemestrePage = () => {
     if (nombre === null || nombre === "") {
       seterrorNombreMateria("Este campo nombre es obligatorio");
       hasErrorsMateria = true;
-      // return true;
     } else if (nombre.length < 3) {
       seterrorNombreMateria("El nombre debe tener mas de 4 caracteres");
       hasErrorsMateria = true;
@@ -480,10 +490,9 @@ export const SemestrePage = () => {
   useEffect(() => {
     traerMateriasRol();
   }, []);
-//  if (recargar || !comentarios) {
-//    return <Loading />;
-//  }
-  // _____________________________________________________________________________________________________________
+   if (recargar || !comentarios) {
+     return <Loading />;
+   }
   return (
     <>
       {/* <div>el semestre es: {semestreid}</div> */}
@@ -579,7 +588,7 @@ export const SemestrePage = () => {
               }
             }}
             disabled={consultando}
-            className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+            className="bg-sky-600 hover:bg-sky-900 text-white font-bold py-1 px-3 rounded-[3px] h-[37px]"
           >
             {consultando ? "Cargando..." : "Editar"}
           </button>
@@ -591,7 +600,7 @@ export const SemestrePage = () => {
               setNombre("");
             }}
             disabled={consultando}
-            className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
+            className="bg-sky-600 hover:bg-sky-900 text-white font-bold py-1 px-3 rounded-[3px] h-[37px]"
           >
             {consultando ? "..." : "Cerrar"}
           </button>
@@ -600,62 +609,64 @@ export const SemestrePage = () => {
       <Modal isOpen={estadoModal3} style={modalStyle}>
         <ModalHeader>Editar Documento</ModalHeader>
         <ModalBody>
-        <form onSubmit={editarDocumento}>
-          <label>Nombre</label>
-          <InputCyan
-            id="nombre_doc"
-            name="nombre_doc"
-            type="text"
-            required
-            value={nombre_doc}
-            setvalue={setNombre_doc}
-            minLength={5}
-          />
-          <input
-            className="text-sm text-grey-500
-                 bg-sky-800 p-1 rounded 
+          <div className="flex flex-col">
+            <form onSubmit={editarDocumento}>
+              <label>Nombre</label>
+              <InputCyan
+                id="nombre_doc"
+                name="nombre_doc"
+                type="text"
+                required
+                value={nombre_doc}
+                setvalue={setNombre_doc}
+                minLength={5}
+              />
+
+              <input
+                className="text-sm text-grey-500
+                 bg-sky-800 p-1 rounded-[2px] 
                  file:mr-1 file:py-1 file:px-2
                  file:rounded-lg file:border-0
                  file:text-md file:font-semibold  file:text-white
                  file:bg-sky-500  
                  hover:file:cursor-pointer hover:file:opacity-80
                "
-            id="documentos"
-            type="file"
-            accept=".pdf"
-            onChange={(e) => {
-              setdocumentos(e.target.files[0]);
-            }}
-          />
-          </form>
+                id="documentos"
+                type="file"
+                accept=".pdf"
+                onChange={(e) => {
+                  setdocumentos(e.target.files[0]);
+                }}
+              />
+            </form>
+            <div className="flex flex-row items-end w-full justify-start mt-2">
+              <button
+                onClick={() => {
+                  //crearMateria(1);
+                  //console.log("Cambie el doc", archivoSelect.current);
+                  editarDocumento();
+                  // actualizarMateria();
+                  //setEstadoModal3(false);
+                }}
+                disabled={consultando}
+                className="bg-sky-600 hover:bg-sky-900 text-white font-bold py-1 px-3 rounded-[3px] h-[37px] mr-1"
+              >
+                {consultando ? "Cargando..." : "Editar"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  // verSemestre(semestre.id);
+                  setEstadoModal3(false);
+                }}
+                disabled={consultando}
+                className="bg-sky-600 hover:bg-sky-900 text-white font-bold py-1 px-3 rounded-[3px] h-[37px] "
+              >
+                {consultando ? "..." : "Cerrar"}
+              </button>
+            </div>
+          </div>
         </ModalBody>
-        <ModalFooter>
-          
-          <button
-            onClick={() => {
-              //crearMateria(1);
-              //console.log("Cambie el doc", archivoSelect.current);
-              editarDocumento();
-              // actualizarMateria();
-              //setEstadoModal3(false);
-            }}
-            disabled={consultando}
-            className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
-          >
-            {consultando ? "Cargando..." : "Editar"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              // verSemestre(semestre.id);
-              setEstadoModal3(false);
-            }}
-            disabled={consultando}
-            className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
-          >
-            {consultando ? "..." : "Cerrar"}
-          </button>
-        </ModalFooter>
       </Modal>
       <Modal isOpen={estadoModal4} style={modalStyle}>
         <ModalHeader>Editar Comentario</ModalHeader>
@@ -707,58 +718,60 @@ export const SemestrePage = () => {
       <Modal isOpen={estadoModal5} style={modalStyle}>
         <ModalHeader>Subir Documento</ModalHeader>
         <ModalBody>
-        <form onSubmit={subirDocumento}>
-          <label>Nombre</label>
-          <InputCyan
-            id="nombre_doc"
-            name="nombre_doc"
-            type="text"
-            required
-            value={nombre_doc}
-            setvalue={setNombre_doc}
-            minLength={5}
-          />
-           <input
-            className="text-sm text-grey-500
-                 bg-sky-800 p-1 rounded 
+          <div>
+            <form onSubmit={subirDocumento}>
+              <label>Nombre</label>
+              <InputCyan
+                id="nombre_doc"
+                name="nombre_doc"
+                type="text"
+                required
+                value={nombre_doc}
+                setvalue={setNombre_doc}
+                minLength={5}
+              />
+
+              <input
+                className="text-sm text-grey-500
+                 bg-sky-800 p-1 rounded-[2px]
                  file:mr-1 file:py-1 file:px-2
                  file:rounded-lg file:border-0
                  file:text-md file:font-semibold  file:text-white
                  file:bg-sky-500  
                  hover:file:cursor-pointer hover:file:opacity-80
                "
-            id="documentos"
-            type="file"
-            accept=".pdf"
-            onChange={(e) => {
-              setdocumentos(e.target.files[0]);
-            }}
-          />
-          </form>
+                id="documentos"
+                type="file"
+                accept=".pdf"
+                onChange={(e) => {
+                  setdocumentos(e.target.files[0]);
+                }}
+              />
+            </form>
+            <div className="flex flex-row items-end w-full justify-start mt-2">
+              <button
+                onClick={() => {
+                  subirDocumento();
+                }}
+                disabled={consultando}
+                className="bg-sky-600 hover:bg-sky-900 text-white font-bold py-1 px-3 rounded-[3px] h-[37px] mr-1 "
+              >
+                {consultando ? "Cargando..." : "Subir"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  // verSemestre(semestre.id);
+                  setEstadoModal5(false);
+                }}
+                disabled={consultando}
+                className="bg-sky-600 hover:bg-sky-900 text-white font-bold py-1 px-3 rounded-[3px] h-[37px]"
+              >
+                {consultando ? "..." : "Cerrar"}
+              </button>
+            </div>
+          </div>
         </ModalBody>
-        <ModalFooter>
-         
-          <button
-            onClick={() => {
-              subirDocumento();
-            }}
-            disabled={consultando}
-            className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
-          >
-            {consultando ? "Cargando..." : "Subir"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              // verSemestre(semestre.id);
-              setEstadoModal5(false);
-            }}
-            disabled={consultando}
-            className=" inline-block px-3 py-1 h-9 bg-sky-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-sky-700 hover:shadow-lg focus:bg-sky-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg transition duration-150 ease-in-out"
-          >
-            {consultando ? "..." : "Cerrar"}
-          </button>
-        </ModalFooter>
       </Modal>
       <form
         onSubmit={(event) => {
@@ -829,7 +842,6 @@ export const SemestrePage = () => {
 
         {active ? (
           <div className="flex flex-row items-center">
-            {/* <div className="font-semibold  pl-3 mr-2">Crear Materia</div> */}
             <button
               type="button"
               onClick={() => {
@@ -955,7 +967,8 @@ export const SemestrePage = () => {
                                   href={docs.path}
                                   className="flex justify-start  h-7 w-full items-center px-1 no-underline text-white"
                                 >
-                                  {/* {docs.path} */}{docs.nombre_doc}.pdf
+                                  {/* {docs.path} */}
+                                  {docs.nombre_doc}.pdf
                                 </a>
                               </div>
 
@@ -969,7 +982,7 @@ export const SemestrePage = () => {
                                       //   "id del doc",
                                       //   archivoSelect.current
                                       // );
-                                      setNombre_doc(docs.nombre_doc);
+                                      //setNombre_doc(docs.nombre_doc);
                                       setEstadoModal3(true);
                                     }}
                                     className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px]"
@@ -1099,7 +1112,6 @@ export const SemestrePage = () => {
           className="flex justify-between items-center w-full"
         >
           <div className="flex flex-row justify-between items-center mb-1 w-full">
-            {/* <InputCyan value={newComentario} setvalue={setnewComentario}  id="newComentario" name="newComentario"/> */}
             <input
               id="comentario"
               name="comentario"
@@ -1111,21 +1123,10 @@ export const SemestrePage = () => {
               focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm"
               placeholder="Comentario"
               onChange={(e) => setComentario(e.target.value)}
-            />
-            {/* <InputCyan
-                      id="comentario"
-                      name="comentario"
-                      type="text"
-                      required
-                      value={comentario}
-                      setvalue={setComentario}
-                      placeholder="Comentario"
-                      minLength={5}
-                    /> */}
+            />           
 
             <button
               type="submit"
-              // onClick={()=>{comentar()}}
               disabled={consultando}
               className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 h-9 rounded-[3px]"
             >
@@ -1151,69 +1152,67 @@ export const SemestrePage = () => {
           </div>
         </form>
 
-        {comentarios?.map((elemento) => (
-          <div
-            key={elemento.id}
-            className="w-full"
-            styles={{ height: "500px", overflowY: "scroll" }}
-          >
-            <div
-              className="flex flex-col w-full mb-1 rounded-[2px] bg-[#B1E0FF] justify-start items-center"
-              key={elemento.id}
-            >
-              <ComentarioCard comentario={elemento} />
-              {user.id === elemento.user_id || user.role_id === 1 ? (
-                <div className="flex flex-row justify-start w-full ">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      comentSelect.current = elemento.id;
-                      setComentario(elemento.comentario);
-                      // console.log(
-                      //   "comentario seleccionado current: ",
-                      //   comentSelect.current
-                      // );
-                      setEstadoModal4(true);
-                    }}
-                    className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 "
-                  >
-                    {consultando ? "" : <IconEdit />}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      comentSelect.current = elemento.id;
-                      eliminarComentarioAlert();
-                    }}
-                    disabled={consultando}
-                    className="bg-sky-900 hover:bg-sky-700 text-white font-medium py-1 px-3 "
-                  >
-                    {consultando ? (
-                      "..."
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-5 h-5"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                        />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-              ) : (
-                <></>
-              )}
+        {comentarios?.map((elemento) => {
+          if (elemento.semestres_id !== semestreid) {
+            comentariosSemestre.push(elemento);
+            console.log("comentarioFil",comentariosSemestre);
+            
+            console.log("comentarioFil semestreid",elemento.semestres_id);
+          }
+        })}
 
-              {/* _______________________________________________________________________________________________k */}
-            </div>
+        {comentariosSemestre?.map((comentariosFil) => (
+          
+          <div
+            className="flex flex-col w-full mb-1 pl-1 rounded-[25px] bg-[#B1E0FF] justify-start items-center"
+            key={comentariosFil.id}
+          >
+            <ComentarioCard comentario={comentariosFil} />
+            {/* {user.id === comentariosFil.user_id || user.role_id === 1 ? (
+              <div className="flex flex-row justify-start w-full ">
+                <button
+                  type="button"
+                  onClick={() => {
+                    comentSelect.current = comentariosFil.id;
+                    setComentario(comentariosFil.comentario);
+                    setEstadoModal4(true);
+                  }}
+                  className="bg-sky-700 hover:bg-sky-900 text-white font-medium py-1 px-3 "
+                >
+                  {consultando ? "" : <IconEdit />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    comentSelect.current = comentariosFil.id;
+                    eliminarComentarioAlert();
+                  }}
+                  disabled={consultando}
+                  className="bg-sky-900 hover:bg-sky-700 text-white font-medium py-1 px-3 "
+                >
+                  {consultando ? (
+                    "..."
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            ) : (
+              <></>
+            )} */}
           </div>
         ))}
       </div>
