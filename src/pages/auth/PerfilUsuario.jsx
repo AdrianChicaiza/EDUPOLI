@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import InputCyan from "../../components/variants/InputCyan";
-// import { AuthContext } from "../../contexts/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Loading from "../app/loading";
 import { BACKEND } from "../VariableBck";
@@ -19,7 +18,6 @@ export const PerfilUsuario = () => {
   const [recargar, setRecargar] = useState(true);
   const [consultando, setConsultando] = useState(false);
   const navigate = useNavigate();
-  // const BACKEND="https://proyectoedupoli.herokuapp.com";
 
   const Swal = require("sweetalert2");
   const errorAlert = () => {
@@ -47,10 +45,8 @@ export const PerfilUsuario = () => {
       confirmButtonText: "Guardar",
       denyButtonText: `Cancelar`,
     }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         actualizarUsusario();
-        //Swal.fire("Saved!", "", "success");
       } else if (result.isDenied) {
         Swal.fire("Los cambios no se guardaron", "", "info");
         setEditar(false);
@@ -88,7 +84,6 @@ export const PerfilUsuario = () => {
     setRecargar(true);
     try {
       const response = await axios.get(BACKEND + "/api/v1/profile", config);
-      console.log("datos de mi usuario: ",response.data.data);
       setImage(response.data.data.avatar);
       setEmail(response.data.data.user.email);
       setFirst_name(response.data.data.user.first_name);
@@ -121,7 +116,6 @@ export const PerfilUsuario = () => {
     if (first_name === null || first_name === "") {
       setErrorFirstName("Este campo nombre es obligatorio");
       hasErrorsUsuario = true;
-      // return true;
     } else if (first_name.length < 3) {
       setErrorFirstName("El nombre debe tener mas de 4 caracteres");
       hasErrorsUsuario = true;
@@ -130,7 +124,6 @@ export const PerfilUsuario = () => {
     if (email === null || email === "") {
       setErrorEmail("Este campo correo es obligatorio");
       hasErrorsUsuario = true;
-      // return true;
     } else if (email.length < 3) {
       setErrorEmail("El correo debe tener mas de 4 caracteres");
       hasErrorsUsuario = true;
@@ -138,11 +131,9 @@ export const PerfilUsuario = () => {
       setErrorEmail("Ingrese un correo válido");
       hasErrorsUsuario = true;
     }
-
     if (last_name === null || last_name === "") {
       setErrorLastName("Este campo apellido es obligatorio");
       hasErrorsUsuario = true;
-      // return true;
     } else if (last_name.length < 3) {
       setErrorLastName("El apellido debe tener mas de 4 caracteres");
       hasErrorsUsuario = true;
@@ -150,7 +141,7 @@ export const PerfilUsuario = () => {
   };
 
   useEffect(() => {
-    traerDatos()
+    traerDatos();
   }, []);
 
   if (recargar) {
@@ -160,14 +151,12 @@ export const PerfilUsuario = () => {
     <>
       <div className="flex flex-col justify-center ">
         <div className="flex justify-center bg-white rounded-[2px]  shadow-xl shadow-cyan-500/80">
-          {/* <div className="p-3 bg-green-800 w-2/3"> */}
           <div className="flex items-center rounded-[2px] w-full justify-center pt-5 pb-5 px-4 sm:px-6 lg:px-8">
             <div className="w-full max-w-md space-y-3">
               <div className="text-center text-3xl font-bold tracking-tight text-gray-900">
                 PerfilUsuario
               </div>
               <div className="flex flex-col items-center justify-center bg-white">
-                {/* __________________________________________________________________________________________________________________ */}
                 <div className="flex flex-col justify-center items-center">
                   <img
                     src={image}
@@ -177,7 +166,6 @@ export const PerfilUsuario = () => {
                   />
                 </div>
                 <div className="flex flex-col justify-center items-center mt-1">
-                  {/* <form method="post" enctype="multipart/form-data"> */}
                   {editar ? (
                     <input
                       className="text-sm text-grey-500
@@ -199,7 +187,6 @@ export const PerfilUsuario = () => {
                     <></>
                   )}
                 </div>
-                {/* //__________________________________________________________________ */}
               </div>
               <form className="mt-0 space-y-1" onSubmit={actualizarUsusario}>
                 <label className="font-medium">Correo</label>
@@ -260,7 +247,6 @@ export const PerfilUsuario = () => {
               <div className="flex flex-row">
                 {editar ? (
                   <button
-                    //  type="submit"
                     onClick={() => {
                       validacionUsuario(true);
                       if (hasErrorsUsuario) {
@@ -276,7 +262,6 @@ export const PerfilUsuario = () => {
                   </button>
                 ) : (
                   <button
-                    //type="submit"
                     onClick={() => {
                       setEditar(true);
                     }}
@@ -313,7 +298,6 @@ export const PerfilUsuario = () => {
               </div>
             </div>
           </div>
-          {/* </div> */}
         </div>
       </div>
     </>

@@ -14,8 +14,7 @@ export const Login = () => {
   const [errorEmail, setErrorEmail] = useState("");
   const [errorContrasena, setErrorContrasena] = useState("");
   const Swal = require("sweetalert2");
-  // const BACKEND="https://proyectoedupoli.herokuapp.com";
-  
+
   const errorAlert = () => {
     Swal.fire({
       icon: "error",
@@ -26,17 +25,15 @@ export const Login = () => {
 
   const onLogin = async () => {
     setConsultando(true);
-    
     try {
       const response = await axios.post(
-        
-        BACKEND+"/api/v1/login",
+        BACKEND + "/api/v1/login",
         { email, password },
         { headers: { accept: "application/json" } }
       );
       const { access_token, token_type, user } = response.data.data;
       login(user, `${token_type} ${access_token}`);
-      console.log("Datos usuario logeado: ",response.data.data);
+      // console.log("Datos usuario logeado: ", response.data.data);
       navigate("/");
     } catch (error) {
       errorAlert();
@@ -53,7 +50,6 @@ export const Login = () => {
     if (email === null || email === "") {
       setErrorEmail("Este campo correo es obligatorio");
       haserrorsLogin = true;
-      // return true;
     } else if (email.length < 3) {
       setErrorEmail("El correo debe tener mas de 4 caracteres");
       haserrorsLogin = true;
@@ -102,7 +98,7 @@ export const Login = () => {
                     <div>
                       <label htmlFor="email" className="sr-only">
                         Correo
-                      </label>                      
+                      </label>
                       <InputCyan
                         id="email"
                         name="email"
@@ -123,7 +119,7 @@ export const Login = () => {
                     <div>
                       <label htmlFor="password" className="sr-only">
                         Contraseña
-                      </label>                     
+                      </label>
                       <InputCyan
                         id="password"
                         name="password"

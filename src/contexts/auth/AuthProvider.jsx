@@ -6,7 +6,7 @@ import { types } from "./types";
 export const AuthProvider = ({ children }) => {
   const initialization = () => {
     const user = JSON.parse(localStorage.getItem("user"));
-    console.log("variable user del context: ",user);
+    // console.log("variable user del context: ", user);
     return {
       logged: !!user,
       user: user,

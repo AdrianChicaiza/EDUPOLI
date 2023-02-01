@@ -1,8 +1,5 @@
-
-
-// Establecer los dos estados para la aplicación 
 export const types = {
-    login: '[Auth] Login',
+  login: "[Auth] Login",
 
-    logout: '[Auth] Logout',
-}
+  logout: "[Auth] Logout",
+};

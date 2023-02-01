@@ -17,7 +17,6 @@ export const Registro = () => {
   const [errorContrasenaConfirm, setErrorContrasenaConfirm] = useState("");
   const [last_name, setlast_name] = useState("");
   const [consultando, setConsultando] = useState(false);
-  // const BACKEND="https://proyectoedupoli.herokuapp.com";
   const role_id = 2;
   let hasErrorsRegistro = false;
   const Swal = require("sweetalert2");
@@ -35,7 +34,6 @@ export const Registro = () => {
       text: "Las contraseñas no coinciden",
     });
   };
-
   const bienAlert = () => {
     Swal.fire({
       icon: "success",
@@ -50,7 +48,7 @@ export const Registro = () => {
     setConsultando(true);
     try {
       await axios.post(
-        BACKEND+"/api/v1/register",
+        BACKEND + "/api/v1/register",
         {
           role_id,
           first_name,
@@ -91,7 +89,6 @@ export const Registro = () => {
     if (email === null || email === "") {
       setErrorEmail("Este campo correo es obligatorio");
       hasErrorsRegistro = true;
-      // return true;
     } else if (email.length < 3) {
       setErrorEmail("El correo debe tener mas de 4 caracteres");
       hasErrorsRegistro = true;
@@ -102,7 +99,6 @@ export const Registro = () => {
     if (password === null || password === "") {
       setErrorContrasena("Este campo contraseña es obligatorio");
       hasErrorsRegistro = true;
-      // return true;
     } else if (password.length < 6) {
       setErrorContrasena("La contraseña debe tener mas de 6 caracteres");
       hasErrorsRegistro = true;
@@ -112,13 +108,10 @@ export const Registro = () => {
         "Este campo confirmar contraseña es obligatorio"
       );
       hasErrorsRegistro = true;
-      // return true;
     } else if (password_confirmation.length < 6) {
       setErrorContrasenaConfirm("La contraseña debe tener mas de 6 caracteres");
       hasErrorsRegistro = true;
     }
-
-    // return false;
   };
 
   return (
@@ -135,7 +128,6 @@ export const Registro = () => {
                   Crea tu cuenta gratis solo tomara unos minutos
                 </p>
               </div>
-              {/* --------------------------------------------------------FORM-------------------------------------------------------------- */}
               <form className="space-y-4" onSubmit={registroF}>
                 <input type="hidden" name="remember" defaultValue="true" />
                 <div className="space-y-2">
@@ -236,7 +228,6 @@ export const Registro = () => {
                     </p>
                   </div>
                 </div>
-
                 <div className="flex flex-row justify-center space-x-4">
                   <div>
                     <button
@@ -250,7 +241,7 @@ export const Registro = () => {
                         }
                       }}
                       disabled={consultando}
-                      className="group relative flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-500 "
+                      className="bg-sky-600 hover:bg-sky-900 text-white font-bold py-1 px-3 rounded-[3px] mr-1"
                     >
                       {consultando ? "Registrando..." : "Registrarse"}
                     </button>
@@ -261,7 +252,7 @@ export const Registro = () => {
                       navigate("/");
                     }}
                     disabled={consultando}
-                    className="group relative justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white hover:bg-cyan-600 "
+                    className="bg-sky-900 hover:bg-sky-600 text-white font-bold py-1 px-3 rounded-[3px]"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -280,7 +271,6 @@ export const Registro = () => {
                   </button>
                 </div>
               </form>
-              {/* --------------------------------------------------------FORM-------------------------------------------------------------- */}
             </div>
           </div>
         </div>

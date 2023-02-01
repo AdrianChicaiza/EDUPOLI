@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import InputCyan from "../../components/variants/InputCyan";
+import { BACKEND } from "../VariableBck";
 
 export const ConfirmarCorreo = () => {
   const [email, setEmail] = useState("");
@@ -29,15 +30,14 @@ export const ConfirmarCorreo = () => {
     setConsultando(true);
     try {
       await axios.post(
-        "http://127.0.0.1:8000/api/v1/forgot-password",
+        BACKEND+"/api/v1/forgot-password",
         { email },
         { headers: { accept: "application/json" } }
       );
       bienAlert();
-      console.log("Se ha enviado a tu correo crack :D");
     } catch (error) {
       errorAlert();
-      console.log(error.response.data.message, "error");
+      console.log(error.response.data.errors, "error");
       setEmail("");
     }
     setConsultando(false);

@@ -1,4 +1,3 @@
-// import './App.css';
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../../contexts/auth/AuthContext";
 import { Outlet, useNavigate } from "react-router-dom";
@@ -9,16 +8,13 @@ import Navbar from "react-bootstrap/Navbar";
 import { NavDropdown } from "react-bootstrap";
 import { useEffect } from "react";
 import "../templates/imageAvatar.css";
-import { Footer } from "flowbite-react";
 import { BACKEND } from "../../pages/VariableBck";
-// const BACKEND = "https://proyectoedupoli.herokuapp.com";
-// https://tailwind-elements.com/docs/standard/components/video-carousel/
-export const AuthNav = () => {
-  //-------------------------------------------------------------------------------
+import Footer from "./Footer";
 
+export const AuthNav = () => {
   const navigate = useNavigate();
   const [image, setImage] = useState("");
-  const { user, logout } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
   const tokenUser = localStorage.getItem("token");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -45,6 +41,8 @@ export const AuthNav = () => {
     try {
       const response = await axios.get(BACKEND + "/api/v1/profile", config);
       setImage(response.data.data.avatar);
+      setFirstName(response.data.data.user.first_name);
+      setLastName(response.data.data.user.last_name);
     } catch (error) {
       console.log(error.response.data.message, "error");
     }
@@ -74,11 +72,8 @@ export const AuthNav = () => {
             </Navbar.Brand>
             <Nav className="me-auto">
               <Nav.Link href="/">Inicio</Nav.Link>
-              {/* <Nav.Link href="/nosotros">Sobre Nosotros</Nav.Link> */}
             </Nav>
-
             <Navbar.Toggle />
-
             <Navbar.Collapse className="justify-content-end">
               <Nav>
                 <img
@@ -90,9 +85,8 @@ export const AuthNav = () => {
                   }
                   alt="img"
                 />
-                {/* <Avatar size="40" round={true} src={image} className="avatarImg"/> */}
                 <NavDropdown
-                  title={user.full_name}
+                  title={firstName + " " + lastName}
                   id="collasible-nav-dropdown"
                 >
                   <NavDropdown.Item href="/perfil">
@@ -107,10 +101,10 @@ export const AuthNav = () => {
         <main className="px-20 py-2">
           <Outlet />
         </main>
-        {/* <div className="bg-black">asas</div> */}
+        {/* <Footer/> */}
       </div>
+      
 
-      {/* _______________________________________________________________________________ */}
     </>
   );
 };

@@ -12,7 +12,7 @@ export default function InputCyan({
   min,
   placeholder,
   disabled,
-  className = "w-full rounded-[2px] border   border-gray-300 px-3 py-2  placeholder-gray-500 focus:z-10 focus:border-cyan-700   focus:outline-none focus:ring-cyan-700 sm:text-sm",
+  className = "w-full rounded-[2px] border border-gray-300 px-3 py-2 placeholder-gray-500 focus:z-10 focus:border-cyan-700 focus:outline-none focus:ring-cyan-700 sm:text-sm",
 }) {
   return (
     <div>
