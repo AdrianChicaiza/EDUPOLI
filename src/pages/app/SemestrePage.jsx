@@ -318,7 +318,7 @@ export const SemestrePage = () => {
     e.preventDefault();
     try {
       await axios.post(
-        BACKEND + "/api/v1/comentarios/admin/cambio/2",
+        BACKEND + "/api/v1/comentarios/admin/cambio/" + semestreid,
         { comentario },
         config
       );
@@ -966,7 +966,7 @@ export const SemestrePage = () => {
         </form>
         {comentarios?.map((comentariosFil) => (
           <div
-            className="flex flex-col w-full mb-1 pl-1 rounded-[5px] bg-[#B1E0FF] justify-start items-center"
+            className="flex flex-col w-full mb-1 pl-1 rounded-[5px] bg-[#B1E0FF] justify-start "
             key={comentariosFil.id}
           >
             <ComentarioCard
@@ -985,7 +985,6 @@ export const SemestrePage = () => {
                 setEstadoModal4(true);
               }}
             />
-            
           </div>
         ))}
       </div>
