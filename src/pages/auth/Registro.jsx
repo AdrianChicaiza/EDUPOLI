@@ -32,6 +32,7 @@ export const Registro = () => {
       icon: "warning",
       title: "Atencion",
       text: "Las contraseñas no coinciden",
+      
     });
   };
   const bienAlert = () => {
