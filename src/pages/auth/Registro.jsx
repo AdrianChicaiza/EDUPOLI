@@ -57,7 +57,6 @@ export const Registro = () => {
           password_confirmation,
           email,
         },
-        { headers: { accept: "application/json" } }
       );
       if (password === password_confirmation) {
         bienAlert();
