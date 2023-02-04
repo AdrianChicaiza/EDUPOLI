@@ -50,6 +50,7 @@ export const SemestrePage = () => {
   const [materiasFiltradas, setMateriasFiltradas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [errorNombreMateria, seterrorNombreMateria] = useState("");
+  const [path, setPath] = useState("");
   const [loadingboton, setLoadingboton] = useState(true);
   const Swal = require("sweetalert2");
   const errorAlert = () => {
@@ -438,9 +439,9 @@ export const SemestrePage = () => {
     traerMateriasRol();
     traerUsuarios();
   }, []);
-  if (recargar || !comentarios) {
-    return <Loading />;
-  }
+  // if (recargar || !comentarios) {
+  //   return <Loading />;
+  // }
   return (
     <>
       <Modal isOpen={estadoModal} style={modalStyle}>
@@ -589,12 +590,12 @@ export const SemestrePage = () => {
             <div className="flex flex-row items-end w-full justify-start mt-2">
               <button
                 onClick={() => {
-                  validarDocumento(true);
-                  if (hasErrorsDocumento) {
-                    return;
-                  } else {
-                    editarDocumentoAlert();
-                  }
+                  // validarDocumento(true);
+                  // if (hasErrorsDocumento) {
+                  //   return;
+                  // } else {
+                  editarDocumentoAlert();
+                  // }
                 }}
                 disabled={consultando}
                 className="bg-sky-600 hover:bg-sky-900 text-white font-bold py-1 px-3 rounded-[3px] mr-1"
@@ -876,7 +877,11 @@ export const SemestrePage = () => {
                                     onClick={() => {
                                       archivoSelect.current = docs.id;
                                       setEstadoModal3(true);
-                                      setNombre_doc("");
+                                      setNombre_doc(docs.nombre_doc);
+
+                                      // setdocumentos(docs.path);
+
+                                      // console.log("documeto", docs.path);
                                     }}
                                     className="bg-sky-600 hover:bg-sky-900 text-white font-medium py-1 px-3 rounded-[3px]"
                                   >

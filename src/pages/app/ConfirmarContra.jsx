@@ -53,6 +53,10 @@ export const ConfirmarContra = () => {
         { token, email, password, password_confirmation },
         { headers: { accept: "application/json" } }
       );
+      console.log("token",token);
+      console.log("email",email);
+      console.log("password",password);
+      console.log("passwordConfirm",password_confirmation);
       bienAlert();
       if (password === password_confirmation) {
         navigate("login");
