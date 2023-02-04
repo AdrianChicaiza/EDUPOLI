@@ -87,7 +87,7 @@ export const ConfirmarContra = () => {
                   alt="Imagen Confirmar Contraseña"
                 />
                 <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-                  Ingresa tu nueva contraseña
+                  Ingresa tu nueva contraseña :D
                 </h2>
               </div>
               <form className="mt-8 space-y-6" onSubmit={confirmPassword}>
